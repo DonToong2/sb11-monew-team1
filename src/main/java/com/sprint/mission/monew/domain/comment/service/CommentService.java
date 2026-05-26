@@ -30,15 +30,29 @@ public class CommentService {
     @Transactional
     public CommentResponse create(CommentCreateRequest request) {
 
+        log.debug("[COMMENT_CREATE] 댓글 생성 시작 - 뉴스 기사 ID={}, 댓글 작성자 ID={}",
+                request.articleId(), request.userId());
+
         Article article = articleRepository.findById(request.articleId()).orElseThrow(
-                () -> ArticleNotFoundException.withId(request.articleId())
+                () -> {
+                    log.warn("[COMMENT_CREATE_FAILED] 댓글 생성 실패 - 뉴스 기사가 존재하지 않음 - 뉴스 기사 ID={}"
+                            , request.articleId());
+                    return ArticleNotFoundException.withId(request.articleId());
+                }
         );
         User user = userRepository.findById(request.userId()).orElseThrow(
-                () -> UserNotFoundException.withId(request.userId())
+                () -> {
+                    log.warn("[COMMENT_CREATE_FAILED] 댓글 생성 실패 - 사용자가 존재하지 않음 - 사용자 ID={}"
+                            , request.userId());
+                    return UserNotFoundException.withId(request.userId());
+                }
         );
 
         Comment comment = Comment.create(article, user, request.content());
         Comment savedComment = commentRepository.save(comment);
+
+        log.info("[COMMENT_CREATE_SUCCESS] 댓글 생성 성공 - 댓글 ID={}, 뉴스 기사 ID={}, 댓글 작성자 ID={}",
+                savedComment.getId(), request.articleId(), request.userId());
 
         return commentMapper.toDto(savedComment, false);
     }
