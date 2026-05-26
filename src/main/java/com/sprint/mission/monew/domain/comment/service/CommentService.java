@@ -26,15 +26,16 @@ public class CommentService {
 
     public CommentResponse create(CommentCreateRequest request) {
 
-        return new CommentResponse(
-                UUID.randomUUID(),
-                request.articleId(),
-                request.userId(),
-                "testNickname",
-                request.content(),
-                0,
-                false,
-                Instant.now()
+        Article article = articleRepository.findById(request.articleId()).orElseThrow(
+                () -> new IllegalArgumentException("Article not found")
         );
+        User user = userRepository.findById(request.userId()).orElseThrow(
+                () -> new IllegalArgumentException("User not found")
+        );
+
+        Comment comment = Comment.create(article, user, request.content());
+        Comment savedComment = commentRepository.save(comment);
+
+        return commentMapper.toDto(savedComment, false);
     }
 }
