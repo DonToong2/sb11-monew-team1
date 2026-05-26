@@ -1,14 +1,22 @@
-package com.sprint.mission.monew.domain.service;
+package com.sprint.mission.monew.domain.comment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
+import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
-import com.sprint.mission.monew.domain.comment.service.CommentService;
+import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
+import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -49,11 +57,38 @@ public class CommentServiceTest {
 
             CommentCreateRequest request = new CommentCreateRequest(articleId, userId, "댓글 내용");
 
+            Article article = new Article();
+            User user = new User();
+            Comment comment = Comment.create(article, user, "댓글 내용");
+            Comment savedComment = comment;
+
+            CommentResponse expectedResponse = new CommentResponse(
+                    UUID.randomUUID(),
+                    articleId,
+                    userId,
+                    "닉네임",
+                    "댓글 내용",
+                    0,
+                    false,
+                    Instant.now()
+            );
+
+            when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
+            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(commentRepository.save(any(Comment.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+            when(commentMapper.toDto(any(Comment.class), eq(false))).thenReturn(expectedResponse);
+
             // when
             CommentResponse response = commentService.create(request);
 
             // then
-            assertThat(response).isNotNull();
+            assertThat(response).isEqualTo(expectedResponse);
+
+            verify(articleRepository).findById(articleId);
+            verify(userRepository).findById(userId);
+            verify(commentRepository).save(any(Comment.class));
+            verify(commentMapper).toDto(any(Comment.class), eq(false));
 
         }
     }
