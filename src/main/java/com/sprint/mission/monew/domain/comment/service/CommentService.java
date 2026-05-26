@@ -34,12 +34,12 @@ public class CommentService {
                 () -> ArticleNotFoundException.withId(request.articleId())
         );
         User user = userRepository.findById(request.userId()).orElseThrow(
-                () -> new IllegalArgumentException("User not found")
+                () -> UserNotFoundException.withId(request.userId())
         );
 
         Comment comment = Comment.create(article, user, request.content());
         Comment savedComment = commentRepository.save(comment);
-        
+
         return commentMapper.toDto(savedComment, false);
     }
 }
