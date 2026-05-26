@@ -2,7 +2,7 @@ package com.sprint.mission.monew.domain.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sprint.mission.monew.domain.article.repository.querydsl.impl.ArticleRepository;
+import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import com.sprint.mission.monew.domain.comment.mapper.CommentMapper;
