@@ -22,6 +22,7 @@ import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,17 @@ public class CommentServiceTest {
     @Mock
     private CommentMapper commentMapper;
 
+    private UUID articleId;
+    private UUID userId;
+    private CommentCreateRequest request;
+
+    @BeforeEach
+    void setUp() {
+        articleId = UUID.randomUUID();
+        userId = UUID.randomUUID();
+        String content = "댓글 내용";
+        request = new CommentCreateRequest(articleId, userId, content);
+    }
     @Nested
     @DisplayName("댓글 등록하기")
     class 댓글_등록하기 {
@@ -56,15 +68,8 @@ public class CommentServiceTest {
         @DisplayName("댓글 등록")
         void 댓글_등록() {
             // given
-            UUID articleId = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
-
-            CommentCreateRequest request = new CommentCreateRequest(articleId, userId, "댓글 내용");
-
             Article article = new Article();
             User user = new User();
-            Comment comment = Comment.create(article, user, "댓글 내용");
-            Comment savedComment = comment;
 
             CommentResponse expectedResponse = new CommentResponse(
                     UUID.randomUUID(),
@@ -77,11 +82,11 @@ public class CommentServiceTest {
                     Instant.now()
             );
 
-            when(articleRepository.findById(articleId)).thenReturn(Optional.of(article));
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-            when(commentRepository.save(any(Comment.class)))
-                    .thenAnswer(invocation -> invocation.getArgument(0));
-            when(commentMapper.toDto(any(Comment.class), eq(false))).thenReturn(expectedResponse);
+            given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(commentRepository.save(any(Comment.class)))
+                    .willAnswer(invocation -> invocation.getArgument(0));
+            given(commentMapper.toDto(any(Comment.class), eq(false))).willReturn(expectedResponse);
 
             // when
             CommentResponse response = commentService.create(request);
@@ -100,11 +105,6 @@ public class CommentServiceTest {
         @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
         void 댓글_등록_실패_뉴스기사_없음() {
             // given
-            UUID articleId = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
-
-            CommentCreateRequest request = new CommentCreateRequest(articleId, userId, "댓글");
-
             given(articleRepository.findById(articleId)).willReturn(Optional.empty());
 
             // when & then
@@ -115,11 +115,6 @@ public class CommentServiceTest {
         @DisplayName("댓글 등록 실패 - 사용자가 존재하지 않음")
         void 댓글_등록_실패_사용자_없음() {
             // given
-            UUID articleId = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
-
-            CommentCreateRequest request = new CommentCreateRequest(articleId, userId, "댓글");
-
             Article article = new Article();
 
             given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
