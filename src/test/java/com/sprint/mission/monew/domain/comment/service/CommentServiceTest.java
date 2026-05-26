@@ -111,6 +111,23 @@ public class CommentServiceTest {
             assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(ArticleNotFoundException.class);
         }
 
+        @Test
+        @DisplayName("댓글 등록 실패 - 사용자가 존재하지 않음")
+        void 댓글_등록_실패_사용자_없음() {
+            // given
+            UUID articleId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+
+            CommentCreateRequest request = new CommentCreateRequest(articleId, userId, "댓글");
+
+            Article article = new Article();
+
+            given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+            given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(UserNotFoundException.class);
+        }
     }
 
 }
