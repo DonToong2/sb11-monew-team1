@@ -14,8 +14,11 @@ import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -24,10 +27,11 @@ public class CommentService {
     private final UserRepository userRepository;
     private final CommentMapper commentMapper;
 
+    @Transactional
     public CommentResponse create(CommentCreateRequest request) {
 
         Article article = articleRepository.findById(request.articleId()).orElseThrow(
-                () -> new IllegalArgumentException("Article not found")
+                () -> ArticleNotFoundException.withId(request.articleId())
         );
         User user = userRepository.findById(request.userId()).orElseThrow(
                 () -> new IllegalArgumentException("User not found")
@@ -35,7 +39,7 @@ public class CommentService {
 
         Comment comment = Comment.create(article, user, request.content());
         Comment savedComment = commentRepository.save(comment);
-
+        
         return commentMapper.toDto(savedComment, false);
     }
 }
