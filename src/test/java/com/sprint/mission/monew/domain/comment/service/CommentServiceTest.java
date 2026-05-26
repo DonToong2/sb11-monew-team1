@@ -1,12 +1,15 @@
 package com.sprint.mission.monew.domain.comment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sprint.mission.monew.domain.article.entity.Article;
+import com.sprint.mission.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
@@ -14,6 +17,7 @@ import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
 import com.sprint.mission.monew.domain.user.entity.User;
+import com.sprint.mission.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.Optional;
@@ -91,6 +95,22 @@ public class CommentServiceTest {
             verify(commentMapper).toDto(any(Comment.class), eq(false));
 
         }
+
+        @Test
+        @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
+        void 댓글_등록_실패_뉴스기사_없음() {
+            // given
+            UUID articleId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+
+            CommentCreateRequest request = new CommentCreateRequest(articleId, userId, "댓글");
+
+            given(articleRepository.findById(articleId)).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(ArticleNotFoundException.class);
+        }
+
     }
 
 }
