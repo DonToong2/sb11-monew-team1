@@ -1,6 +1,8 @@
 package com.sprint.mission.monew.domain.comment.entity;
 
 import com.sprint.mission.monew.common.entity.BaseSoftDeletableEntity;
+import com.sprint.mission.monew.domain.article.entity.Article;
+import com.sprint.mission.monew.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
