@@ -57,5 +57,6 @@ public class Comment extends BaseSoftDeletableEntity {
   }
 
   public void updateContent(String newContent) {
+    this.content = newContent;
   }
 }
