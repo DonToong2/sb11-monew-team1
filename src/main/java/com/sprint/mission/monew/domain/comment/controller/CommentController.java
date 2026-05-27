@@ -22,7 +22,7 @@ public class CommentController implements CommentApi {
 
     @Override
     @PostMapping
-    public ResponseEntity<CommentResponse> createComment(@RequestBody CommentCreateRequest request) {
+    public ResponseEntity<CommentResponse> createComment(@RequestBody @Valid CommentCreateRequest request) {
 
         CommentResponse response = commentService.create(request);
 
