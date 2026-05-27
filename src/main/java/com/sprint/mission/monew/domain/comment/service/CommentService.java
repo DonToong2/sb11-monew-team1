@@ -34,18 +34,10 @@ public class CommentService {
                 request.articleId(), request.userId());
 
         Article article = articleRepository.findById(request.articleId()).orElseThrow(
-                () -> {
-                    log.warn("[COMMENT_CREATE_FAILED] 댓글 생성 실패 - 뉴스 기사가 존재하지 않음 - 뉴스 기사 ID={}"
-                            , request.articleId());
-                    return ArticleNotFoundException.withId(request.articleId());
-                }
+                () -> ArticleNotFoundException.withId(request.articleId())
         );
         User user = userRepository.findById(request.userId()).orElseThrow(
-                () -> {
-                    log.warn("[COMMENT_CREATE_FAILED] 댓글 생성 실패 - 사용자가 존재하지 않음 - 사용자 ID={}"
-                            , request.userId());
-                    return UserNotFoundException.withId(request.userId());
-                }
+                () -> UserNotFoundException.withId(request.userId())
         );
 
         Comment comment = Comment.create(article, user, request.content());
