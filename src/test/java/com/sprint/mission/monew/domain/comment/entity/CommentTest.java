@@ -11,37 +11,37 @@ import org.junit.jupiter.api.Test;
 
 public class CommentTest {
 
-    private Article article;
-    private User user;
-    private String content;
-    private Comment comment;
+  private Article article;
+  private User user;
+  private String content;
+  private Comment comment;
 
-    @BeforeEach
-    void setUp() {
-        article = new Article();
-        user = new User();
-        content = "댓글 내용";
+  @BeforeEach
+  void setUp() {
+    article = new Article();
+    user = new User();
+    content = "댓글 내용";
 
-        comment = Comment.create(article, user, content);
+    comment = Comment.create(article, user, content);
+  }
+
+  @Nested
+  @DisplayName("댓글 등록하기")
+  class Create {
+
+    @Test
+    @DisplayName("댓글 등록")
+    void 댓글_등록() {
+      // given
+      // setUp()의 article, user, content 초기화
+
+      // when
+      // setUp()의 comment 초기화
+
+      // then
+      assertThat(comment.getArticle()).isEqualTo(article);
+      assertThat(comment.getUser()).isEqualTo(user);
+      assertThat(comment.getContent()).isEqualTo(content);
     }
-
-    @Nested
-    @DisplayName("댓글 등록하기")
-    class Create {
-
-        @Test
-        @DisplayName("댓글 등록")
-        void 댓글_등록() {
-            // given
-            // setUp()의 article, user, content 초기화
-
-            // when
-            // setUp()의 comment 초기화
-
-            // then
-            assertThat(comment.getArticle()).isEqualTo(article);
-            assertThat(comment.getUser()).isEqualTo(user);
-            assertThat(comment.getContent()).isEqualTo(content);
-        }
-    }
+  }
 }

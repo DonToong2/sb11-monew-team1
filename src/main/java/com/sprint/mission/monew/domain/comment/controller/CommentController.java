@@ -20,18 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/comments")
 public class CommentController implements CommentApi {
 
-    private final CommentService commentService;
+  private final CommentService commentService;
 
-    @Override
-    @PostMapping
-    public ResponseEntity<CommentResponse> createComment(@RequestBody @Valid CommentCreateRequest request) {
-        log.info("[COMMENT_CREATE_REQUEST] 댓글 생성 요청 - 뉴스 기사 ID={}, 댓글 작성자 ID={}",
-                request.articleId(), request.userId());
+  @Override
+  @PostMapping
+  public ResponseEntity<CommentResponse> createComment(
+      @RequestBody @Valid CommentCreateRequest request) {
+    log.info("[COMMENT_CREATE_REQUEST] 댓글 생성 요청 - 뉴스 기사 ID={}, 댓글 작성자 ID={}",
+        request.articleId(), request.userId());
 
-        CommentResponse response = commentService.create(request);
+    CommentResponse response = commentService.create(request);
 
-        log.debug("[COMMENT_CREATE_RESPONSE] 댓글 생성 응답 - 댓글 ID={}", response.id());
+    log.debug("[COMMENT_CREATE_RESPONSE] 댓글 생성 응답 - 댓글 ID={}", response.id());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
 }

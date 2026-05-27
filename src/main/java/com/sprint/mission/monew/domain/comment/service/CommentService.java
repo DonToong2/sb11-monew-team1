@@ -23,30 +23,31 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CommentService {
-    private final CommentRepository commentRepository;
-    private final ArticleRepository articleRepository;
-    private final UserRepository userRepository;
-    private final CommentMapper commentMapper;
 
-    @Transactional
-    public CommentResponse create(CommentCreateRequest request) {
+  private final CommentRepository commentRepository;
+  private final ArticleRepository articleRepository;
+  private final UserRepository userRepository;
+  private final CommentMapper commentMapper;
 
-        log.debug("[COMMENT_CREATE] 댓글 생성 시작 - 뉴스 기사 ID={}, 댓글 작성자 ID={}",
-                request.articleId(), request.userId());
+  @Transactional
+  public CommentResponse create(CommentCreateRequest request) {
 
-        Article article = articleRepository.findById(request.articleId()).orElseThrow(
-                () -> ArticleNotFoundException.withId(request.articleId())
-        );
-        User user = userRepository.findById(request.userId()).orElseThrow(
-                () -> UserNotFoundException.withId(request.userId())
-        );
+    log.debug("[COMMENT_CREATE] 댓글 생성 시작 - 뉴스 기사 ID={}, 댓글 작성자 ID={}",
+        request.articleId(), request.userId());
 
-        Comment comment = Comment.create(article, user, request.content());
-        Comment savedComment = commentRepository.save(comment);
+    Article article = articleRepository.findById(request.articleId()).orElseThrow(
+        () -> ArticleNotFoundException.withId(request.articleId())
+    );
+    User user = userRepository.findById(request.userId()).orElseThrow(
+        () -> UserNotFoundException.withId(request.userId())
+    );
 
-        log.info("[COMMENT_CREATE_SUCCESS] 댓글 생성 성공 - 댓글 ID={}, 뉴스 기사 ID={}, 댓글 작성자 ID={}",
-                savedComment.getId(), request.articleId(), request.userId());
+    Comment comment = Comment.create(article, user, request.content());
+    Comment savedComment = commentRepository.save(comment);
 
-        return commentMapper.toResponse(savedComment, false);
-    }
+    log.info("[COMMENT_CREATE_SUCCESS] 댓글 생성 성공 - 댓글 ID={}, 뉴스 기사 ID={}, 댓글 작성자 ID={}",
+        savedComment.getId(), request.articleId(), request.userId());
+
+    return commentMapper.toResponse(savedComment, false);
+  }
 }

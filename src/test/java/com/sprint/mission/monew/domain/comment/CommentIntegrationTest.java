@@ -33,76 +33,79 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 public class CommentIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-    @Autowired
-    private CommentService commentService;
+  @Autowired
+  private CommentService commentService;
 
-    @Autowired
-    private CommentRepository commentRepository;
+  @Autowired
+  private CommentRepository commentRepository;
 
-    @Autowired
-    private ArticleRepository articleRepository;
+  @Autowired
+  private ArticleRepository articleRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
-    private Article article;
-    private User user;
-    private String content;
+  private Article article;
+  private User user;
+  private String content;
 
-    @BeforeEach
-    void setUp() {
-        article = articleRepository.save(new Article());
-        user = userRepository.save(new User());
-        content = "댓글 내용";
+  @BeforeEach
+  void setUp() {
+    article = articleRepository.save(new Article());
+    user = userRepository.save(new User());
+    content = "댓글 내용";
+  }
+
+  @Nested
+  @DisplayName("댓글 등록하기")
+  class 댓글_생성하기 {
+
+    @Test
+    @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
+    void 댓글_등록_실패_뉴스기사_없음() {
+      // given
+      CommentCreateRequest request = new CommentCreateRequest(UUID.randomUUID(), user.getId(),
+          content);
+
+      // when & then
+      assertThatThrownBy(
+          () -> commentService.create(request)
+      ).isInstanceOf(ArticleNotFoundException.class);
     }
 
-    @Nested
-    @DisplayName("댓글 등록하기")
-    class 댓글_생성하기 {
+    @Test
+    @DisplayName("댓글 등록 실패 - 사용자가 존재하지 않음")
+    void 댓글_등록_실패_사용자_없음() {
+      // given
+      CommentCreateRequest request = new CommentCreateRequest(article.getId(), UUID.randomUUID(),
+          content);
 
-        @Test
-        @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
-        void 댓글_등록_실패_뉴스기사_없음() {
-            // given
-            CommentCreateRequest request = new CommentCreateRequest(UUID.randomUUID(), user.getId(), content);
-
-            // when & then
-            assertThatThrownBy(
-                    () -> commentService.create(request)
-            ).isInstanceOf(ArticleNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("댓글 등록 실패 - 사용자가 존재하지 않음")
-        void 댓글_등록_실패_사용자_없음() {
-            // given
-            CommentCreateRequest request = new CommentCreateRequest(article.getId(), UUID.randomUUID(), content);
-
-            // when & then
-            assertThatThrownBy(
-                    () -> commentService.create(request)
-            ).isInstanceOf(UserNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("댓글 등록 성공")
-        void 댓글_등록_성공() {
-            // given
-            CommentCreateRequest request = new CommentCreateRequest(article.getId(), user.getId(), content);
-
-            // when
-            CommentResponse response = commentService.create(request);
-            Comment savedComment = commentRepository.findById(response.id()).orElseThrow();
-
-            // then
-            assertThat(response).isNotNull();
-            assertThat(response.content()).isEqualTo(content);
-
-            assertThat(savedComment).isNotNull();
-            assertThat(savedComment.getContent()).isEqualTo(content);
-        }
+      // when & then
+      assertThatThrownBy(
+          () -> commentService.create(request)
+      ).isInstanceOf(UserNotFoundException.class);
     }
+
+    @Test
+    @DisplayName("댓글 등록 성공")
+    void 댓글_등록_성공() {
+      // given
+      CommentCreateRequest request = new CommentCreateRequest(article.getId(), user.getId(),
+          content);
+
+      // when
+      CommentResponse response = commentService.create(request);
+      Comment savedComment = commentRepository.findById(response.id()).orElseThrow();
+
+      // then
+      assertThat(response).isNotNull();
+      assertThat(response.content()).isEqualTo(content);
+
+      assertThat(savedComment).isNotNull();
+      assertThat(savedComment.getContent()).isEqualTo(content);
+    }
+  }
 }

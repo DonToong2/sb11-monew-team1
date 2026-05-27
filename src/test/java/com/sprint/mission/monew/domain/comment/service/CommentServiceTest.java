@@ -34,94 +34,96 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class CommentServiceTest {
 
-    @InjectMocks
-    private CommentService commentService;
+  @InjectMocks
+  private CommentService commentService;
 
-    @Mock
-    private CommentRepository commentRepository;
+  @Mock
+  private CommentRepository commentRepository;
 
-    @Mock
-    private ArticleRepository articleRepository;
+  @Mock
+  private ArticleRepository articleRepository;
 
-    @Mock
-    private UserRepository userRepository;
+  @Mock
+  private UserRepository userRepository;
 
-    @Mock
-    private CommentMapper commentMapper;
+  @Mock
+  private CommentMapper commentMapper;
 
-    private UUID articleId;
-    private UUID userId;
-    private CommentCreateRequest request;
+  private UUID articleId;
+  private UUID userId;
+  private CommentCreateRequest request;
 
-    @BeforeEach
-    void setUp() {
-        articleId = UUID.randomUUID();
-        userId = UUID.randomUUID();
-        String content = "댓글 내용";
-        request = new CommentCreateRequest(articleId, userId, content);
+  @BeforeEach
+  void setUp() {
+    articleId = UUID.randomUUID();
+    userId = UUID.randomUUID();
+    String content = "댓글 내용";
+    request = new CommentCreateRequest(articleId, userId, content);
+  }
+
+  @Nested
+  @DisplayName("댓글 등록하기")
+  class 댓글_등록하기 {
+
+    @Test
+    @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
+    void 댓글_등록_실패_뉴스기사_없음() {
+      // given
+      given(articleRepository.findById(articleId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(
+          ArticleNotFoundException.class);
     }
 
-    @Nested
-    @DisplayName("댓글 등록하기")
-    class 댓글_등록하기 {
+    @Test
+    @DisplayName("댓글 등록 실패 - 사용자가 존재하지 않음")
+    void 댓글_등록_실패_사용자_없음() {
+      // given
+      Article article = new Article();
 
-        @Test
-        @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
-        void 댓글_등록_실패_뉴스기사_없음() {
-            // given
-            given(articleRepository.findById(articleId)).willReturn(Optional.empty());
+      given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+      given(userRepository.findById(userId)).willReturn(Optional.empty());
 
-            // when & then
-            assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(ArticleNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("댓글 등록 실패 - 사용자가 존재하지 않음")
-        void 댓글_등록_실패_사용자_없음() {
-            // given
-            Article article = new Article();
-
-            given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
-            given(userRepository.findById(userId)).willReturn(Optional.empty());
-
-            // when & then
-            assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(UserNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("댓글 등록_성공")
-        void 댓글_등록_성공() {
-            // given
-            Article article = new Article();
-            User user = new User();
-
-            CommentResponse expectedResponse = new CommentResponse(
-                UUID.randomUUID(),
-                articleId,
-                userId,
-                "닉네임",
-                "댓글 내용",
-                0,
-                false,
-                Instant.now()
-            );
-
-            given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(commentRepository.save(any(Comment.class)))
-                .willAnswer(invocation -> invocation.getArgument(0));
-            given(commentMapper.toResponse(any(Comment.class), eq(false))).willReturn(expectedResponse);
-
-            // when
-            CommentResponse response = commentService.create(request);
-
-            // then
-            assertThat(response).isEqualTo(expectedResponse);
-
-            verify(articleRepository).findById(articleId);
-            verify(userRepository).findById(userId);
-            verify(commentRepository).save(any(Comment.class));
-            verify(commentMapper).toResponse(any(Comment.class), eq(false));
-        }
+      // when & then
+      assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(
+          UserNotFoundException.class);
     }
+
+    @Test
+    @DisplayName("댓글 등록_성공")
+    void 댓글_등록_성공() {
+      // given
+      Article article = new Article();
+      User user = new User();
+
+      CommentResponse expectedResponse = new CommentResponse(
+          UUID.randomUUID(),
+          articleId,
+          userId,
+          "닉네임",
+          "댓글 내용",
+          0,
+          false,
+          Instant.now()
+      );
+
+      given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+      given(userRepository.findById(userId)).willReturn(Optional.of(user));
+      given(commentRepository.save(any(Comment.class)))
+          .willAnswer(invocation -> invocation.getArgument(0));
+      given(commentMapper.toResponse(any(Comment.class), eq(false))).willReturn(expectedResponse);
+
+      // when
+      CommentResponse response = commentService.create(request);
+
+      // then
+      assertThat(response).isEqualTo(expectedResponse);
+
+      verify(articleRepository).findById(articleId);
+      verify(userRepository).findById(userId);
+      verify(commentRepository).save(any(Comment.class));
+      verify(commentMapper).toResponse(any(Comment.class), eq(false));
+    }
+  }
 }
