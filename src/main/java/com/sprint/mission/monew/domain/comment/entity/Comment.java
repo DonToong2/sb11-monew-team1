@@ -55,4 +55,7 @@ public class Comment extends BaseSoftDeletableEntity {
   public static Comment create(Article article, User user, String content) {
     return new Comment(article, user, content);
   }
+
+  public void updateContent(String newContent) {
+  }
 }
