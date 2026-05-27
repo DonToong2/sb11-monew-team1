@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.user.entity.User;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -51,6 +52,20 @@ public class CommentTest {
   @Nested
   @DisplayName("댓글 수정하기")
   class Update {
+
+    @Test
+    @DisplayName("받아온 작성자는 댓글 작성자가 맞는지 테스트")
+    void 댓글_작성자인지_확인() {
+      // given
+      // user, comment는 BeforeEach에서 초기화
+      UUID userId = user.getId();
+
+      // when
+      boolean result = comment.isOwner(userId);
+
+      // then
+      assertThat(result).isTrue();
+    }
 
     @Test
     @DisplayName("댓글 수정")
