@@ -160,6 +160,46 @@ public class CommentControllerTest {
   class 댓글_수정하기 {
 
     @Test
+    @DisplayName("댓글 수정 실패 - 댓글이 존재하지 않음")
+    void 댓글_수정_실패_댓글_없음() throws Exception {
+      // given
+      given(commentService.update(any(), any(), any())).willThrow(CommentNotFoundException.withId(commentId));
+
+      // when & then
+      String rawJson = """
+          {
+          "newContent": "수정한 댓글 내용"
+          }
+          """;
+
+      mockMvc.perform(patch("/api/comments/{commentId}", commentId)
+              .header("Monew-Request-User-ID", userId)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(rawJson))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("댓글 수정 실패 - 댓글 작성 권한 없음")
+    void 댓글_수정_실패_권한_없음() throws Exception {
+      // given
+      given(commentService.update(any(), any(), any())).willThrow(CommentAccessDeniedException.withId(commentId));
+
+      // when & then
+      String rawJson = """
+          {
+          "newContent": "수정한 댓글 내용"
+          }
+          """;
+
+      mockMvc.perform(patch("/api/comments/{commentId}", commentId)
+              .header("Monew-Request-User-ID", userId)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(rawJson))
+          .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("댓글 수정 성공")
     void 댓글_수정_성공() throws Exception {
       // given
