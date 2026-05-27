@@ -55,6 +55,10 @@ public class CommentService {
 
   @Transactional
   public CommentResponse update(UUID commentId, UUID userId, CommentUpdateRequest request) {
-    return null;
+    Comment comment = commentRepository.findById(commentId).orElseThrow();
+
+    comment.updateContent(request.newContent());
+
+    return commentMapper.toResponse(comment, false);
   }
 }
