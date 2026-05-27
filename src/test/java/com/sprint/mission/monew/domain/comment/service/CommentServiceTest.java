@@ -12,6 +12,7 @@ import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
+import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.mapper.CommentMapper;
@@ -51,14 +52,19 @@ public class CommentServiceTest {
 
   private UUID articleId;
   private UUID userId;
-  private CommentCreateRequest request;
+  private UUID commentId;
+  private String content;
+  private CommentCreateRequest createRequest;
+  private CommentUpdateRequest updateRequest;
 
   @BeforeEach
   void setUp() {
     articleId = UUID.randomUUID();
     userId = UUID.randomUUID();
-    String content = "댓글 내용";
-    request = new CommentCreateRequest(articleId, userId, content);
+    commentId = UUID.randomUUID();
+    content = "댓글 내용";
+    createRequest = new CommentCreateRequest(articleId, userId, content);
+    updateRequest = new CommentUpdateRequest("수정한 댓글 내용");
   }
 
   @Nested
@@ -72,7 +78,7 @@ public class CommentServiceTest {
       given(articleRepository.findById(articleId)).willReturn(Optional.empty());
 
       // when & then
-      assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(
+      assertThatThrownBy(() -> commentService.create(createRequest)).isInstanceOf(
           ArticleNotFoundException.class);
     }
 
@@ -86,7 +92,7 @@ public class CommentServiceTest {
       given(userRepository.findById(userId)).willReturn(Optional.empty());
 
       // when & then
-      assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(
+      assertThatThrownBy(() -> commentService.create(createRequest)).isInstanceOf(
           UserNotFoundException.class);
     }
 
@@ -115,7 +121,7 @@ public class CommentServiceTest {
       given(commentMapper.toResponse(any(Comment.class), eq(false))).willReturn(expectedResponse);
 
       // when
-      CommentResponse response = commentService.create(request);
+      CommentResponse response = commentService.create(createRequest);
 
       // then
       assertThat(response).isEqualTo(expectedResponse);
@@ -124,6 +130,40 @@ public class CommentServiceTest {
       verify(userRepository).findById(userId);
       verify(commentRepository).save(any(Comment.class));
       verify(commentMapper).toResponse(any(Comment.class), eq(false));
+    }
+  }
+
+  @Nested
+  @DisplayName("댓글 수정하기")
+  class 댓글_수정하기 {
+
+    @Test
+    @DisplayName("댓글 수정 성공")
+    void 댓글_수정_성공() {
+      // given
+      // commentId, userId, updateRequest를 BeforeEach에서 초기화
+      Comment comment = Comment.create(new Article(), new User(), content);
+
+      CommentResponse expectedResponse = new CommentResponse(
+          UUID.randomUUID(),
+          articleId,
+          userId,
+          "닉네임",
+          "수정한 댓글 내용",
+          0,
+          false,
+          Instant.now()
+      );
+
+      given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+      given(commentMapper.toResponse(any(Comment.class), eq(false))).willReturn(expectedResponse);
+
+      // when
+      CommentResponse response = commentService.update(commentId, userId, updateRequest);
+
+      // then
+      assertThat(response).isNotNull();
+      assertThat(response.content()).isEqualTo("수정한 댓글 내용");
     }
   }
 }
