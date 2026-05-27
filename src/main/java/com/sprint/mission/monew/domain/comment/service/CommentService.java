@@ -55,6 +55,10 @@ public class CommentService {
 
   @Transactional
   public CommentResponse update(UUID commentId, UUID userId, CommentUpdateRequest request) {
+
+    log.debug("[COMMENT_UPDATE] 댓글 수정 시작 - 댓글 ID={}, 요청자 ID={}",
+        commentId, userId);
+
     Comment comment = commentRepository.findById(commentId).orElseThrow(
         () -> CommentNotFoundException.withId(commentId)
     );
@@ -64,6 +68,9 @@ public class CommentService {
     }
 
     comment.updateContent(request.newContent());
+
+    log.info("[COMMENT_UPDATE_SUCCESS] 댓글 수정 성공 - 댓글 ID={}, 요청자 ID={}",
+        commentId, userId);
 
     return commentMapper.toResponse(comment, false);
   }
