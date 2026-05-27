@@ -15,6 +15,7 @@ import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
+import com.sprint.mission.monew.domain.comment.exception.CommentNotFoundException;
 import com.sprint.mission.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
 import com.sprint.mission.monew.domain.user.entity.User;
@@ -136,6 +137,17 @@ public class CommentServiceTest {
   @Nested
   @DisplayName("댓글 수정하기")
   class 댓글_수정하기 {
+
+    @Test
+    @DisplayName("댓글 수정 실패 - 댓글이 존재하지 않음")
+    void 댓글_수정_실패_댓글_없음() {
+      // given
+      given(commentRepository.findById(commentId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> commentService.update(commentId, userId, updateRequest)).isInstanceOf(
+          CommentNotFoundException.class);
+    }
 
     @Test
     @DisplayName("댓글 수정 성공")
