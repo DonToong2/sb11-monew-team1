@@ -87,7 +87,7 @@ public class CommentServiceTest {
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
             given(commentRepository.save(any(Comment.class)))
                     .willAnswer(invocation -> invocation.getArgument(0));
-            given(commentMapper.toDto(any(Comment.class), eq(false))).willReturn(expectedResponse);
+            given(commentMapper.toResponse(any(Comment.class), eq(false))).willReturn(expectedResponse);
 
             // when
             CommentResponse response = commentService.create(request);
@@ -98,7 +98,7 @@ public class CommentServiceTest {
             verify(articleRepository).findById(articleId);
             verify(userRepository).findById(userId);
             verify(commentRepository).save(any(Comment.class));
-            verify(commentMapper).toDto(any(Comment.class), eq(false));
+            verify(commentMapper).toResponse(any(Comment.class), eq(false));
 
         }
 

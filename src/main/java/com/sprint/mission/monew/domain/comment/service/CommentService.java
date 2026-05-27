@@ -47,6 +47,6 @@ public class CommentService {
         log.info("[COMMENT_CREATE_SUCCESS] 댓글 생성 성공 - 댓글 ID={}, 뉴스 기사 ID={}, 댓글 작성자 ID={}",
                 savedComment.getId(), request.articleId(), request.userId());
 
-        return commentMapper.toDto(savedComment, false);
+        return commentMapper.toResponse(savedComment, false);
     }
 }
