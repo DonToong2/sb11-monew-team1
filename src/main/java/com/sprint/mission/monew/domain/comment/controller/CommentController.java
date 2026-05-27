@@ -5,6 +5,7 @@ import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import com.sprint.mission.monew.domain.comment.service.CommentService;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -44,12 +45,12 @@ public class CommentController implements CommentApi {
   @Override
   @PatchMapping("/{commentId}")
   public ResponseEntity<CommentResponse> updateComment(
-      @PathVariable UUID commentId,
-      @RequestHeader("Monew-Request-User-ID") UUID userId,
+      @PathVariable @Parameter(description = "댓글 ID") UUID commentId,
+      @RequestHeader("Monew-Request-User-ID") @Parameter(description = "요청자 ID")UUID userId,
       @RequestBody @Valid CommentUpdateRequest request
   ) {
     log.info("[COMMENT_UPDATE_REQUEST] 댓글 수정 요청 - 댓글 ID={}", commentId);
-    log.debug("[COMMENT_UPDATE_REQUEST] 댓글 수정 요청 - 요청자 ID={}, 수정 댓글={}", userId, request.newContent());
+    log.debug("[COMMENT_UPDATE_REQUEST] 댓글 수정 요청 - 요청자 ID={}, 수정 댓글={}", userId, request.content());
 
     CommentResponse response = commentService.update(commentId, userId, request);
 

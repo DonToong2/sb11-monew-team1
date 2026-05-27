@@ -67,7 +67,7 @@ public class CommentService {
       throw CommentAccessDeniedException.withId(commentId);
     }
 
-    comment.updateContent(request.newContent());
+    comment.updateContent(request.content());
 
     log.info("[COMMENT_UPDATE_SUCCESS] 댓글 수정 성공 - 댓글 ID={}, 요청자 ID={}",
         commentId, userId);

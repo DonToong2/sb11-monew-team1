@@ -168,7 +168,7 @@ public class CommentControllerTest {
       // when & then
       String rawJson = """
           {
-          "newContent": "수정한 댓글 내용"
+          "content": "수정한 댓글 내용"
           }
           """;
 
@@ -188,7 +188,7 @@ public class CommentControllerTest {
       // when & then
       String rawJson = """
           {
-          "newContent": "수정한 댓글 내용"
+          "content": "수정한 댓글 내용"
           }
           """;
 
@@ -205,7 +205,7 @@ public class CommentControllerTest {
       // given
       String invalidRawJson = """
           {
-              "newContent": ""
+              "content": ""
           }
           """;
 
@@ -227,7 +227,7 @@ public class CommentControllerTest {
       // when & then
       String rawJson = """
           {
-          "newContent": "수정한 댓글 내용"
+          "content": "수정한 댓글 내용"
           }
           """;
 
