@@ -7,13 +7,13 @@ import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
+import com.sprint.mission.monew.domain.comment.exception.CommentAccessDeniedException;
 import com.sprint.mission.monew.domain.comment.exception.CommentNotFoundException;
 import com.sprint.mission.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
-import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +55,13 @@ public class CommentService {
 
   @Transactional
   public CommentResponse update(UUID commentId, UUID userId, CommentUpdateRequest request) {
-    Comment comment = commentRepository.findById(commentId).orElseThrow();
+    Comment comment = commentRepository.findById(commentId).orElseThrow(
+        () -> CommentNotFoundException.withId(commentId)
+    );
+
+    if(!comment.isOwner(userId)) {
+      throw CommentAccessDeniedException.withId(commentId);
+    }
 
     comment.updateContent(request.newContent());
 
