@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "댓글 관리", description = "댓글 관련 API")
 public interface CommentApi {
@@ -17,5 +19,5 @@ public interface CommentApi {
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (입력값 검증 실패)"),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
-    ResponseEntity<CommentResponse> createComment(@Parameter CommentCreateRequest request);
+    ResponseEntity<CommentResponse> createComment(@RequestBody @Valid CommentCreateRequest request);
 }
