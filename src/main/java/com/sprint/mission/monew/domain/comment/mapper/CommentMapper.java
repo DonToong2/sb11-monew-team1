@@ -8,8 +8,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
     @Mapping(target = "articleId", expression = "java(comment.getArticle().getId())")
-    @Mapping(target = "userId", expression = "java(comment.getUser().getId())")
-    @Mapping(target = "userNickname", expression = "java(comment.getUser().getNickname())")
+    @Mapping(target = "userId", expression = "java(comment.getUser() != null ? comment.getUser().getId()) : null")
+    @Mapping(target = "userNickname", expression = "java(comment.getUser() != null ? comment.getUser().getNickname()) : \"알 수 없음\"")
     @Mapping(target = "likedByMe", source = "likedByMe")
     CommentResponse toDto(Comment comment, boolean likedByMe);
 }
