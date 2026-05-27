@@ -44,36 +44,4 @@ public class CommentTest {
             assertThat(comment.getContent()).isEqualTo(content);
         }
     }
-
-    @Nested
-    @DisplayName("좋아요")
-    class Like {
-
-        @Test
-        @DisplayName("좋아요 증가")
-        void 좋아요_증가() {
-            // given
-            // setUp()의 comment 초기화
-
-            // when
-            comment.increaseLikeCount();
-
-            // then
-            assertThat(comment.getLikeCount()).isEqualTo(1);
-        }
-
-        @Test
-        @DisplayName("좋아요 감소")
-        void 좋아요_감소() {
-            // given
-            // setUp()의 comment 초기화
-            comment.increaseLikeCount(); // 미리 1 증가시키기
-
-            // when
-            comment.decreaseLikeCount();
-
-            // then
-            assertThat(comment.getLikeCount()).isEqualTo(0);
-        }
-    }
 }

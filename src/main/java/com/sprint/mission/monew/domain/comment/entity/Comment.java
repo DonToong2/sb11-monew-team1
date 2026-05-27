@@ -55,16 +55,4 @@ public class Comment extends BaseSoftDeletableEntity {
     public static Comment create(Article article, User user, String content) {
         return new Comment(article, user, content);
     }
-
-    // 좋아요 생성 시
-    public void increaseLikeCount() {
-        this.likeCount++;
-    }
-
-    // 좋아요 취소 시(음수는 존재할 수 없음, 0에서도 좋아요 취소 불가)
-    public void decreaseLikeCount() {
-        if (this.likeCount > 0) {
-            this.likeCount--;
-        }
-    }
 }
