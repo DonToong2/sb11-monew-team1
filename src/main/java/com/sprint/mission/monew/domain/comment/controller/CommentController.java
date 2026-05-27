@@ -26,8 +26,8 @@ public class CommentController implements CommentApi {
   @PostMapping
   public ResponseEntity<CommentResponse> createComment(
       @RequestBody @Valid CommentCreateRequest request) {
-    log.info("[COMMENT_CREATE_REQUEST] 댓글 생성 요청 - 뉴스 기사 ID={}, 댓글 작성자 ID={}",
-        request.articleId(), request.userId());
+    log.info("[COMMENT_CREATE_REQUEST] 댓글 생성 요청 - 뉴스 기사 ID={}", request.articleId());
+    log.debug("[COMMENT_CREATE_REQUEST] 댓글 생성 요청 - 댓글 작성자 ID={}", request.userId());
 
     CommentResponse response = commentService.create(request);
 
