@@ -66,43 +66,6 @@ public class CommentServiceTest {
     class 댓글_등록하기 {
 
         @Test
-        @DisplayName("댓글 등록")
-        void 댓글_등록() {
-            // given
-            Article article = new Article();
-            User user = new User();
-
-            CommentResponse expectedResponse = new CommentResponse(
-                    UUID.randomUUID(),
-                    articleId,
-                    userId,
-                    "닉네임",
-                    "댓글 내용",
-                    0,
-                    false,
-                    Instant.now()
-            );
-
-            given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(commentRepository.save(any(Comment.class)))
-                    .willAnswer(invocation -> invocation.getArgument(0));
-            given(commentMapper.toResponse(any(Comment.class), eq(false))).willReturn(expectedResponse);
-
-            // when
-            CommentResponse response = commentService.create(request);
-
-            // then
-            assertThat(response).isEqualTo(expectedResponse);
-
-            verify(articleRepository).findById(articleId);
-            verify(userRepository).findById(userId);
-            verify(commentRepository).save(any(Comment.class));
-            verify(commentMapper).toResponse(any(Comment.class), eq(false));
-
-        }
-
-        @Test
         @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
         void 댓글_등록_실패_뉴스기사_없음() {
             // given
@@ -124,6 +87,41 @@ public class CommentServiceTest {
             // when & then
             assertThatThrownBy(() -> commentService.create(request)).isInstanceOf(UserNotFoundException.class);
         }
-    }
 
+        @Test
+        @DisplayName("댓글 등록_성공")
+        void 댓글_등록_성공() {
+            // given
+            Article article = new Article();
+            User user = new User();
+
+            CommentResponse expectedResponse = new CommentResponse(
+                UUID.randomUUID(),
+                articleId,
+                userId,
+                "닉네임",
+                "댓글 내용",
+                0,
+                false,
+                Instant.now()
+            );
+
+            given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(commentRepository.save(any(Comment.class)))
+                .willAnswer(invocation -> invocation.getArgument(0));
+            given(commentMapper.toResponse(any(Comment.class), eq(false))).willReturn(expectedResponse);
+
+            // when
+            CommentResponse response = commentService.create(request);
+
+            // then
+            assertThat(response).isEqualTo(expectedResponse);
+
+            verify(articleRepository).findById(articleId);
+            verify(userRepository).findById(userId);
+            verify(commentRepository).save(any(Comment.class));
+            verify(commentMapper).toResponse(any(Comment.class), eq(false));
+        }
+    }
 }

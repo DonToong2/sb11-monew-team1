@@ -26,12 +26,12 @@ public class CommentTest {
     }
 
     @Nested
-    @DisplayName("댓글 생성하기")
+    @DisplayName("댓글 등록하기")
     class Create {
 
         @Test
-        @DisplayName("댓글 생성")
-        void 댓글_생성() {
+        @DisplayName("댓글 등록")
+        void 댓글_등록() {
             // given
             // setUp()의 article, user, content 초기화
 

@@ -60,12 +60,36 @@ public class CommentIntegrationTest {
     }
 
     @Nested
-    @DisplayName("댓글 생성하기")
+    @DisplayName("댓글 등록하기")
     class 댓글_생성하기 {
 
         @Test
-        @DisplayName("댓글 생성 성공")
-        void 댓글_생성_성공() {
+        @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
+        void 댓글_등록_실패_뉴스기사_없음() {
+            // given
+            CommentCreateRequest request = new CommentCreateRequest(UUID.randomUUID(), user.getId(), content);
+
+            // when & then
+            assertThatThrownBy(
+                    () -> commentService.create(request)
+            ).isInstanceOf(ArticleNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("댓글 등록 실패 - 사용자가 존재하지 않음")
+        void 댓글_등록_실패_사용자_없음() {
+            // given
+            CommentCreateRequest request = new CommentCreateRequest(article.getId(), UUID.randomUUID(), content);
+
+            // when & then
+            assertThatThrownBy(
+                    () -> commentService.create(request)
+            ).isInstanceOf(UserNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("댓글 등록 성공")
+        void 댓글_등록_성공() {
             // given
             CommentCreateRequest request = new CommentCreateRequest(article.getId(), user.getId(), content);
 
@@ -79,30 +103,6 @@ public class CommentIntegrationTest {
 
             assertThat(savedComment).isNotNull();
             assertThat(savedComment.getContent()).isEqualTo(content);
-        }
-
-        @Test
-        @DisplayName("댓글 생성 실패 - 뉴스 기사가 존재하지 않음")
-        void 댓글_생성_실패_뉴스기사_없음() {
-            // given
-            CommentCreateRequest request = new CommentCreateRequest(UUID.randomUUID(), user.getId(), content);
-
-            // when & then
-            assertThatThrownBy(
-                    () -> commentService.create(request)
-            ).isInstanceOf(ArticleNotFoundException.class);
-        }
-
-        @Test
-        @DisplayName("댓글 생성 실패 - 사용자가 존재하지 않음")
-        void 댓글_생성_실패_사용자_없음() {
-            // given
-            CommentCreateRequest request = new CommentCreateRequest(article.getId(), UUID.randomUUID(), content);
-
-            // when & then
-            assertThatThrownBy(
-                    () -> commentService.create(request)
-            ).isInstanceOf(UserNotFoundException.class);
         }
     }
 }

@@ -65,27 +65,12 @@ public class CommentControllerTest {
     }
 
     @Nested
-    @DisplayName("댓글 생성하기")
-    class 댓글_생성하기 {
+    @DisplayName("댓글 등록하기")
+    class 댓글_등록하기 {
 
         @Test
-        @DisplayName("댓글 생성")
-        void 댓글_생성() throws Exception {
-            // given
-            given(commentService.create(any(CommentCreateRequest.class))).willReturn(response);
-
-            // when & then
-            mockMvc.perform(post("/api/comments")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.content").value("댓글 내용"));
-        }
-
-
-        @Test
-        @DisplayName("댓글 생성 실패 - 뉴스 기사 ID Null(유효성 검증, 400 에러)")
-        void 댓글_생성_실패_뉴스기사ID_null() throws Exception {
+        @DisplayName("댓글 등록 실패 - 뉴스 기사 ID Null(유효성 검증, 400 에러)")
+        void 댓글_등록_실패_뉴스기사ID_null() throws Exception {
             // given
             String invalidRawJson = """
                     {
@@ -102,8 +87,8 @@ public class CommentControllerTest {
         }
 
         @Test
-        @DisplayName("댓글 생성 실패 - 사용자 ID Null(유효성 검증, 400 에러)")
-        void 댓글_생성_실패_사용자ID_null() throws Exception {
+        @DisplayName("댓글 등록 실패 - 사용자 ID Null(유효성 검증, 400 에러)")
+        void 댓글_등록_실패_사용자ID_null() throws Exception {
             // given
             String invalidRawJson = """
                     {
@@ -120,8 +105,8 @@ public class CommentControllerTest {
         }
 
         @Test
-        @DisplayName("댓글 생성 실패 - 댓글 내용 공백(유효성 검증, 400 에러)")
-        void 댓글_생성_실패_댓글내용_blank() throws Exception {
+        @DisplayName("댓글 등록 실패 - 댓글 내용 공백(유효성 검증, 400 에러)")
+        void 댓글_등록_실패_댓글내용_blank() throws Exception {
             // given
             String invalidRawJson = """
                     {
@@ -136,6 +121,20 @@ public class CommentControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(invalidRawJson))
                     .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @DisplayName("댓글 등록 성공")
+        void 댓글_등록_성공() throws Exception {
+            // given
+            given(commentService.create(any(CommentCreateRequest.class))).willReturn(response);
+
+            // when & then
+            mockMvc.perform(post("/api/comments")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.content").value("댓글 내용"));
         }
     }
 }
