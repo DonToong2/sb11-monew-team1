@@ -24,6 +24,7 @@ public class CommentTest {
 
         comment = Comment.create(article, user, content);
     }
+
     @Nested
     @DisplayName("댓글 생성하기")
     class Create {

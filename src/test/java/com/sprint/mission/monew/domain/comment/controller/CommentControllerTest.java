@@ -88,11 +88,11 @@ public class CommentControllerTest {
         void 댓글_생성_실패_뉴스기사ID_null() throws Exception {
             // given
             String invalidRawJson = """
-                {
-                    "userId": "12345678-1234-1234-1234-123456789012",
-                    "content": "댓글 내용"
-                }
-                """;
+                    {
+                        "userId": "12345678-1234-1234-1234-123456789012",
+                        "content": "댓글 내용"
+                    }
+                    """;
 
             // when & then
             mockMvc.perform(post("/api/comments")
@@ -106,11 +106,11 @@ public class CommentControllerTest {
         void 댓글_생성_실패_사용자ID_null() throws Exception {
             // given
             String invalidRawJson = """
-                {
-                    "articleId": "12345678-1234-1234-1234-123456789012",
-                    "content": "댓글 내용"
-                }
-                """;
+                    {
+                        "articleId": "12345678-1234-1234-1234-123456789012",
+                        "content": "댓글 내용"
+                    }
+                    """;
 
             // when & then
             mockMvc.perform(post("/api/comments")
@@ -124,12 +124,12 @@ public class CommentControllerTest {
         void 댓글_생성_실패_댓글내용_blank() throws Exception {
             // given
             String invalidRawJson = """
-                {
-                    "articleId": "12345678-1234-1234-1234-123456789012",
-                    "userId": "12345678-1234-1234-1234-123456789012",
-                    "content": ""
-                }
-                """;
+                    {
+                        "articleId": "12345678-1234-1234-1234-123456789012",
+                        "userId": "12345678-1234-1234-1234-123456789012",
+                        "content": ""
+                    }
+                    """;
 
             // when & then
             mockMvc.perform(post("/api/comments")

@@ -60,6 +60,7 @@ public class CommentServiceTest {
         String content = "댓글 내용";
         request = new CommentCreateRequest(articleId, userId, content);
     }
+
     @Nested
     @DisplayName("댓글 등록하기")
     class 댓글_등록하기 {
