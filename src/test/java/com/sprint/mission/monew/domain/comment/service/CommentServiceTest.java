@@ -15,6 +15,7 @@ import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
+import com.sprint.mission.monew.domain.comment.exception.CommentAccessDeniedException;
 import com.sprint.mission.monew.domain.comment.exception.CommentNotFoundException;
 import com.sprint.mission.monew.domain.comment.mapper.CommentMapper;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
@@ -105,7 +106,7 @@ public class CommentServiceTest {
       User user = new User();
 
       CommentResponse expectedResponse = new CommentResponse(
-          UUID.randomUUID(),
+          commentId,
           articleId,
           userId,
           "닉네임",
@@ -150,14 +151,28 @@ public class CommentServiceTest {
     }
 
     @Test
+    @DisplayName("댓글 수정 실패 - 권한 없음")
+    void 댓글_수정_실패_권한_없음() {
+      // given
+      Comment comment = Comment.create(new Article(), new User(), content);
+
+      given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+      // when & then
+      assertThatThrownBy(() -> commentService.update(commentId, userId, updateRequest)).isInstanceOf(
+          CommentAccessDeniedException.class);
+    }
+
+    @Test
     @DisplayName("댓글 수정 성공")
     void 댓글_수정_성공() {
       // given
-      // commentId, userId, updateRequest를 BeforeEach에서 초기화
-      Comment comment = Comment.create(new Article(), new User(), content);
+      // commentId, updateRequest를 BeforeEach에서 초기화
+      User user = new User();
+      Comment comment = Comment.create(new Article(), user, content);
 
       CommentResponse expectedResponse = new CommentResponse(
-          UUID.randomUUID(),
+          commentId,
           articleId,
           userId,
           "닉네임",
@@ -171,7 +186,7 @@ public class CommentServiceTest {
       given(commentMapper.toResponse(any(Comment.class), eq(false))).willReturn(expectedResponse);
 
       // when
-      CommentResponse response = commentService.update(commentId, userId, updateRequest);
+      CommentResponse response = commentService.update(commentId, user.getId(), updateRequest);
 
       // then
       assertThat(response).isNotNull();
