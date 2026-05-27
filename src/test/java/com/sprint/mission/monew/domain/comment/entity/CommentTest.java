@@ -14,6 +14,7 @@ public class CommentTest {
   private Article article;
   private User user;
   private String content;
+  private String newContent;
   private Comment comment;
 
   @BeforeEach
@@ -23,6 +24,8 @@ public class CommentTest {
     content = "댓글 내용";
 
     comment = Comment.create(article, user, content);
+
+    newContent = "수정한 댓글 내용";
   }
 
   @Nested
@@ -42,6 +45,24 @@ public class CommentTest {
       assertThat(comment.getArticle()).isEqualTo(article);
       assertThat(comment.getUser()).isEqualTo(user);
       assertThat(comment.getContent()).isEqualTo(content);
+    }
+  }
+
+  @Nested
+  @DisplayName("댓글 수정하기")
+  class Update {
+
+    @Test
+    @DisplayName("댓글 수정")
+    void 댓글_수정() {
+      // given
+      // setUp()의 comment 초기화
+
+      // when
+      comment.updateContent(newContent);
+
+      // then
+      assertThat(comment.getContent()).isEqualTo(newContent);
     }
   }
 }
