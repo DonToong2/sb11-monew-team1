@@ -46,7 +46,7 @@ public class CommentController implements CommentApi {
   public ResponseEntity<CommentResponse> updateComment(
       @PathVariable UUID commentId,
       @RequestHeader("Monew-Request-User-ID") UUID userId,
-      @RequestBody CommentUpdateRequest request
+      @RequestBody @Valid CommentUpdateRequest request
   ) {
     CommentResponse response = commentService.update(commentId, userId, request);
 
