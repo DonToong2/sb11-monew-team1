@@ -63,6 +63,6 @@ public class Comment extends BaseSoftDeletableEntity {
 
   // 댓글의 userId와 받아온 userId가 같은지 여부를 체크
   public boolean isOwner(UUID userId) {
-    return false;
+    return this.user.getId().equals(userId);
   }
 }
