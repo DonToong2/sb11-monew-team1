@@ -160,7 +160,7 @@ public class CommentControllerTest {
   class 댓글_수정하기 {
 
     @Test
-    @DisplayName("댓글 수정 실패 - 댓글이 존재하지 않음")
+    @DisplayName("댓글 수정 실패 - 댓글이 존재하지 않음(404 에러)")
     void 댓글_수정_실패_댓글_없음() throws Exception {
       // given
       given(commentService.update(any(), any(), any())).willThrow(CommentNotFoundException.withId(commentId));
@@ -180,7 +180,7 @@ public class CommentControllerTest {
     }
 
     @Test
-    @DisplayName("댓글 수정 실패 - 댓글 작성 권한 없음")
+    @DisplayName("댓글 수정 실패 - 댓글 작성 권한 없음(403 에러)")
     void 댓글_수정_실패_권한_없음() throws Exception {
       // given
       given(commentService.update(any(), any(), any())).willThrow(CommentAccessDeniedException.withId(commentId));
@@ -200,10 +200,27 @@ public class CommentControllerTest {
     }
 
     @Test
+    @DisplayName("댓글 수정 실패 - 댓글 내용 공백(유효성 검증, 400 에러)")
+    void 댓글_수정_실패_댓글내용_blank() throws Exception {
+      // given
+      String invalidRawJson = """
+          {
+              "newContent": ""
+          }
+          """;
+
+      // when & then
+      mockMvc.perform(patch("/api/comments/{commentId}", commentId)
+              .header("Monew-Request-User-ID", userId)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(invalidRawJson))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("댓글 수정 성공")
     void 댓글_수정_성공() throws Exception {
       // given
-
       // response는 BeforeEach에서 초기화
       given(commentService.update(any(), any(), any())).willReturn(updateResponse);
 
