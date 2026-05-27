@@ -48,6 +48,8 @@ public class CommentController implements CommentApi {
       @RequestHeader("Monew-Request-User-ID") UUID userId,
       @RequestBody CommentUpdateRequest request
   ) {
-    return ResponseEntity.status(null).body(null);
+    CommentResponse response = commentService.update(commentId, userId, request);
+
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 }
