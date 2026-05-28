@@ -3,6 +3,7 @@ package com.sprint.mission.monew.domain.comment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,48 +71,78 @@ public class CommentIntegrationTest {
   class 댓글_등록하기 {
 
     @Test
-    @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
-    void 댓글_등록_실패_뉴스기사_없음() {
+    @DisplayName("댓글 등록 실패 - 뉴스 기사 ID Null(유효성 검증)")
+    void 댓글_등록_실패_뉴스기사ID_null() throws Exception {
       // given
-      CommentCreateRequest request = new CommentCreateRequest(UUID.randomUUID(), user.getId(),
-          content);
+      String requestBody = """
+          {
+            "userId": "%s"
+            "content": "%s"
+          }
+          """.formatted(user.getId(), content);
 
       // when & then
-      assertThatThrownBy(
-          () -> commentService.create(request)
-      ).isInstanceOf(ArticleNotFoundException.class);
+      mockMvc.perform(post("/api/comments")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isBadRequest());
     }
 
     @Test
-    @DisplayName("댓글 등록 실패 - 사용자가 존재하지 않음")
-    void 댓글_등록_실패_사용자_없음() {
+    @DisplayName("댓글 등록 실패 - 사용자 ID Null(유효성 검증)")
+    void 댓글_등록_실패_사용자ID_null() throws Exception {
       // given
-      CommentCreateRequest request = new CommentCreateRequest(article.getId(), UUID.randomUUID(),
-          content);
+      String requestBody = """
+          {
+            "articleId": "%s"
+            "content": "%s"
+          }
+          """.formatted(article.getId(), content);
 
       // when & then
-      assertThatThrownBy(
-          () -> commentService.create(request)
-      ).isInstanceOf(UserNotFoundException.class);
+      mockMvc.perform(post("/api/comments")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("댓글 등록 실패 - 댓글 내용 공백(유효성 검증)")
+    void 댓글_등록_실패_댓글내용_blank() throws Exception {
+      // given
+      String requestBody = """
+          {
+            "articleId": "%s",
+            "userId": "%s"
+            "content": ""
+          }
+          """.formatted(article.getId(), user.getId());
+
+      // when & then
+      mockMvc.perform(post("/api/comments")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("댓글 등록 성공")
-    void 댓글_등록_성공() {
+    void 댓글_등록_성공() throws Exception {
       // given
-      CommentCreateRequest request = new CommentCreateRequest(article.getId(), user.getId(),
-          content);
+      String requestBody = """
+          {
+            "articleId": "%s",
+            "userId": "%s",
+            "content": "%s"
+          }
+          """.formatted(article.getId(), user.getId(), content);
 
-      // when
-      CommentResponse response = commentService.create(request);
-      Comment savedComment = commentRepository.findById(response.id()).orElseThrow();
-
-      // then
-      assertThat(response).isNotNull();
-      assertThat(response.content()).isEqualTo(content);
-
-      assertThat(savedComment).isNotNull();
-      assertThat(savedComment.getContent()).isEqualTo(content);
+      // when & then
+      mockMvc.perform(post("/api/comments")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isCreated())
+          .andExpect(jsonPath("$.content").value(content));
     }
   }
 
@@ -157,8 +188,8 @@ public class CommentIntegrationTest {
     }
 
     @Test
-    @DisplayName("댓글 수정 실패 - 수정할 댓글 내용 공백")
-    void 댓글_수정_실패_수정댓글_공백() throws Exception {
+    @DisplayName("댓글 수정 실패 - 수정할 댓글 내용 공백(유효성 검증)")
+    void 댓글_수정_실패_수정댓글내용_blank() throws Exception {
       // when
       // comment는 BeforeEach에서 초기화
       String requestBody = """
