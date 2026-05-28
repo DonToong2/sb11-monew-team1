@@ -2,6 +2,7 @@ package com.sprint.mission.monew.domain.comment.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -101,6 +102,8 @@ public class CommentControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(invalidRawJson))
           .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(commentService); // 유효성 검증 실패 시 CommentService가 미호출 되어야함
     }
 
     @Test
@@ -119,6 +122,8 @@ public class CommentControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(invalidRawJson))
           .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(commentService); // 유효성 검증 실패 시 CommentService가 미호출 되어야함
     }
 
     @Test
@@ -138,6 +143,8 @@ public class CommentControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(invalidRawJson))
           .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(commentService); // 유효성 검증 실패 시 CommentService가 미호출 되어야함
     }
 
     @Test
@@ -217,6 +224,8 @@ public class CommentControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(invalidRawJson))
           .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(commentService); // 유효성 검증 실패 시 CommentService가 미호출 되어야함
     }
 
     @Test
