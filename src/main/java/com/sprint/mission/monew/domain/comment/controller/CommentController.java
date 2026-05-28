@@ -5,7 +5,6 @@ import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import com.sprint.mission.monew.domain.comment.service.CommentService;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -62,9 +61,7 @@ public class CommentController implements CommentApi {
 
   @Override
   @DeleteMapping("/{commentId}")
-  public ResponseEntity<Void> softDeleteComment(
-      @PathVariable UUID commentId
-  ) {
+  public ResponseEntity<Void> softDeleteComment(@PathVariable UUID commentId) {
     log.info("[COMMENT_SOFT_DELETE_REQUEST] 댓글 삭제 요청 - 댓글 ID={}", commentId);
 
     commentService.softDelete(commentId);
