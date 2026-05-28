@@ -61,12 +61,15 @@ public class CommentController implements CommentApi {
 
   @Override
   @DeleteMapping("/{commentId}")
-  public ResponseEntity<Void> softDeleteComment(@PathVariable UUID commentId) {
-    log.info("[COMMENT_SOFT_DELETE_REQUEST] 댓글 삭제 요청 - 댓글 ID={}", commentId);
+  public ResponseEntity<Void> softDeleteComment(
+      @PathVariable UUID commentId,
+      @RequestHeader("Monew-Request-User-ID") UUID userId) {
+    log.info("[COMMENT_SOFT_DELETE_REQUEST] 댓글 논리 삭제 요청 - 댓글 ID={}", commentId);
+    log.debug("[COMMENT_SOFT_DELETE_REQUEST] 댓글 논리 삭제 요청 - 요청자 ID={}", userId);
 
-    commentService.softDelete(commentId);
+    commentService.softDelete(commentId, userId);
 
-    log.debug("[COMMENT_SOFT_DELETE_RESPONSE] 댓글 삭제 응답 - 댓글 ID={}", commentId);
+    log.debug("[COMMENT_SOFT_DELETE_RESPONSE] 댓글 논리 삭제 응답 - 댓글 ID={}", commentId);
 
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
