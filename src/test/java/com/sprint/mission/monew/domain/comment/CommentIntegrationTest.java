@@ -76,7 +76,7 @@ public class CommentIntegrationTest {
       // given
       String requestBody = """
           {
-            "userId": "%s"
+            "userId": "%s",
             "content": "%s"
           }
           """.formatted(user.getId(), content);
@@ -94,7 +94,7 @@ public class CommentIntegrationTest {
       // given
       String requestBody = """
           {
-            "articleId": "%s"
+            "articleId": "%s",
             "content": "%s"
           }
           """.formatted(article.getId(), content);
@@ -113,7 +113,7 @@ public class CommentIntegrationTest {
       String requestBody = """
           {
             "articleId": "%s",
-            "userId": "%s"
+            "userId": "%s",
             "content": ""
           }
           """.formatted(article.getId(), user.getId());
