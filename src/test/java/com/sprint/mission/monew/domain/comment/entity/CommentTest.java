@@ -54,6 +54,20 @@ public class CommentTest {
   class Update {
 
     @Test
+    @DisplayName("받아온 작성자가 댓글 작성자가 아닐 경우")
+    void 댓글_작성자가_아닌지_확인() {
+      // given
+      // comment는 BeforeEach에서 초기화
+      UUID anotherUserId = UUID.randomUUID();
+
+      // when
+      boolean result = comment.isOwner(anotherUserId);
+
+      // then
+      assertThat(result).isFalse();
+    }
+
+    @Test
     @DisplayName("받아온 작성자는 댓글 작성자가 맞는지 테스트")
     void 댓글_작성자인지_확인() {
       // given
