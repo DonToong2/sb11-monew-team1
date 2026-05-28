@@ -220,9 +220,25 @@ public class CommentServiceTest {
       given(commentRepository.findById(commentId)).willReturn(Optional.empty());
 
       // when & then
-      assertThatThrownBy(() -> commentService.softDelete(commentId)).isInstanceOf(
+      assertThatThrownBy(() -> commentService.softDelete(commentId, userId)).isInstanceOf(
           CommentNotFoundException.class);
     }
+
+    @Test
+    @DisplayName("댓글 논리삭제 실패 - 권한 없음")
+    void 댓글_논리삭제_실패_권한_없음() {
+      // given
+      User otherUser = User.create("test2@naver.com", "test2", "12345678");
+      Comment comment = Comment.create(article, otherUser, content);
+
+      given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+      // when & then
+      assertThatThrownBy(
+          () -> commentService.softDelete(commentId, userId)).isInstanceOf(
+          CommentAccessDeniedException.class);
+    }
+
 
     @Test
     @DisplayName("댓글 논리삭제 성공")
@@ -232,7 +248,7 @@ public class CommentServiceTest {
       given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
       // when
-      commentService.softDelete(commentId);
+      commentService.softDelete(commentId, userId);
 
       // then
       assertThat(comment.isDeleted()).isTrue();
