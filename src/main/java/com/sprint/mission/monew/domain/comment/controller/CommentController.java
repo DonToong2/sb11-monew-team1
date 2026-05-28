@@ -46,7 +46,7 @@ public class CommentController implements CommentApi {
   @PatchMapping("/{commentId}")
   public ResponseEntity<CommentResponse> updateComment(
       @PathVariable @Parameter(description = "댓글 ID") UUID commentId,
-      @RequestHeader("Monew-Request-User-ID") @Parameter(description = "요청자 ID")UUID userId,
+      @RequestHeader("Monew-Request-User-ID") @Parameter(description = "요청자 ID") UUID userId,
       @RequestBody @Valid CommentUpdateRequest request
   ) {
     log.info("[COMMENT_UPDATE_REQUEST] 댓글 수정 요청 - 댓글 ID={}", commentId);

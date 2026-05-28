@@ -63,7 +63,7 @@ public class CommentService {
         () -> CommentNotFoundException.withId(commentId)
     );
 
-    if(!comment.isOwner(userId)) {
+    if (!comment.isOwner(userId)) {
       throw CommentAccessDeniedException.withId(commentId);
     }
 

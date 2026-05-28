@@ -146,7 +146,8 @@ public class CommentServiceTest {
       given(commentRepository.findById(commentId)).willReturn(Optional.empty());
 
       // when & then
-      assertThatThrownBy(() -> commentService.update(commentId, userId, updateRequest)).isInstanceOf(
+      assertThatThrownBy(
+          () -> commentService.update(commentId, userId, updateRequest)).isInstanceOf(
           CommentNotFoundException.class);
     }
 
@@ -159,7 +160,8 @@ public class CommentServiceTest {
       given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
       // when & then
-      assertThatThrownBy(() -> commentService.update(commentId, userId, updateRequest)).isInstanceOf(
+      assertThatThrownBy(
+          () -> commentService.update(commentId, userId, updateRequest)).isInstanceOf(
           CommentAccessDeniedException.class);
     }
 

@@ -163,7 +163,8 @@ public class CommentControllerTest {
     @DisplayName("댓글 수정 실패 - 댓글이 존재하지 않음(404 에러)")
     void 댓글_수정_실패_댓글_없음() throws Exception {
       // given
-      given(commentService.update(any(), any(), any())).willThrow(CommentNotFoundException.withId(commentId));
+      given(commentService.update(any(), any(), any())).willThrow(
+          CommentNotFoundException.withId(commentId));
 
       // when & then
       String rawJson = """
@@ -183,7 +184,8 @@ public class CommentControllerTest {
     @DisplayName("댓글 수정 실패 - 댓글 작성 권한 없음(403 에러)")
     void 댓글_수정_실패_권한_없음() throws Exception {
       // given
-      given(commentService.update(any(), any(), any())).willThrow(CommentAccessDeniedException.withId(commentId));
+      given(commentService.update(any(), any(), any())).willThrow(
+          CommentAccessDeniedException.withId(commentId));
 
       // when & then
       String rawJson = """
