@@ -30,7 +30,9 @@ public class CommentTest {
         "기사 요약 내용"
     );
 
-    user = new User();
+    user = User.create(
+        "Test@naver.com", "test", "12345678"
+    );
     content = "댓글 내용";
 
     comment = Comment.create(article, user, content);

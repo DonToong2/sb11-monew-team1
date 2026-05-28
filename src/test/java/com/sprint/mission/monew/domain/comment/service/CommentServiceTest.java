@@ -109,7 +109,9 @@ public class CommentServiceTest {
           "기사 요약 내용"
       );
 
-      User user = new User();
+      User user = User.create(
+          "Test@naver.com", "test", "12345678"
+      );
 
       CommentResponse expectedResponse = new CommentResponse(
           UUID.randomUUID(),

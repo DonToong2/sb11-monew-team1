@@ -71,7 +71,10 @@ public class CommentIntegrationTest {
             "기사 요약 내용"
         ));
 
-    user = userRepository.save(new User());
+    user = userRepository.save(
+        User.create(
+            "Test@naver.com", "test", "12345678"
+        ));
     content = "댓글 내용";
     comment = commentRepository.save(Comment.create(article, user, content));
   }

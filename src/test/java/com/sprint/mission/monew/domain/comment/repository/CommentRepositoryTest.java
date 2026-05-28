@@ -51,7 +51,9 @@ public class CommentRepositoryTest {
             Instant.parse("2024-01-01T00:00:00Z"),
             "기사 요약 내용"
         ));
-    user = userRepository.save(new User());
+    user = userRepository.save(User.create(
+        "Test@naver.com", "test", "12345678"
+    ));
     comment = Comment.create(article, user, "댓글 내용");
   }
 
