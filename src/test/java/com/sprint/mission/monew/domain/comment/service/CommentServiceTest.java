@@ -2,7 +2,6 @@ package com.sprint.mission.monew.domain.comment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -213,6 +212,33 @@ public class CommentServiceTest {
   @Nested
   @DisplayName("댓글 논리 삭제하기")
   class Service_Comment_SoftDelete {
+
+    @Test
+    @DisplayName("댓글 논리삭제 실패 - 댓글이 존재하지 않음")
+    void 댓글_논리삭제_실패_댓글_없음() {
+      // given
+      given(commentRepository.findById(commentId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> commentService.softDelete(commentId, userId)).isInstanceOf(
+          CommentNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 논리삭제 실패 - 권한 없음")
+    void 댓글_논리삭제_실패_권한_없음() {
+      // given
+      User otherUser = User.create("test2@naver.com", "test2", "12345678");
+      Comment comment = Comment.create(article, otherUser, content);
+
+      given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+      // when & then
+      assertThatThrownBy(
+          () -> commentService.softDelete(commentId, userId)).isInstanceOf(
+          CommentAccessDeniedException.class);
+    }
+
 
     @Test
     @DisplayName("댓글 논리삭제 성공")
