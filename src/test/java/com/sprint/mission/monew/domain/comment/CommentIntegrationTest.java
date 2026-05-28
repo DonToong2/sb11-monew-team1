@@ -255,11 +255,11 @@ public class CommentIntegrationTest {
     @DisplayName("댓글 논리삭제 실패 - 삭제 권한 없음")
     void 댓글_논리삭제_실패_권한_없음() throws Exception {
       // given
-      UUID notCreateCommentUserId = UUID.randomUUID();
+      UUID unauthorizedUserId = UUID.randomUUID();
 
       // when & then
       mockMvc.perform(delete("/api/comments/{commentId}", comment.getId())
-              .header("Monew-Request-User-ID", notCreateCommentUserId))
+              .header("Monew-Request-User-ID", unauthorizedUserId))
           .andExpect(status().isForbidden());
     }
 
