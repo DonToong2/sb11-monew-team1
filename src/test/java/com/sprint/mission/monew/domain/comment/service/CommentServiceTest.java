@@ -192,7 +192,9 @@ public class CommentServiceTest {
 
       // then
       assertThat(response).isNotNull();
-      assertThat(response.content()).isEqualTo("수정한 댓글 내용");
+      assertThat(response.content()).isEqualTo("수정한 댓글 내용"); // Response DTO 검증
+      assertThat(comment.getContent()).isEqualTo(updateRequest.content()); // Entity 검증
+      verify(commentMapper).toResponse(any(Comment.class), eq(false)); // Mapper 검증
     }
   }
 }
