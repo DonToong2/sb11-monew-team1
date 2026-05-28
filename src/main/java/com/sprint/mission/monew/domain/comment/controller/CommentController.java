@@ -50,7 +50,7 @@ public class CommentController implements CommentApi {
       @RequestBody @Valid CommentUpdateRequest request
   ) {
     log.info("[COMMENT_UPDATE_REQUEST] 댓글 수정 요청 - 댓글 ID={}", commentId);
-    log.debug("[COMMENT_UPDATE_REQUEST] 댓글 수정 요청 - 요청자 ID={}, 수정 댓글={}", userId, request.content());
+    log.debug("[COMMENT_UPDATE_REQUEST] 댓글 수정 요청 - 요청자 ID={}", userId);
 
     CommentResponse response = commentService.update(commentId, userId, request);
 
