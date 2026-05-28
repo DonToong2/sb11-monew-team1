@@ -261,36 +261,21 @@ public class CommentControllerTest {
     void 댓글_논리삭제_실패_댓글_없음() throws Exception {
       // given
       doThrow(CommentNotFoundException.withId(commentId)).when(commentService)
-          .softDelete(commentId, userId);
+          .softDelete(commentId);
 
       // when & then
-      mockMvc.perform(delete("/api/comments/{commentId}", commentId)
-              .header("Monew-Request-User-ID", userId))
+      mockMvc.perform(delete("/api/comments/{commentId}", commentId))
           .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("댓글 논리삭제 실패 - 권한 없음(403 에러)")
-    void 댓글_논리삭제_실패_권한_없음() throws Exception {
-      // given
-      doThrow(CommentAccessDeniedException.withId(commentId)).when(commentService)
-          .softDelete(commentId, userId);
-
-      // when & then
-      mockMvc.perform(delete("/api/comments/{commentId}", commentId)
-          .header("Monew-Request-User-ID", userId))
-          .andExpect(status().isForbidden());
     }
 
     @Test
     @DisplayName("댓글 논리 삭제 성공")
     void 댓글_논리삭제_성공() throws Exception {
       // given
-      doNothing().when(commentService).softDelete(commentId, userId);
+      doNothing().when(commentService).softDelete(commentId);
 
       // when & then
-      mockMvc.perform(delete("/api/comments/{commentId}", commentId)
-              .header("Monew-Request-User-ID", userId))
+      mockMvc.perform(delete("/api/comments/{commentId}", commentId))
           .andExpect(status().isNoContent());
     }
   }
