@@ -2,6 +2,7 @@ package com.sprint.mission.monew.domain.comment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -237,6 +238,39 @@ public class CommentIntegrationTest {
               .content(requestBody))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content").value("수정한 댓글 내용"));
+    }
+  }
+
+  @Nested
+  @DisplayName("댓글 논리 삭제하기")
+  class SoftDelete {
+
+    @Test
+    @DisplayName("댓글 논리삭제 실패 - 댓글이 존재하지 않음")
+    void 댓글_논리삭제_실패_댓글_없음() throws Exception {
+      // given
+      UUID notExistCommentId = UUID.randomUUID();
+
+      // when & then
+      mockMvc.perform(delete("/api/comments/{commentId}", notExistCommentId))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("댓글 논리삭제 성공")
+    void 댓글_논리삭제_성공() throws Exception {
+      // given
+      // commentId, userId를 BeforeEach에서 초기화
+
+      // when & then
+      mockMvc.perform(delete("/api/comments/{commentId}", comment.getId()))
+          .andExpect(status().isNoContent());
+
+      // DB 검증
+      Comment deletedComment = commentRepository.findById(comment.getId()).orElseThrow();
+
+      assertThat(deletedComment.isDeleted()).isTrue();
+      assertThat(deletedComment.getDeletedAt()).isNotNull();
     }
   }
 }
