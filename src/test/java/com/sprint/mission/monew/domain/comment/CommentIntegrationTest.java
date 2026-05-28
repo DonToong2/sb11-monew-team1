@@ -68,7 +68,7 @@ public class CommentIntegrationTest {
 
   @Nested
   @DisplayName("댓글 등록하기")
-  class 댓글_등록하기 {
+  class Create {
 
     @Test
     @DisplayName("댓글 등록 실패 - 뉴스 기사 ID Null(유효성 검증)")
@@ -148,7 +148,7 @@ public class CommentIntegrationTest {
 
   @Nested
   @DisplayName("댓글 수정하기")
-  class 댓글_수정하기 {
+  class Update {
 
     @Test
     @DisplayName("댓글 수정 실패 - 댓글이 존재하지 않음")

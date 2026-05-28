@@ -31,7 +31,7 @@ public class CommentTest {
 
   @Nested
   @DisplayName("댓글 등록하기")
-  class Create {
+  class CreateComment {
 
     @Test
     @DisplayName("댓글 등록")
@@ -51,7 +51,7 @@ public class CommentTest {
 
   @Nested
   @DisplayName("댓글 수정하기")
-  class Update {
+  class UpdateComment {
 
     @Test
     @DisplayName("받아온 작성자가 댓글 작성자가 아닐 경우")
