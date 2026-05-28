@@ -38,4 +38,6 @@ public interface CommentApi {
       @PathVariable UUID commentId,
       @RequestHeader("Monew-Request-User-ID") UUID userId,
       @RequestBody CommentUpdateRequest request);
+
+  ResponseEntity<Void> softDeleteComment(@PathVariable UUID commentId, UUID userId);
 }

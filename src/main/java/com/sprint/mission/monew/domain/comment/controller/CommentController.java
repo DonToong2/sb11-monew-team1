@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,5 +58,14 @@ public class CommentController implements CommentApi {
     log.debug("[COMMENT_UPDATE_RESPONSE] 댓글 수정 응답 - 댓글 ID={}", response.id());
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+
+  @Override
+  @DeleteMapping("/{commentID}")
+  public ResponseEntity<Void> softDeleteComment(
+      @PathVariable UUID commentId,
+      UUID userId
+  ) {
+    return ResponseEntity.status(null).build();
   }
 }
