@@ -10,6 +10,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -62,7 +63,8 @@ public class Comment extends BaseSoftDeletableEntity {
   }
 
   // 댓글의 userId와 받아온 userId가 같은지 여부를 체크
+  // 탈퇴하지 않은 사용자의 댓글에만 체크, 사용자 ID까지 Objects.equals를 사용하여 null 체크
   public boolean isOwner(UUID userId) {
-    return this.user.getId().equals(userId);
+    return this.user != null && Objects.equals(this.user.getId(), userId);
   }
 }
