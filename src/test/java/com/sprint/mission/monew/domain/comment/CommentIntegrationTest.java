@@ -2,6 +2,9 @@ package com.sprint.mission.monew.domain.comment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.exception.ArticleNotFoundException;
@@ -23,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,12 +55,14 @@ public class CommentIntegrationTest {
   private Article article;
   private User user;
   private String content;
+  private Comment comment;
 
   @BeforeEach
   void setUp() {
     article = articleRepository.save(new Article());
     user = userRepository.save(new User());
     content = "댓글 내용";
+    comment = commentRepository.save(Comment.create(article, user, content));
   }
 
   @Nested
@@ -106,6 +112,87 @@ public class CommentIntegrationTest {
 
       assertThat(savedComment).isNotNull();
       assertThat(savedComment.getContent()).isEqualTo(content);
+    }
+  }
+
+  @Nested
+  @DisplayName("댓글 수정하기")
+  class 댓글_수정하기 {
+
+    @Test
+    @DisplayName("댓글 수정 실패 - 댓글이 존재하지 않음")
+    void 댓글_수정_실패_댓글_없음() throws Exception {
+      // given
+      String requestBody = """
+          {
+            "content": "수정한 댓글 내용"
+          }
+          """;
+
+      // when & then
+      mockMvc.perform(patch("/api/comments/{commentId}", UUID.randomUUID())
+              .header("Monew-Request-User-ID", user.getId())
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("댓글 수정 실패 - 댓글 작성 권한 없음")
+    void 댓글_수정_실패_권한_없음() throws Exception {
+      // given
+      // comment는 BeforeEach에서 초기화
+      String requestBody = """
+          {
+            "content": "수정한 댓글 내용"
+          }
+          """;
+
+      // when & then
+      mockMvc.perform(patch("/api/comments/{commentId}", comment.getId())
+              .header("Monew-Request-User-ID", UUID.randomUUID())
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("댓글 수정 실패 - 수정할 댓글 내용 공백")
+    void 댓글_수정_실패_수정댓글_공백() throws Exception {
+      // when
+      // comment는 BeforeEach에서 초기화
+      String requestBody = """
+          {
+            "content": ""
+          }
+          """;
+
+      // when & then
+      mockMvc.perform(patch("/api/comments/{commentId}", comment.getId())
+              .header("Monew-Request-User-ID", user.getId())
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("댓글 수정 성공")
+    void 댓글_수정_성공() throws Exception {
+      // given
+      // comment를 BeforeEach에서 초기화
+      String requestBody = """
+          {
+            "content": "수정한 댓글 내용"
+          }
+          """;
+
+      // when & then
+      mockMvc.perform(patch("/api/comments/{commentId}", comment.getId())
+              .header("Monew-Request-User-ID", user.getId())
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content").value("수정한 댓글 내용"));
     }
   }
 }
