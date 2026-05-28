@@ -77,6 +77,9 @@ public class CommentService {
 
   @Transactional
   public void softDelete(UUID commentId, UUID requestUserId) {
+    Comment comment = commentRepository.findById(commentId).orElseThrow();
+
+    comment.softDelete();
   }
-  
+
 }
