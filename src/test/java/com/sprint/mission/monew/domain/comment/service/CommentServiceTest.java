@@ -64,9 +64,6 @@ public class CommentServiceTest {
 
   @BeforeEach
   void setUp() {
-    articleId = UUID.randomUUID();
-    userId = UUID.randomUUID();
-    commentId = UUID.randomUUID();
     article = Article.create(
         ArticleSource.NAVER,
         "https://example.com/news/1",
@@ -76,6 +73,9 @@ public class CommentServiceTest {
     );
     user = User.create("Test@naver.com", "test", "12345678");
     content = "댓글 내용";
+    articleId = article.getId();
+    userId = user.getId();
+    commentId = UUID.randomUUID();
     createRequest = new CommentCreateRequest(articleId, userId, content);
     updateRequest = new CommentUpdateRequest("수정한 댓글 내용");
   }
@@ -167,7 +167,8 @@ public class CommentServiceTest {
     @DisplayName("댓글 수정 실패 - 권한 없음")
     void 댓글_수정_실패_권한_없음() {
       // given
-      Comment comment = Comment.create(article, user, content);
+      User otherUser = User.create("test2@naver.com", "test2", "12345678");
+      Comment comment = Comment.create(article, otherUser, content);
 
       given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
 
