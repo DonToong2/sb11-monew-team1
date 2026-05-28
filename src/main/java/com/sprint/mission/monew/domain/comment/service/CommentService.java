@@ -74,4 +74,9 @@ public class CommentService {
 
     return commentMapper.toResponse(comment, false);
   }
+
+  @Transactional
+  public void softDelete(UUID commentId, UUID requestUserId) {
+  }
+  
 }
