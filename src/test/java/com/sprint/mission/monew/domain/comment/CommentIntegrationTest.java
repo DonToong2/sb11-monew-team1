@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sprint.mission.monew.domain.article.entity.Article;
+import com.sprint.mission.monew.domain.article.entity.ArticleSource;
+import java.time.Instant;
 import com.sprint.mission.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
@@ -54,14 +56,15 @@ public class CommentIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    article = articleRepository.save(new Article());
+    article = articleRepository.save(
+        Article.create(ArticleSource.NAVER, "https://test.com", "테스트 기사", Instant.now(), null));
     user = userRepository.save(new User());
     content = "댓글 내용";
   }
 
   @Nested
   @DisplayName("댓글 등록하기")
-  class 댓글_등록하기 {
+  class CreateComment {
 
     @Test
     @DisplayName("댓글 등록 실패 - 뉴스 기사가 존재하지 않음")
