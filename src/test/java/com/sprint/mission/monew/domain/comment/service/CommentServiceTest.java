@@ -2,11 +2,11 @@ package com.sprint.mission.monew.domain.comment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
@@ -206,6 +206,25 @@ public class CommentServiceTest {
       assertThat(response.content()).isEqualTo("수정한 댓글 내용"); // Response DTO 검증
       assertThat(comment.getContent()).isEqualTo(updateRequest.content()); // Entity 검증
       verify(commentMapper).toResponse(eq(comment), eq(false)); // Mapper 검증
+    }
+  }
+
+  @Nested
+  @DisplayName("댓글 논리 삭제하기")
+  class Service_Comment_SoftDelete {
+
+    @Test
+    @DisplayName("댓글 논리삭제 성공")
+    void 댓글_논리삭제_성공() {
+      // given
+      Comment comment = Comment.create(article, user, content);
+      given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+      // when
+      commentService.softDelete(commentId, userId);
+
+      // then
+      assertThat(comment.isDeleted()).isTrue();
     }
   }
 }
