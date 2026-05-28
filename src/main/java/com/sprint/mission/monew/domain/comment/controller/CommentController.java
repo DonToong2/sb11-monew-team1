@@ -61,11 +61,13 @@ public class CommentController implements CommentApi {
   }
 
   @Override
-  @DeleteMapping("/{commentID}")
+  @DeleteMapping("/{commentId}")
   public ResponseEntity<Void> softDeleteComment(
       @PathVariable UUID commentId,
-      UUID userId
+      @RequestHeader("Monew-Request-User-ID") UUID userId
   ) {
-    return ResponseEntity.status(null).build();
+    commentService.softDelete(commentId, userId);
+
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
