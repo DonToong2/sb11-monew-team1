@@ -77,7 +77,13 @@ public class CommentService {
 
   @Transactional
   public void softDelete(UUID commentId, UUID requestUserId) {
-    Comment comment = commentRepository.findById(commentId).orElseThrow();
+    Comment comment = commentRepository.findById(commentId).orElseThrow(
+        () -> CommentNotFoundException.withId(commentId)
+    );
+
+    if (!comment.isOwner(requestUserId)) {
+      throw CommentAccessDeniedException.withId(commentId);
+    }
 
     comment.softDelete();
   }
