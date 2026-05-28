@@ -2,11 +2,14 @@ package com.sprint.mission.monew.domain.comment.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sprint.mission.monew.common.config.QuerydslConfig;
 import com.sprint.mission.monew.domain.article.entity.Article;
+import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,9 +17,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
+@ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(QuerydslConfig.class)
 public class CommentRepositoryTest {
 
   @Autowired
@@ -34,7 +43,14 @@ public class CommentRepositoryTest {
 
   @BeforeEach
   void setUp() {
-    article = articleRepository.save(new Article());
+    article = articleRepository.save(
+        Article.create(
+            ArticleSource.NAVER,
+            "https://example.com/news/1",
+            "테스트 기사 제목",
+            Instant.parse("2024-01-01T00:00:00Z"),
+            "기사 요약 내용"
+        ));
     user = userRepository.save(new User());
     comment = Comment.create(article, user, "댓글 내용");
   }
