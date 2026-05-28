@@ -246,8 +246,21 @@ public class CommentIntegrationTest {
       UUID notExistCommentId = UUID.randomUUID();
 
       // when & then
-      mockMvc.perform(delete("/api/comments/{commentId}", notExistCommentId))
+      mockMvc.perform(delete("/api/comments/{commentId}", notExistCommentId)
+              .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("댓글 논리삭제 실패 - 삭제 권한 없음")
+    void 댓글_논리삭제_실패_권한_없음() throws Exception {
+      // given
+      UUID notCreateCommentUserId = UUID.randomUUID();
+
+      // when & then
+      mockMvc.perform(delete("/api/comments/{commentId}", comment.getId())
+              .header("Monew-Request-User-ID", notCreateCommentUserId))
+          .andExpect(status().isForbidden());
     }
 
     @Test
@@ -257,7 +270,8 @@ public class CommentIntegrationTest {
       // commentId, userId를 BeforeEach에서 초기화
 
       // when & then
-      mockMvc.perform(delete("/api/comments/{commentId}", comment.getId()))
+      mockMvc.perform(delete("/api/comments/{commentId}", comment.getId())
+              .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isNoContent());
 
       // DB 검증
