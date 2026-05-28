@@ -3,6 +3,7 @@ package com.sprint.mission.monew.domain.comment.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -256,14 +257,40 @@ public class CommentControllerTest {
   class Controller_SoftDelete_Comment {
 
     @Test
+    @DisplayName("댓글 논리삭제 실패 - 댓글이 존재하지 않음(404 에러)")
+    void 댓글_논리삭제_실패_댓글_없음() throws Exception {
+      // given
+      doThrow(CommentNotFoundException.withId(commentId)).when(commentService)
+          .softDelete(commentId, userId);
+
+      // when & then
+      mockMvc.perform(delete("/api/comments/{commentId}", commentId)
+              .header("Monew-Request-User-ID", userId))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("댓글 논리삭제 실패 - 권한 없음(403 에러)")
+    void 댓글_논리삭제_실패_권한_없음() throws Exception {
+      // given
+      doThrow(CommentAccessDeniedException.withId(commentId)).when(commentService)
+          .softDelete(commentId, userId);
+
+      // when & then
+      mockMvc.perform(delete("/api/comments/{commentId}", commentId)
+          .header("Monew-Request-User-ID", userId))
+          .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("댓글 논리 삭제 성공")
     void 댓글_논리삭제_성공() throws Exception {
       // given
       doNothing().when(commentService).softDelete(commentId, userId);
 
       // when & then
-      mockMvc.perform(delete("api/comments/{commentId}", commentId)
-          .header("Monwe-Request-User-ID", userId))
+      mockMvc.perform(delete("/api/comments/{commentId}", commentId)
+              .header("Monew-Request-User-ID", userId))
           .andExpect(status().isNoContent());
     }
   }
