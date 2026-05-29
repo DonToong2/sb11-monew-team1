@@ -95,8 +95,8 @@ public class CommentService {
   }
 
   @Transactional
-  public void harDelete(UUID commentId) {
-    
+  public void hardDelete(UUID commentId) {
+
   }
 
 }
