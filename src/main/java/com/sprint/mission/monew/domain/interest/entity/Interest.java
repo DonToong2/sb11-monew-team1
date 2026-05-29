@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.BatchSize;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -22,6 +23,7 @@ public class Interest extends BaseUpdatableEntity {
   @Column(nullable = false, length = 50)
   private String name;
 
+  @BatchSize(size = 100)
   @OneToMany(mappedBy = "interest", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<InterestKeyword> keywords = new ArrayList<>();
 
@@ -37,14 +39,21 @@ public class Interest extends BaseUpdatableEntity {
     return interest;
   }
 
-  public void increaseSubscriberCount() {
-    this.subscriberCount++;
-  }
-
   public void updateKeywords(List<String> newKeywords) {
     this.keywords.clear();
     newKeywords.stream()
         .map(k -> InterestKeyword.create(this, k))
         .forEach(this.keywords::add);
+  }
+
+  public void increaseSubscriberCount() {
+    this.subscriberCount++;
+  }
+
+  public void decreaseSubscriberCount() {
+    if (this.subscriberCount <= 0) {
+      throw new IllegalStateException("subscriberCount는 0보다 작아질 수 없습니다.");
+    }
+    this.subscriberCount--;
   }
 }

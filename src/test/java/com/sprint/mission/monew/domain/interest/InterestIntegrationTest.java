@@ -2,6 +2,7 @@ package com.sprint.mission.monew.domain.interest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -47,6 +48,68 @@ class InterestIntegrationTest {
     subscriptionRepository.deleteAll();
     interestRepository.deleteAll();
     userRepository.deleteAll();
+  }
+
+  @Nested
+  @DisplayName("GET /api/interests — 관심사 목록 조회")
+  class FindAll {
+
+    @Test
+    @DisplayName("관심사가 없으면 빈 목록을 반환한다")
+    void 관심사가_없으면_빈_목록을_반환한다() throws Exception {
+      // when & then
+      mockMvc
+          .perform(
+              get("/api/interests")
+                  .header("Monew-Request-User-ID", UUID.randomUUID())
+                  .param("orderBy", "name")
+                  .param("direction", "ASC")
+                  .param("limit", "10"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content").isArray())
+          .andExpect(jsonPath("$.content").isEmpty())
+          .andExpect(jsonPath("$.hasNext").value(false))
+          .andExpect(jsonPath("$.totalElements").value(0));
+    }
+
+    @Test
+    @DisplayName("저장된 관심사가 목록에 포함된다")
+    void 저장된_관심사가_목록에_포함된다() throws Exception {
+      // given
+      interestRepository.save(Interest.create("인공지능", List.of("AI")));
+
+      // when & then
+      mockMvc
+          .perform(
+              get("/api/interests")
+                  .header("Monew-Request-User-ID", UUID.randomUUID())
+                  .param("orderBy", "name")
+                  .param("direction", "ASC")
+                  .param("limit", "10"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content[0].name").value("인공지능"))
+          .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    @DisplayName("구독한 관심사는 subscribedByMe=true로 반환된다")
+    void 구독한_관심사는_subscribedByMe_true로_반환된다() throws Exception {
+      // given
+      Interest interest = interestRepository.save(Interest.create("인공지능", List.of("AI")));
+      User user = userRepository.save(User.create("test@test.com", "테스터", "password123!"));
+      subscriptionRepository.save(Subscription.create(interest, user));
+
+      // when & then
+      mockMvc
+          .perform(
+              get("/api/interests")
+                  .header("Monew-Request-User-ID", user.getId())
+                  .param("orderBy", "name")
+                  .param("direction", "ASC")
+                  .param("limit", "10"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content[0].subscribedByMe").value(true));
+    }
   }
 
   @Nested
@@ -156,6 +219,62 @@ class InterestIntegrationTest {
           .andExpect(status().isNoContent());
 
       assertThat(interestRepository.findById(interest.getId())).isEmpty();
+    }
+  }
+
+  @Nested
+  @DisplayName("DELETE /api/interests/{interestId}/subscriptions — 관심사 구독 취소")
+  class Unsubscribe {
+
+    Interest interest;
+    User user;
+
+    @BeforeEach
+    void setUp() {
+      interest = interestRepository.save(Interest.create("인공지능", List.of("AI", "머신러닝")));
+      user = userRepository.save(User.create("test@test.com", "테스터", "password123!"));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 관심사 구독 취소 시 404를 반환한다")
+    void 존재하지_않는_관심사_구독_취소_시_404를_반환한다() throws Exception {
+      // when & then
+      mockMvc
+          .perform(delete("/api/interests/{interestId}/subscriptions", UUID.randomUUID())
+              .header("Monew-Request-User-ID", user.getId()))
+          .andExpect(status().isNotFound())
+          .andExpect(jsonPath("$.code").value("INTEREST_NOT_FOUND"));
+    }
+
+    @Test
+    @DisplayName("구독하지 않은 관심사 취소 시 404를 반환한다")
+    void 구독하지_않은_관심사_취소_시_404를_반환한다() throws Exception {
+      // when & then
+      mockMvc
+          .perform(delete("/api/interests/{interestId}/subscriptions", interest.getId())
+              .header("Monew-Request-User-ID", user.getId()))
+          .andExpect(status().isNotFound())
+          .andExpect(jsonPath("$.code").value("SUBSCRIPTION_NOT_FOUND"));
+    }
+
+    @Test
+    @DisplayName("정상 취소 시 204를 반환하고 DB에서 삭제되며 subscriberCount가 감소한다")
+    void 정상_취소_시_204를_반환하고_DB에서_삭제되며_subscriberCount가_감소한다() throws Exception {
+      // given
+      subscriptionRepository.save(Subscription.create(interest, user));
+      interest.increaseSubscriberCount();
+      interestRepository.save(interest);
+
+      // when & then
+      mockMvc
+          .perform(delete("/api/interests/{interestId}/subscriptions", interest.getId())
+              .header("Monew-Request-User-ID", user.getId()))
+          .andExpect(status().isNoContent());
+
+      assertThat(subscriptionRepository.existsByInterestIdAndUserId(
+          interest.getId(), user.getId())).isFalse();
+      assertThat(interestRepository.findById(interest.getId())
+          .get().getSubscriberCount()).isEqualTo(0L);
     }
   }
 
