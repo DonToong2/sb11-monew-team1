@@ -126,12 +126,10 @@ public class CommentLikeRepositoryTest {
       commentLikeRepository.save(CommentLike.create(user, comment));
 
       // when
-      commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
+      int deletedCount = commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
 
       // then
-      boolean exists = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
-          comment.getId());
-      assertThat(exists).isFalse();
+      assertThat(deletedCount).isEqualTo(1);
     }
   }
 

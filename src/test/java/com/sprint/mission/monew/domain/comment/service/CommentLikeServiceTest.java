@@ -167,7 +167,7 @@ public class CommentLikeServiceTest {
     @DisplayName("댓글 좋아요 취소 실패 - 좋아요가 존재하지 않음")
     void 댓글_좋아요_취소_실패_좋아요_없음() {
       // given
-      given(commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)).willReturn(false);
+      // commentId, userId는 BeforeEach에서 초기화
 
       // when & then
       assertThatThrownBy(
@@ -179,7 +179,7 @@ public class CommentLikeServiceTest {
     @DisplayName("댓글 좋아요 취소 성공")
     void 댓글_좋아요_취소_성공() {
       // given
-      given(commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)).willReturn(true);
+      given(commentLikeRepository.deleteByUserIdAndCommentId(userId, commentId)).willReturn(1);
 
       // when
       commentLikeService.cancel(commentId, userId);
