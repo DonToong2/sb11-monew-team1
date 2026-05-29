@@ -139,4 +139,23 @@ public class CommentTest {
       assertThat(comment.getDeletedAt()).isNotNull();
     }
   }
+
+  @Nested
+  @DisplayName("댓글 좋아요 등록하기")
+  class CreateCommentLike {
+
+    @Test
+    @DisplayName("댓글 좋아요 등록 시 likeCount 1 증가")
+    void 댓글_좋아요_증가() {
+      // given
+      // comment는 BeforeEach에서 초기화
+      long before = comment.getLikeCount();
+
+      // when
+      comment.increaseLikeCount();
+
+      // then
+      assertThat(comment.getLikeCount()).isEqualTo(before + 1);
+    }
+  }
 }
