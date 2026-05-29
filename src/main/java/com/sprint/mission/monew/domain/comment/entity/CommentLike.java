@@ -46,4 +46,9 @@ public class CommentLike extends BaseEntity {
     this.comment = comment;
   }
 
+  // 정적 팩토리 메서드
+  public static CommentLike create(User user, Comment comment) {
+    return null;
+  }
+
 }
