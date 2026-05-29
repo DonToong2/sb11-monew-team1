@@ -75,7 +75,7 @@ public class CommentLikeService {
     commentLikeRepository.deleteByUserIdAndCommentId(userId, commentId);
     commentRepository.decreaseLikeCount(commentId);
 
-    log.info("[COMMENT_LIKE_CANCEL_SUCCESS] 댓글 좋아요 등록 성공 - 요청자 ID={}, 댓글 ID={}",
+    log.info("[COMMENT_LIKE_CANCEL_SUCCESS] 댓글 좋아요 취소 성공 - 요청자 ID={}, 댓글 ID={}",
         userId, commentId);
   }
 
