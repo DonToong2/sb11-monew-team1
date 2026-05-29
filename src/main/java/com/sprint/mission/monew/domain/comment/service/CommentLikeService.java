@@ -62,4 +62,8 @@ public class CommentLikeService {
     return commentLikeMapper.toResponse(savedCommentLike);
   }
 
+  @Transactional
+  public void cancel(UUID commentId, UUID userId) {
+  }
+
 }
