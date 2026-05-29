@@ -14,4 +14,6 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
       """)
   void increaseLikeCount(UUID commentId);
 
+  void decreaseLikeCount(UUID commentId);
+
 }
