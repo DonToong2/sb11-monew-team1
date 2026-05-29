@@ -10,7 +10,7 @@ public record CommentLikeResponse(
     UUID commentId,
     UUID articleId,
     UUID commentUserId,
-    String commentUserNickName,
+    String commentUserNickname,
     String commentContent,
     int commentLikeCount,
     Instant commentCreatedAt
