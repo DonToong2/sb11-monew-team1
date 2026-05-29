@@ -120,7 +120,7 @@ public class CommentLikeIntegrationTest {
       // when & then
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", comment.getId())
               .header("Monew-Request-User-ID", user.getId()))
-          .andExpect(status().isOk());
+          .andExpect(status().isCreated());
 
       // DB 검증
       boolean exists = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),

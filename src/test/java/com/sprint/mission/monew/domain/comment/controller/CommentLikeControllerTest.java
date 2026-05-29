@@ -131,7 +131,7 @@ public class CommentLikeControllerTest {
       // when & then
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", commentId)
               .header("Monew-Request-User-ID", userId))
-          .andExpect(status().isOk());
+          .andExpect(status().isCreated());
 
     }
   }

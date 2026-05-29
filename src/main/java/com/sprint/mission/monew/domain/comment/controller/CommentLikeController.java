@@ -34,7 +34,7 @@ public class CommentLikeController implements CommentLikeApi {
 
     log.debug("[COMMENT_LIKE_CREATE_RESPONSE] 댓글 좋아요 등록 응답 - 댓글 좋아요 ID={}", response.id());
 
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
 }
