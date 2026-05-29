@@ -19,7 +19,8 @@ import lombok.NoArgsConstructor;
 @Table(
     name = "comment_likes",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_comment_likes_user_comment", columnNames = {"user_id", "comment_id"})
+        @UniqueConstraint(name = "uk_comment_likes_user_comment", columnNames = {"user_id",
+            "comment_id"})
     },
     indexes = {
         @Index(name = "idx_comment_likes_user_id", columnList = "user_id"),

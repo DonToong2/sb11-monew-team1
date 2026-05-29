@@ -83,7 +83,7 @@ public class CommentLikeControllerTest {
   class Controller_Create_CommentLike {
 
     @Test
-    @DisplayName("댓글 좋아요 등록 실패 - 사용자가 존재하지 않음")
+    @DisplayName("댓글 좋아요 등록 실패 - 사용자가 존재하지 않음(404 에러)")
     void 댓글_좋아요_등록_실패_사용자_없음() throws Exception {
       // given
       given(commentLikeService.create(any(), any())).willThrow(
@@ -91,12 +91,12 @@ public class CommentLikeControllerTest {
 
       // when & then
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", commentId)
-          .header("Monew-Request-User-ID", userId))
+              .header("Monew-Request-User-ID", userId))
           .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("댓글 좋아요 등록 실패 - 댓글이 존재하지 않음")
+    @DisplayName("댓글 좋아요 등록 실패 - 댓글이 존재하지 않음(404 에러)")
     void 댓글_좋아요_등록_실패_댓글_없음() throws Exception {
       // given
       given(commentLikeService.create(any(), any())).willThrow(
@@ -109,7 +109,7 @@ public class CommentLikeControllerTest {
     }
 
     @Test
-    @DisplayName("댓글 좋아요 등록 실패 - 이미 좋아요가 등록되어 있음")
+    @DisplayName("댓글 좋아요 등록 실패 - 이미 좋아요가 등록되어 있음(409 에러)")
     void 댓글_좋아요_등록_실패_좋아요_중복등록() throws Exception {
       // given
       given(commentLikeService.create(any(), any())).willThrow(
@@ -130,7 +130,7 @@ public class CommentLikeControllerTest {
 
       // when & then
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", commentId)
-          .header("Monew-Request-User-ID", userId))
+              .header("Monew-Request-User-ID", userId))
           .andExpect(status().isOk());
 
     }

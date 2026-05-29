@@ -82,7 +82,7 @@ public class CommentLikeIntegrationTest {
 
       // when & then
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", comment.getId())
-          .header("Monew-Request-User-ID", notExistUserId))
+              .header("Monew-Request-User-ID", notExistUserId))
           .andExpect(status().isNotFound());
     }
 
@@ -94,7 +94,7 @@ public class CommentLikeIntegrationTest {
 
       // when & then
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", notExistCommentId)
-          .header("Monew-Request-User-ID", user.getId()))
+              .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isNotFound());
     }
 
@@ -103,11 +103,11 @@ public class CommentLikeIntegrationTest {
     void 댓글_좋아요_등록_실패_좋아요_중복등록() throws Exception {
       // given
       // 미리 좋아요 생성
-      commentLikeRepository.save(CommentLike.create(user,comment));
+      commentLikeRepository.save(CommentLike.create(user, comment));
 
       // when & then
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", comment.getId())
-          .header("Monew-Request-User-ID", user.getId()))
+              .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isConflict());
     }
 
@@ -119,11 +119,12 @@ public class CommentLikeIntegrationTest {
 
       // when & then
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", comment.getId())
-          .header("Monew-Request-User-ID", user.getId()))
+              .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isOk());
 
       // DB 검증
-      boolean exists = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+      boolean exists = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
+          comment.getId());
 
       assertThat(exists).isTrue();
 

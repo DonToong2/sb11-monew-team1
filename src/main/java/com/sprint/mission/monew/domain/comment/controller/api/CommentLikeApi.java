@@ -20,11 +20,11 @@ public interface CommentLikeApi {
   @Operation(summary = "댓글 좋아요", description = "댓글 좋아요를 등록합니다.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "댓글 좋아요 성공",
-      content = @Content(schema = @Schema(implementation = CommentLikeResponse.class))),
+          content = @Content(schema = @Schema(implementation = CommentLikeResponse.class))),
       @ApiResponse(responseCode = "404", description = "댓글 정보 또는 사용자 없음",
           content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(responseCode = "409", description = "이미 댓글에 좋아요를 등록함",
-      content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(responseCode = "500", description = "서버 내부 오류",
           content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })

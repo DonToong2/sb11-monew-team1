@@ -87,7 +87,7 @@ public class CommentLikeServiceTest {
       // when & then
       assertThatThrownBy(
           () -> commentLikeService.create(commentId, userId)).isInstanceOf(
-              UserNotFoundException.class);
+          UserNotFoundException.class);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class CommentLikeServiceTest {
       // when & then
       assertThatThrownBy(
           () -> commentLikeService.create(commentId, userId)).isInstanceOf(
-              CommentNotFoundException.class);
+          CommentNotFoundException.class);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class CommentLikeServiceTest {
 
       assertThatThrownBy(
           () -> commentLikeService.create(commentId, userId)).isInstanceOf(
-              CommentLikeAlreadyExistsException.class);
+          CommentLikeAlreadyExistsException.class);
     }
 
     @Test

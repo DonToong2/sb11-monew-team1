@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CommentLikeMapper {
+
   @Mapping(target = "likedBy", expression = "java(commentLike.getUser() != null ? commentLike.getUser().getId() : null)")
   @Mapping(target = "commentId", expression = "java(commentLike.getComment().getId())")
   @Mapping(target = "articleId", expression = "java(commentLike.getComment().getArticle().getId())")
