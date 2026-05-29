@@ -160,6 +160,34 @@ public class CommentRepositoryTest {
       Comment after = commentRepository.findById(savedComment.getId()).orElseThrow();
       assertThat(after.getLikeCount()).isEqualTo(1);
     }
+  }
 
+  @Nested
+  @DisplayName("decreaseLikeCount() 테스트")
+  class DecreaseLikeCount {
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 성공")
+    void 댓글_좋아요_취소_성공() {
+      // given
+      Comment savedComment = commentRepository.save(comment);
+
+      commentRepository.findById(savedComment.getId()).orElseThrow();
+      commentRepository.increaseLikeCount(savedComment.getId());
+      testEntityManager.flush();
+      testEntityManager.clear();
+      Comment before = commentRepository.findById(savedComment.getId()).orElseThrow();
+      assertThat(before.getLikeCount()).isEqualTo(1);
+
+      // when
+      commentRepository.decreaseLikeCount(savedComment.getId());
+
+      testEntityManager.flush();
+      testEntityManager.clear();
+
+      // then
+      Comment after = commentRepository.findById(savedComment.getId()).orElseThrow();
+      assertThat(after.getLikeCount()).isEqualTo(0);
+    }
   }
 }
