@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -130,7 +129,8 @@ public class CommentLikeRepositoryTest {
       commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
 
       // then
-      boolean exists = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+      boolean exists = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
+          comment.getId());
       assertThat(exists).isFalse();
     }
   }
