@@ -1,6 +1,7 @@
 package com.sprint.mission.monew.domain.comment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -10,10 +11,13 @@ import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentLikeResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.entity.CommentLike;
+import com.sprint.mission.monew.domain.comment.exception.CommentLikeAlreadyExistsException;
+import com.sprint.mission.monew.domain.comment.exception.CommentNotFoundException;
 import com.sprint.mission.monew.domain.comment.mapper.CommentLikeMapper;
 import com.sprint.mission.monew.domain.comment.repository.CommentLikeRepository;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
 import com.sprint.mission.monew.domain.user.entity.User;
+import com.sprint.mission.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.Optional;
@@ -73,6 +77,42 @@ public class CommentLikeServiceTest {
   @Nested
   @DisplayName("댓글 좋아요 등록하기")
   class Service_CommentLike_Create {
+
+    @Test
+    @DisplayName("댓글 좋아요 등록 실패 - 유저가 존재하지 않음")
+    void 댓글좋아요_등록_실패_유저_없음() {
+      // given
+      given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(
+          () -> commentLikeService.create(commentId, userId)).isInstanceOf(
+              UserNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 등록 실패 - 댓글이 존재하지 않음")
+    void 댓글좋아요_등록_실패_댓글_없음() {
+      // given
+      given(userRepository.findById(userId)).willReturn(Optional.of(user));
+      given(commentRepository.findById(commentId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(
+          () -> commentLikeService.create(commentId, userId)).isInstanceOf(
+              CommentNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 등록 실패 - 이미 좋아요가 등록되어 있음")
+    void 댓글좋아요_등록_실패_좋아요_중복등록() {
+      // given
+      given(commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)).willReturn(true);
+
+      assertThatThrownBy(
+          () -> commentLikeService.create(commentId, userId)).isInstanceOf(
+              CommentLikeAlreadyExistsException.class);
+    }
 
     @Test
     @DisplayName("댓글 좋아요 등록 성공")
