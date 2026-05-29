@@ -93,7 +93,8 @@ public class CommentLikeRepositoryTest {
       // user, comment를 BeforeEach에서 초기화
 
       // when
-      boolean result = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+      boolean result = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
+          comment.getId());
 
       // then
       assertThat(result).isFalse();
@@ -107,10 +108,30 @@ public class CommentLikeRepositoryTest {
       commentLikeRepository.save(CommentLike.create(user, comment));
 
       // when
-      boolean result = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+      boolean result = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
+          comment.getId());
 
       // then
       assertThat(result).isTrue();
+    }
+  }
+
+  @Nested
+  @DisplayName("사용자ID와 댓글ID가 일치하는 행 삭제")
+  class DeleteByUserIdAndCommentId {
+
+    @Test
+    @DisplayName("사용자ID와 댓글ID가 일치하는 행 삭제 성공")
+    void 사용자ID와_댓글ID_행_삭제_성공() {
+      // given
+      // commentLike와 save()는 BeforeEach에서 초기화
+
+      // when
+      commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
+
+      // then
+      boolean exists = commentLikeRepository.existsByUserIdAndCommentId(user.getId(), comment.getId());
+      assertThat(exists).isFalse();
     }
   }
 
