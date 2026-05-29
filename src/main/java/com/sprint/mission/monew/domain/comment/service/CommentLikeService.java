@@ -4,6 +4,7 @@ import com.sprint.mission.monew.domain.comment.dto.response.CommentLikeResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.entity.CommentLike;
 import com.sprint.mission.monew.domain.comment.exception.CommentLikeAlreadyExistsException;
+import com.sprint.mission.monew.domain.comment.exception.CommentLikeNotFoundException;
 import com.sprint.mission.monew.domain.comment.exception.CommentNotFoundException;
 import com.sprint.mission.monew.domain.comment.mapper.CommentLikeMapper;
 import com.sprint.mission.monew.domain.comment.repository.CommentLikeRepository;
@@ -64,7 +65,9 @@ public class CommentLikeService {
 
   @Transactional
   public void cancel(UUID commentId, UUID userId) {
-    if (!commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)) {}
+    if (!commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)) {
+      throw CommentLikeNotFoundException.withId(commentId, userId);
+    }
     commentLikeRepository.deleteByUserIdAndCommentId(userId, commentId);
     commentRepository.decreaseLikeCount(commentId);
   }
