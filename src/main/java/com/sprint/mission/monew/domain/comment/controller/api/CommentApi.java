@@ -68,7 +68,7 @@ public interface CommentApi {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "삭제 성공"),
       @ApiResponse(responseCode = "404", description = "댓글 정보 없음",
-      content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(responseCode = "500", description = "서버 내부 오류",
           content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
