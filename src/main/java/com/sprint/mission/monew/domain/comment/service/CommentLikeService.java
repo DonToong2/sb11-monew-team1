@@ -1,9 +1,12 @@
 package com.sprint.mission.monew.domain.comment.service;
 
 import com.sprint.mission.monew.domain.comment.dto.response.CommentLikeResponse;
+import com.sprint.mission.monew.domain.comment.entity.Comment;
+import com.sprint.mission.monew.domain.comment.entity.CommentLike;
 import com.sprint.mission.monew.domain.comment.mapper.CommentLikeMapper;
 import com.sprint.mission.monew.domain.comment.repository.CommentLikeRepository;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
+import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +25,15 @@ public class CommentLikeService {
 
   @Transactional
   public CommentLikeResponse create(UUID commentId, UUID userId) {
-    return null;
+    User user = userRepository.findById(userId).orElseThrow();
+    Comment comment = commentRepository.findById(commentId).orElseThrow();
+
+    CommentLike commentLike = CommentLike.create(user, comment);
+
+    comment.increaseLikeCount();
+    CommentLike savedCommentLike = commentLikeRepository.save(commentLike);
+
+    return commentLikeMapper.toResponse(savedCommentLike);
   }
 
 }
