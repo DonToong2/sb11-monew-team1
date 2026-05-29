@@ -96,7 +96,9 @@ public class CommentService {
 
   @Transactional
   public void hardDelete(UUID commentId) {
-    Comment comment = commentRepository.findById(commentId).orElseThrow();
+    Comment comment = commentRepository.findById(commentId).orElseThrow(
+        () -> CommentNotFoundException.withId(commentId)
+    );
 
     commentRepository.delete(comment);
   }
