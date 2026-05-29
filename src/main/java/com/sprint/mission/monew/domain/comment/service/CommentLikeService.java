@@ -64,6 +64,9 @@ public class CommentLikeService {
 
   @Transactional
   public void cancel(UUID commentId, UUID userId) {
+    if (!commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)) {}
+    commentLikeRepository.deleteByUserIdAndCommentId(userId, commentId);
+    commentRepository.decreaseLikeCount(commentId);
   }
 
 }
