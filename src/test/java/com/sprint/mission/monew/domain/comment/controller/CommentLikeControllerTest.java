@@ -81,7 +81,46 @@ public class CommentLikeControllerTest {
   @Nested
   @DisplayName("댓글 좋아요 등록하기")
   class Controller_Create_CommentLike {
-    
+
+    @Test
+    @DisplayName("댓글 좋아요 등록 실패 - 사용자가 존재하지 않음")
+    void 댓글_좋아요_등록_실패_사용자_없음() throws Exception {
+      // given
+      given(commentLikeService.create(any(), any())).willThrow(
+          UserNotFoundException.withId(userId));
+
+      // when & then
+      mockMvc.perform(post("/api/comments/{commentId}/comment-likes", commentId)
+          .header("Monew-Request-User-ID", userId))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 등록 실패 - 댓글이 존재하지 않음")
+    void 댓글_좋아요_등록_실패_댓글_없음() throws Exception {
+      // given
+      given(commentLikeService.create(any(), any())).willThrow(
+          CommentNotFoundException.withId(commentId));
+
+      // when & then
+      mockMvc.perform(post("/api/comments/{commentId}/comment-likes", commentId)
+              .header("Monew-Request-User-ID", userId))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요 등록 실패 - 이미 좋아요가 등록되어 있음")
+    void 댓글_좋아요_등록_실패_좋아요_중복등록() throws Exception {
+      // given
+      given(commentLikeService.create(any(), any())).willThrow(
+          CommentLikeAlreadyExistsException.withId(userId, commentId));
+
+      // when & then
+      mockMvc.perform(post("/api/comments/{commentId}/comment-likes", commentId)
+              .header("Monew-Request-User-ID", userId))
+          .andExpect(status().isConflict());
+    }
+
     @Test
     @DisplayName("댓글 좋아요 등록 성공")
     void 댓글_좋아요_등록_성공() throws Exception {
