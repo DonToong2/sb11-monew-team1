@@ -260,6 +260,17 @@ public class CommentServiceTest {
   class Service_Comment_HardDelete {
 
     @Test
+    @DisplayName("댓글 물리삭제 실패 - 댓글이 존재하지 않음")
+    void 댓글_물리삭제_실패() {
+      // given
+      given(commentRepository.findById(commentId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> commentService.hardDelete(commentId)).isInstanceOf(
+          CommentNotFoundException.class);
+    }
+
+    @Test
     @DisplayName("댓글 물리삭제 성공")
     void 댓글_물리삭제_성공() {
       // given
