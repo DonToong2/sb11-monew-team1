@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
 import com.sprint.mission.monew.domain.article.entity.Article;
@@ -116,7 +117,7 @@ public class CommentLikeServiceTest {
 
     @Test
     @DisplayName("댓글 좋아요 등록 성공")
-    void 댓글좋아요_등록_성공() {
+    void 댓글_좋아요_등록_성공() {
       // given
       // comment(commentId, userId), user는 BeforeEach에서 초기화
 
@@ -127,17 +128,22 @@ public class CommentLikeServiceTest {
           Instant.now(),
           commentId,
           articleId,
-          comment.getUser().getId(),
-          comment.getUser().getNickname(),
-          comment.getContent(),
-          comment.getLikeCount(),
-          comment.getCreatedAt()
+          userId,
+          "test2",
+          "댓글 내용",
+          0,
+          Instant.now()
       );
 
+      given(commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)).willReturn(false);
       given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
       given(userRepository.findById(userId)).willReturn(Optional.of(user));
-      given(commentLikeRepository.save(any(CommentLike.class)))
-          .willAnswer(invocation -> invocation.getArgument(0));
+
+      CommentLike savedCommentLike = CommentLike.create(user, comment);
+      given(commentLikeRepository.saveAndFlush(any(CommentLike.class))).willReturn(
+          savedCommentLike);
+
+      doNothing().when(commentRepository).increaseLikeCount(commentId);
       given(commentLikeMapper.toResponse(any(CommentLike.class))).willReturn(expectedResponse);
 
       // when
@@ -146,8 +152,8 @@ public class CommentLikeServiceTest {
       // then
       assertThat(response).isNotNull();
       assertThat(response).isEqualTo(expectedResponse);
-      assertThat(comment.getLikeCount()).isEqualTo(1);
-      verify(commentLikeRepository).save(any(CommentLike.class));
+      verify(commentRepository).increaseLikeCount(commentId);
+      verify(commentLikeRepository).saveAndFlush(any(CommentLike.class));
       verify(commentLikeMapper).toResponse(any(CommentLike.class));
     }
   }
