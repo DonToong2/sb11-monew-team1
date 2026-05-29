@@ -70,5 +70,6 @@ public class Comment extends BaseSoftDeletableEntity {
 
   // 좋아요 생성 시
   public void increaseLikeCount() {
+    this.likeCount++;
   }
 }
