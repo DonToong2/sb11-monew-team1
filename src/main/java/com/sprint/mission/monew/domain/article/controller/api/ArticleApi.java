@@ -4,6 +4,7 @@ import com.sprint.mission.monew.common.dto.CursorPageResponse;
 import com.sprint.mission.monew.common.dto.ErrorResponse;
 import com.sprint.mission.monew.domain.article.dto.ArticleResponse;
 import com.sprint.mission.monew.domain.article.dto.ArticleQueryCondition;
+import com.sprint.mission.monew.domain.article.dto.ArticleViewResponse;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -65,6 +66,10 @@ public interface ArticleApi {
         description = "조회 성공",
         content = @Content(schema = @Schema(implementation = ArticleResponse.class))),
     @ApiResponse(
+        responseCode = "400",
+        description = "잘못된 요청 (잘못된 articleId 형식, 헤더 누락 등)",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    @ApiResponse(
         responseCode = "404",
         description = "기사를 찾을 수 없음",
         content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -77,4 +82,43 @@ public interface ArticleApi {
       @Parameter(description = "뉴스 기사 ID") @PathVariable UUID articleId,
       @Parameter(description = "요청자 ID") @RequestHeader("Monew-Request-User-ID")
           UUID requestUserId);
+
+  @Operation(summary = "기사 조회수 등록", description = "뉴스 기사 조회수를 등록합니다. 중복 조회 시 기존 조회 정보를 반환합니다.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "조회수 등록 성공",
+        content = @Content(schema = @Schema(implementation = ArticleViewResponse.class))),
+    @ApiResponse(
+        responseCode = "400",
+        description = "잘못된 요청 (잘못된 articleId 형식, 헤더 누락 등)",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    @ApiResponse(
+        responseCode = "404",
+        description = "기사를 찾을 수 없음",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    @ApiResponse(
+        responseCode = "500",
+        description = "서버 내부 오류",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
+  ResponseEntity<ArticleViewResponse> registerView(
+      @Parameter(description = "뉴스 기사 ID") @PathVariable UUID articleId,
+      @Parameter(description = "요청자 ID") @RequestHeader("Monew-Request-User-ID")
+          UUID requestUserId);
+
+  @Operation(summary = "뉴스 기사 논리 삭제", description = "뉴스 기사를 논리적으로 삭제합니다.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "논리 삭제 성공"),
+    @ApiResponse(
+        responseCode = "404",
+        description = "뉴스 기사 정보 없음",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    @ApiResponse(
+        responseCode = "500",
+        description = "서버 내부 오류",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+  })
+  ResponseEntity<Void> softDelete(
+      @Parameter(description = "뉴스 기사 ID") @PathVariable UUID articleId);
 }

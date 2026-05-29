@@ -4,6 +4,7 @@ import com.sprint.mission.monew.common.dto.CursorPageResponse;
 import com.sprint.mission.monew.domain.article.controller.api.ArticleApi;
 import com.sprint.mission.monew.domain.article.dto.ArticleResponse;
 import com.sprint.mission.monew.domain.article.dto.ArticleQueryCondition;
+import com.sprint.mission.monew.domain.article.dto.ArticleViewResponse;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.article.service.ArticleService;
 import jakarta.validation.Valid;
@@ -13,9 +14,11 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,5 +50,20 @@ public class ArticleController implements ArticleApi {
       @PathVariable UUID articleId,
       @RequestHeader("Monew-Request-User-ID") UUID requestUserId) {
     return ResponseEntity.ok(articleService.getArticle(articleId, requestUserId));
+  }
+
+  @PostMapping("/{articleId}/article-views")
+  @Override
+  public ResponseEntity<ArticleViewResponse> registerView(
+      @PathVariable UUID articleId,
+      @RequestHeader("Monew-Request-User-ID") UUID requestUserId) {
+    return ResponseEntity.ok(articleService.registerView(articleId, requestUserId));
+  }
+
+  @DeleteMapping("/{articleId}")
+  @Override
+  public ResponseEntity<Void> softDelete(@PathVariable UUID articleId) {
+    articleService.softDelete(articleId);
+    return ResponseEntity.noContent().build();
   }
 }
