@@ -2,6 +2,8 @@ package com.sprint.mission.monew.domain.comment.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -132,7 +134,23 @@ public class CommentLikeControllerTest {
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", commentId)
               .header("Monew-Request-User-ID", userId))
           .andExpect(status().isCreated());
+    }
+  }
 
+  @Nested
+  @DisplayName("댓글 좋아요 취소하기")
+  class Controller_Cancel_CommentLike {
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 성공")
+    void 댓글_좋아요_취소_성공() throws Exception {
+      // given
+      doNothing().when(commentLikeService).cancel(commentId, userId);
+
+      // when & then
+      mockMvc.perform(delete("/api/comments/{commentId}/comment-likes", commentId)
+          .header("Monew-Request-User-ID", userId))
+          .andExpect(status().isNoContent());
     }
   }
 }
