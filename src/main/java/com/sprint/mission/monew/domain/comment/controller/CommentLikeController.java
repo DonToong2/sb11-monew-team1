@@ -3,11 +3,13 @@ package com.sprint.mission.monew.domain.comment.controller;
 import com.sprint.mission.monew.domain.comment.controller.api.CommentLikeApi;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentLikeResponse;
 import com.sprint.mission.monew.domain.comment.service.CommentLikeService;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -35,6 +37,14 @@ public class CommentLikeController implements CommentLikeApi {
     log.debug("[COMMENT_LIKE_CREATE_RESPONSE] 댓글 좋아요 등록 응답 - 댓글 좋아요 ID={}", response.id());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
+
+  @Override
+  @DeleteMapping("/{commentId}/comment-likes")
+  public ResponseEntity<Void> cancelCommentLike(
+      @PathVariable @Parameter(description = "댓글 ID") UUID commentId,
+      @RequestHeader("Monew-Request-User-ID") UUID userId) {
+    return null;
   }
 
 }

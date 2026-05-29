@@ -33,4 +33,9 @@ public interface CommentLikeApi {
       @RequestHeader("Monew-Request-User-ID") @Parameter(description = "요청자 ID") UUID userId
   );
 
+  ResponseEntity<Void> cancelCommentLike(
+      @PathVariable @Parameter(description = "댓글 ID") UUID commentId,
+      @RequestHeader("Monew-Request-User-ID") UUID userId
+  );
+
 }
