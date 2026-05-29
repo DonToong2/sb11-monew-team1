@@ -48,7 +48,7 @@ public class CommentLikeService {
 
     CommentLike commentLike = CommentLike.create(user, comment);
 
-    comment.increaseLikeCount();
+    commentRepository.increaseLikeCount(commentId);
     CommentLike savedCommentLike;
     try {
       savedCommentLike = commentLikeRepository.saveAndFlush(commentLike);
