@@ -96,11 +96,15 @@ public class CommentService {
 
   @Transactional
   public void hardDelete(UUID commentId) {
+    log.debug("[COMMENT_HARD_DELETE] 댓글 물리삭제 시작 - 댓글 ID={}", commentId);
+
     Comment comment = commentRepository.findById(commentId).orElseThrow(
         () -> CommentNotFoundException.withId(commentId)
     );
 
     commentRepository.delete(comment);
+
+    log.info("[COMMENT_HARD_DELETE_SUCCESS] 댓글 물리삭제 성공 - 댓글 ID={}", commentId);
   }
 
 }
