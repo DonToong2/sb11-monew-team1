@@ -123,7 +123,7 @@ public class CommentLikeRepositoryTest {
     @DisplayName("사용자ID와 댓글ID가 일치하는 행 삭제 성공")
     void 사용자ID와_댓글ID_행_삭제_성공() {
       // given
-      // commentLike와 save()는 BeforeEach에서 초기화
+      commentLikeRepository.save(CommentLike.create(user, comment));
 
       // when
       commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
