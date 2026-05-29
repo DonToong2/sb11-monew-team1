@@ -254,4 +254,23 @@ public class CommentServiceTest {
       assertThat(comment.isDeleted()).isTrue();
     }
   }
+
+  @Nested
+  @DisplayName("댓글 물리 삭제하기")
+  class Service_Comment_HardDelete {
+
+    @Test
+    @DisplayName("댓글 물리삭제 성공")
+    void 댓글_물리삭제_성공() {
+      // given
+      Comment comment = Comment.create(article, user, content);
+      given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+      // when
+      commentService.hardDelete(commentId);
+
+      // then
+      verify(commentRepository).delete(comment);
+    }
+  }
 }
