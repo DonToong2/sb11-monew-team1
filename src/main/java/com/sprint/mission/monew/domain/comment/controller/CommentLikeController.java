@@ -29,12 +29,15 @@ public class CommentLikeController implements CommentLikeApi {
   public ResponseEntity<CommentLikeResponse> createCommentLike(
       @PathVariable UUID commentId,
       @RequestHeader("Monew-Request-User-ID") UUID userId) {
-    log.info("[COMMENT_LIKE_CREATE_REQUEST] 댓글 좋아요 등록 요청 - 댓글 ID={}", commentId);
-    log.debug("[COMMENT_LIKE_CREATE_REQUEST] 댓글 좋아요 등록 요청 - 요청자 ID={}", userId);
+    log.info("[COMMENT_LIKE_CREATE_REQUEST] 댓글 좋아요 등록 요청 - 댓글 ID={}",
+        commentId);
+    log.debug("[COMMENT_LIKE_CREATE_REQUEST] 댓글 좋아요 등록 요청 - 요청자 ID={}",
+        userId);
 
     CommentLikeResponse response = commentLikeService.create(commentId, userId);
 
-    log.debug("[COMMENT_LIKE_CREATE_RESPONSE] 댓글 좋아요 등록 응답 - 댓글 좋아요 ID={}", response.id());
+    log.debug("[COMMENT_LIKE_CREATE_RESPONSE] 댓글 좋아요 등록 응답 - 댓글 좋아요 ID={}",
+        response.id());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
@@ -44,7 +47,14 @@ public class CommentLikeController implements CommentLikeApi {
   public ResponseEntity<Void> cancelCommentLike(
       @PathVariable @Parameter(description = "댓글 ID") UUID commentId,
       @RequestHeader("Monew-Request-User-ID") UUID userId) {
+    log.info("[COMMENT_LIKE_CANCEL_REQUEST] 댓글 좋아요 취소 요청 - 댓글 ID={}, 요청자 ID={}",
+        commentId, userId);
+
     commentLikeService.cancel(commentId, userId);
+
+    log.debug("[COMMENT_LIKE_CANCEL_RESPONSE] 댓글 좋아요 취소 응답 - 댓글 ID={}, 요청자 ID={}",
+        commentId, userId);
+
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
