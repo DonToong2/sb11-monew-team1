@@ -77,6 +77,7 @@ public class CommentController implements CommentApi {
   @Override
   @DeleteMapping("/{commentId}/hard")
   public ResponseEntity<Void> hardDeleteComment(@PathVariable UUID commentId) {
-    return null;
+    commentService.hardDelete(commentId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
