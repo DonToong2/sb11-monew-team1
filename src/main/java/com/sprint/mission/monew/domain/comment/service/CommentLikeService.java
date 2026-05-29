@@ -14,6 +14,7 @@ import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +49,12 @@ public class CommentLikeService {
     CommentLike commentLike = CommentLike.create(user, comment);
 
     comment.increaseLikeCount();
-    CommentLike savedCommentLike = commentLikeRepository.save(commentLike);
+    CommentLike savedCommentLike;
+    try {
+      savedCommentLike = commentLikeRepository.saveAndFlush(commentLike);
+    } catch (DataIntegrityViolationException e) {
+      throw CommentLikeAlreadyExistsException.withId(userId, commentId);
+    }
 
     log.info("[COMMENT_LIKE_CREATE_SUCCESS] 댓글 좋아요 등록 성공 - 좋아요 ID={}, 요청자 ID={}, 댓글 ID={}",
         savedCommentLike.getId(), userId, commentId);
