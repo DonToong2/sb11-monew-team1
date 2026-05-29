@@ -44,7 +44,8 @@ public class CommentLikeController implements CommentLikeApi {
   public ResponseEntity<Void> cancelCommentLike(
       @PathVariable @Parameter(description = "댓글 ID") UUID commentId,
       @RequestHeader("Monew-Request-User-ID") UUID userId) {
-    return null;
+    commentLikeService.cancel(commentId, userId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
 }
