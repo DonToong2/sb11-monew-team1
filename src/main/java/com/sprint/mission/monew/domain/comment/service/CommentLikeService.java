@@ -69,7 +69,7 @@ public class CommentLikeService {
         userId, commentId);
 
     if (!commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)) {
-      throw CommentLikeNotFoundException.withId(commentId, userId);
+      throw CommentLikeNotFoundException.withId(userId, commentId);
     }
 
     commentLikeRepository.deleteByUserIdAndCommentId(userId, commentId);
