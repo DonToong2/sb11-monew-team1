@@ -5,6 +5,7 @@ import com.sprint.mission.monew.domain.comment.dto.response.CommentLikeResponse;
 import com.sprint.mission.monew.domain.comment.service.CommentLikeService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/comment")
+@RequestMapping("/api/comments")
 public class CommentLikeController implements CommentLikeApi {
 
   private final CommentLikeService commentLikeService;
@@ -24,7 +25,8 @@ public class CommentLikeController implements CommentLikeApi {
   public ResponseEntity<CommentLikeResponse> createCommentLike(
       @PathVariable UUID commentId,
       @RequestHeader("Monew-Request-User-ID") UUID userId) {
-    return null;
+    CommentLikeResponse response = commentLikeService.create(commentId, userId);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
 }
