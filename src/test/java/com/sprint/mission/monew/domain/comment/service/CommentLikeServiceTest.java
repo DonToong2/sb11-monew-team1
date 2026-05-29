@@ -158,4 +158,23 @@ public class CommentLikeServiceTest {
     }
   }
 
+  @Nested
+  @DisplayName("댓글 좋아요 취소하기")
+  class Service_CommentLike_Cancel {
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 성공")
+    void 댓글_좋아요_취소_성공() {
+      // given
+      given(commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)).willReturn(true);
+
+      // when
+      commentLikeService.cancel(commentId, userId);
+
+      // then
+      verify(commentLikeRepository).deleteByUserIdAndCommentId(userId, commentId);
+      verify(commentRepository).decreaseLikeCount(commentId);
+    }
+  }
+
 }
