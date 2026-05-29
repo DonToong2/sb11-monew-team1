@@ -301,6 +301,18 @@ public class CommentControllerTest {
   class Controller_HardDelete_Comment {
 
     @Test
+    @DisplayName("댓글 물리삭제 실패 - 댓글이 존재하지 않음")
+    void 댓글_물리삭제_실패_댓글_없음() throws Exception {
+      // given
+      doThrow(CommentNotFoundException.withId(commentId)).when(commentService)
+          .hardDelete(commentId);
+
+      // when & then
+      mockMvc.perform(delete("/api/comments/{commentId}/hard", commentId))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("댓글 물리삭제 성공")
     void 댓글_물리삭제_성공() throws Exception {
       // given
