@@ -13,6 +13,7 @@ import com.sprint.mission.monew.domain.comment.dto.response.CommentLikeResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.entity.CommentLike;
 import com.sprint.mission.monew.domain.comment.exception.CommentLikeAlreadyExistsException;
+import com.sprint.mission.monew.domain.comment.exception.CommentLikeNotFoundException;
 import com.sprint.mission.monew.domain.comment.exception.CommentNotFoundException;
 import com.sprint.mission.monew.domain.comment.mapper.CommentLikeMapper;
 import com.sprint.mission.monew.domain.comment.repository.CommentLikeRepository;
@@ -161,6 +162,18 @@ public class CommentLikeServiceTest {
   @Nested
   @DisplayName("댓글 좋아요 취소하기")
   class Service_CommentLike_Cancel {
+
+    @Test
+    @DisplayName("댓글 좋아요 취소 실패 - 좋아요가 존재하지 않음")
+    void 댓글_좋아요_취소_실패_좋아요_없음() {
+      // given
+      given(commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)).willReturn(false);
+
+      // when & then
+      assertThatThrownBy(
+          () -> commentLikeService.cancel(commentId, userId)).isInstanceOf(
+          CommentLikeNotFoundException.class);
+    }
 
     @Test
     @DisplayName("댓글 좋아요 취소 성공")
