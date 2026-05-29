@@ -126,7 +126,7 @@ public class CommentLikeControllerTest {
     void 댓글_좋아요_등록_성공() throws Exception {
       // given
       // userId, commentId는 BeforeEach에서 초기화
-      given(commentLikeService.create(userId, commentId)).willReturn(response);
+      given(commentLikeService.create(commentId, userId)).willReturn(response);
 
       // when & then
       mockMvc.perform(post("/api/comments/{commentId}/comment-likes", commentId)
