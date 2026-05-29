@@ -164,6 +164,15 @@ public class CommentLikeIntegrationTest {
       mockMvc.perform(delete("/api/comments/{commentId}/comment-likes", comment.getId())
               .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isNoContent());
+
+      // DB 검증
+      boolean exists = commentLikeRepository.existsByUserIdAndCommentId(user.getId(),
+          comment.getId());
+      assertThat(exists).isFalse();
+
+      // LikeCount 감소 검증
+      Comment foundComment = commentRepository.findById(comment.getId()).orElseThrow();
+      assertThat(foundComment.getLikeCount()).isEqualTo(0);
     }
   }
 
