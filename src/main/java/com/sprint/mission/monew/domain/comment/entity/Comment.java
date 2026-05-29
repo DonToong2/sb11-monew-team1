@@ -67,4 +67,8 @@ public class Comment extends BaseSoftDeletableEntity {
   public boolean isOwner(UUID userId) {
     return this.user != null && Objects.equals(this.user.getId(), userId);
   }
+
+  // 좋아요 생성 시
+  public void increaseLikeCount() {
+  }
 }
