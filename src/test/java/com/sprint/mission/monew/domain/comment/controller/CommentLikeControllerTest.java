@@ -3,6 +3,7 @@ package com.sprint.mission.monew.domain.comment.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -13,6 +14,7 @@ import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentLikeResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.exception.CommentLikeAlreadyExistsException;
+import com.sprint.mission.monew.domain.comment.exception.CommentLikeNotFoundException;
 import com.sprint.mission.monew.domain.comment.exception.CommentNotFoundException;
 import com.sprint.mission.monew.domain.comment.service.CommentLikeService;
 import com.sprint.mission.monew.domain.user.entity.User;
@@ -142,6 +144,19 @@ public class CommentLikeControllerTest {
   class Controller_Cancel_CommentLike {
 
     @Test
+    @DisplayName("댓글 좋아요 취소 실패 - 좋아요가 존재하지 않음(404 에러)")
+    void 댓글_좋아요_취소_실패_좋아요_없음() throws Exception {
+      // given
+      doThrow(CommentLikeNotFoundException.withId(userId, commentId)).when(commentLikeService)
+          .cancel(commentId, userId);
+
+      // when & then
+      mockMvc.perform(delete("/api/comments/{commentId}/comment-likes", commentId)
+              .header("Monew-Request-User-ID", userId))
+          .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("댓글 좋아요 취소 성공")
     void 댓글_좋아요_취소_성공() throws Exception {
       // given
@@ -149,7 +164,7 @@ public class CommentLikeControllerTest {
 
       // when & then
       mockMvc.perform(delete("/api/comments/{commentId}/comment-likes", commentId)
-          .header("Monew-Request-User-ID", userId))
+              .header("Monew-Request-User-ID", userId))
           .andExpect(status().isNoContent());
     }
   }
