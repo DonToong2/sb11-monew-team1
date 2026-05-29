@@ -13,9 +13,11 @@ import com.sprint.mission.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -28,6 +30,8 @@ public class CommentLikeService {
 
   @Transactional
   public CommentLikeResponse create(UUID commentId, UUID userId) {
+    log.debug("[COMMENT_LIKE_CREATE_START] 댓글 좋아요 등록 시작 - 요청자 ID={}, 댓글 ID={}",
+        userId, commentId);
 
     // 사용자가 이미 댓글에 좋아요를 눌렀다면 예외처리
     if (commentLikeRepository.existsByUserIdAndCommentId(userId, commentId)) {
@@ -45,6 +49,9 @@ public class CommentLikeService {
 
     comment.increaseLikeCount();
     CommentLike savedCommentLike = commentLikeRepository.save(commentLike);
+
+    log.info("[COMMENT_LIKE_CREATE_SUCCESS] 댓글 좋아요 등록 성공 - 좋아요 ID={}, 요청자 ID={}, 댓글 ID={}",
+        savedCommentLike.getId(), userId, commentId);
 
     return commentLikeMapper.toResponse(savedCommentLike);
   }
