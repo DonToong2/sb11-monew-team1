@@ -63,4 +63,8 @@ public interface CommentApi {
   ResponseEntity<Void> softDeleteComment(
       @PathVariable @Parameter(description = "댓글 ID") UUID commentId,
       @RequestHeader("Monew-Request-User-ID") @Parameter(description = "요청자 ID") UUID userId);
+
+  ResponseEntity<Void> hardDeleteComment(
+      @PathVariable UUID commentId
+  );
 }
