@@ -115,15 +115,25 @@ public class CommentService {
   public CursorPageResponse<CommentResponse> getComments(CommentQueryCondition condition, UUID requestId) {
     List<Comment> comments = commentRepository.getComments(condition);
 
-    List<CommentResponse> content = comments.stream()
+    boolean hasNext = comments.size() > condition.limit();
+    List<Comment> pageComments = hasNext ? comments.subList(0, condition.limit()) : comments;
+
+    String nextCursor = null;
+
+    if (hasNext) {
+      Comment lastComment = pageComments.get(pageComments.size() - 1);
+      nextCursor = lastComment.getCreatedAt().toString();
+    }
+
+    List<CommentResponse> content = pageComments.stream()
         .map(comment -> commentMapper.toResponse(comment, false))
         .toList();
 
     return CursorPageResponse.of(
         content,
+        nextCursor,
         null,
-        null,
-        false,
+        hasNext,
         content.size(),
         commentRepository.countByArticleId(condition.articleId())
     );
