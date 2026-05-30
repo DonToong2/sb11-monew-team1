@@ -38,6 +38,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class CommentServiceTest {
@@ -296,8 +297,115 @@ public class CommentServiceTest {
   class Service_Comment_Find {
 
     @Test
-    @DisplayName("댓글 목록 조회")
-    void 댓글_목록_조회() throws InterruptedException {
+    @DisplayName("hasNext True 테스트(임시 limit 2로 고정)")
+    void hasNext_True() throws InterruptedException {
+      // given
+      Comment firstComment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
+      Thread.sleep(1000);
+
+      Comment secondComment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
+      Thread.sleep(1000);
+
+      Comment thirdComment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
+
+
+      List<Comment> comments = List.of(firstComment, secondComment, thirdComment);
+      given(commentRepository.getComments(any())).willReturn(comments);
+      given(commentRepository.countByArticleId(article.getId())).willReturn(3L);
+
+      CommentQueryCondition condition = new CommentQueryCondition(
+          articleId,
+          CommentOrderBy.CREATED_AT,
+          SortDirection.DESC,
+          null,
+          null,
+          2
+      );
+
+      // when
+      CursorPageResponse<CommentResponse> result = commentService.getComments(condition, userId);
+
+      // then
+      assertThat(result.hasNext()).isTrue();
+    }
+
+    @Test
+    @DisplayName("다음 페이지가 없을 때 hasNext false")
+    void hasNext_False() throws InterruptedException {
+      // given
+      Comment firstComment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
+      Thread.sleep(1000);
+
+      Comment secondComment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
+      Thread.sleep(1000);
+
+      Comment thirdComment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
+
+      List<Comment> comments = List.of(firstComment, secondComment, thirdComment);
+      given(commentRepository.getComments(any())).willReturn(comments);
+      given(commentRepository.countByArticleId(article.getId())).willReturn(3L);
+
+      CommentQueryCondition condition = new CommentQueryCondition(
+          articleId,
+          CommentOrderBy.CREATED_AT,
+          SortDirection.DESC,
+          null,
+          null,
+          5
+      );
+
+      // when
+      CursorPageResponse<CommentResponse> result = commentService.getComments(condition, userId);
+
+      // then
+      assertThat(result.hasNext()).isFalse();
+    }
+
+    @Test
+    @DisplayName("등록순 조회 시 nextCursor 반환")
+    void 등록순_nextCursor() throws InterruptedException {
+      // given
+      Comment firstComment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
+      Thread.sleep(1000);
+
+      Comment secondComment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
+      Thread.sleep(1000);
+
+      Comment thirdComment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
+
+      given(commentRepository.getComments(any())).willReturn(List.of(thirdComment, secondComment, firstComment));
+
+      given(commentRepository.countByArticleId(articleId)).willReturn(3L);
+
+      CommentQueryCondition condition =
+          new CommentQueryCondition(
+              articleId,
+              CommentOrderBy.CREATED_AT,
+              SortDirection.DESC,
+              null,
+              null,
+              2
+          );
+
+      // when
+      CursorPageResponse<CommentResponse> result = commentService.getComments(condition, userId);
+
+      // then
+      assertThat(result.nextCursor()).isEqualTo(secondComment.getCreatedAt().toString());
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 성공")
+    void 댓글_목록_조회_성공() throws InterruptedException {
       // given
       Comment firstComment = Comment.create(article, user, content);
       Thread.sleep(1000);
