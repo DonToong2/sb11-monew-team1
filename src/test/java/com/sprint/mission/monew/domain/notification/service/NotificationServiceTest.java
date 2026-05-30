@@ -6,8 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import com.sprint.mission.monew.common.dto.CursorPageResponse;
 import com.sprint.mission.monew.domain.notification.dto.NotificationQueryCondition;
@@ -15,8 +13,9 @@ import com.sprint.mission.monew.domain.notification.dto.NotificationResponse;
 import com.sprint.mission.monew.domain.notification.entity.Notification;
 import com.sprint.mission.monew.domain.notification.entity.ResourceType;
 import com.sprint.mission.monew.domain.notification.exception.NotificationNotFoundException;
-import com.sprint.mission.monew.domain.notification.mapper.NotificationMapper;
 import com.sprint.mission.monew.domain.notification.repository.NotificationRepository;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,12 +31,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
 
-  @InjectMocks
-  NotificationService notificationService;
-  @Mock
-  NotificationRepository notificationRepository;
-  @Mock
-  NotificationMapper notificationMapper;
+  @InjectMocks NotificationService notificationService;
+  @Mock NotificationRepository notificationRepository;
 
   UUID userId;
 
@@ -68,8 +63,8 @@ class NotificationServiceTest {
     void 성공_시_알림의_confirm이_호출된다() {
       // given
       UUID notificationId = UUID.randomUUID();
-      Notification notification = Notification.create(userId, "알림", ResourceType.INTEREST,
-          UUID.randomUUID());
+      Notification notification =
+          Notification.create(userId, "알림", ResourceType.INTEREST, UUID.randomUUID());
       given(notificationRepository.findByIdAndUserIdAndConfirmedAtIsNull(notificationId, userId))
           .willReturn(Optional.of(notification));
 
@@ -142,9 +137,65 @@ class NotificationServiceTest {
 
       // then
       Instant after = Instant.now();
-      then(notificationRepository).should().deleteConfirmedBefore(argThat(cutoff ->
-          !cutoff.isBefore(before.minus(7, ChronoUnit.DAYS))
-              && !cutoff.isAfter(after.minus(7, ChronoUnit.DAYS))));
+      then(notificationRepository)
+          .should()
+          .deleteConfirmedBefore(
+              argThat(
+                  cutoff ->
+                      !cutoff.isBefore(before.minus(7, ChronoUnit.DAYS))
+                          && !cutoff.isAfter(after.minus(7, ChronoUnit.DAYS))));
+    }
+  }
+
+  @Nested
+  @DisplayName("댓글 좋아요 알림 생성")
+  class CreateCommentLikeNotification {
+
+    @Test
+    @DisplayName("댓글 작성자에게 좋아요 알림이 저장된다")
+    void 댓글_작성자에게_좋아요_알림이_저장된다() {
+      // given
+      UUID commentId = UUID.randomUUID();
+      UUID commentAuthorId = UUID.randomUUID();
+      String likerNickname = "닉네임";
+      given(notificationRepository.save(any(Notification.class)))
+          .willAnswer(invocation -> invocation.getArgument(0));
+
+      // when
+      notificationService.createCommentLikeNotification(commentId, commentAuthorId, likerNickname);
+
+      // then
+      then(notificationRepository)
+          .should()
+          .save(
+              argThat(
+                  n ->
+                      n.getUserId().equals(commentAuthorId)
+                          && n.getResourceType() == ResourceType.COMMENT
+                          && n.getResourceId().equals(commentId)
+                          && n.getContent().contains(likerNickname)));
+    }
+  }
+
+  @Nested
+  @DisplayName("구독 관심사 기사 등록 알림 일괄 생성")
+  class CreateArticleNotifications {
+
+    @Test
+    @DisplayName("구독자 수만큼 알림이 saveAll로 저장된다")
+    void 구독자_수만큼_알림이_saveAll로_저장된다() {
+      // given
+      UUID interestId = UUID.randomUUID();
+      List<UUID> subscriberIds = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+
+      // when
+      notificationService.createArticleNotifications(interestId, "인공지능", subscriberIds);
+
+      // then
+      then(notificationRepository)
+          .should()
+          .saveAll(
+              argThat(notifications -> ((List<?>) notifications).size() == subscriberIds.size()));
     }
   }
 }
