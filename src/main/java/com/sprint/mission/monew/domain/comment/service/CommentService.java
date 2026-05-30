@@ -113,7 +113,20 @@ public class CommentService {
 
   @Transactional(readOnly = true)
   public CursorPageResponse<CommentResponse> getComments(CommentQueryCondition condition, UUID requestId) {
-    return null;
+    List<Comment> comments = commentRepository.getComments(condition);
+
+    List<CommentResponse> content = comments.stream()
+        .map(comment -> commentMapper.toResponse(comment, false))
+        .toList();
+
+    return CursorPageResponse.of(
+        content,
+        null,
+        null,
+        false,
+        content.size(),
+        commentRepository.countByArticleId(condition.articleId())
+    );
   }
 
 }
