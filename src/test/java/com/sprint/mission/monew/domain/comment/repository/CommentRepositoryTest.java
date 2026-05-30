@@ -280,7 +280,60 @@ public class CommentRepositoryTest {
       assertThat(comments.get(0).getId()).isEqualTo(secondComment.getId());
       assertThat(comments.get(1).getId()).isEqualTo(firstComment.getId());
       assertThat(comments.get(2).getId()).isEqualTo(thirdComment.getId());
+    }
 
+    @Test
+    @DisplayName("등록순 첫 페이지 조회")
+    void 등록순_조회_cursor_null() {
+      // given
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      testEntityManager.flush();
+      testEntityManager.clear();
+
+      CommentQueryCondition condition = new CommentQueryCondition(
+          article.getId(),
+          CommentOrderBy.CREATED_AT,
+          SortDirection.DESC,
+          null,
+          null,
+          5
+      );
+
+      // when
+      List<Comment> comments = commentRepository.getComments(condition);
+
+      // then
+      assertThat(comments).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("등록순 다음 페이지 조회")
+    void 등록순_조회_cursor() throws InterruptedException {
+      // given
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Thread.sleep(1000);
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      Thread.sleep(1000);
+      Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
+      testEntityManager.flush();
+      testEntityManager.clear();
+
+      CommentQueryCondition condition = new CommentQueryCondition(
+          article.getId(),
+          CommentOrderBy.CREATED_AT,
+          SortDirection.DESC,
+          secondComment.getCreatedAt().toString(), // 두번째 시간 이전의 댓글(firstComment)만 조회됨
+          null,
+          5
+      );
+
+      // when
+      List<Comment> comments = commentRepository.getComments(condition);
+
+      // then
+      assertThat(comments).hasSize(1); // 그래서 size는 3이 아닌 1이 나옴
+      assertThat(comments.get(0).getId()).isEqualTo(firstComment.getId());
     }
 
     @Test
