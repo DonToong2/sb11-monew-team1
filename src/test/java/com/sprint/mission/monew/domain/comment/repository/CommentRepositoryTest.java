@@ -4,13 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.monew.common.config.JpaConfig;
 import com.sprint.mission.monew.common.config.QuerydslConfig;
+import com.sprint.mission.monew.common.dto.SortDirection;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
+import com.sprint.mission.monew.domain.comment.dto.request.CommentOrderBy;
+import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
+import com.sprint.mission.monew.domain.comment.entity.CommentLike;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +27,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
@@ -38,6 +44,9 @@ public class CommentRepositoryTest {
 
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private CommentLikeRepository commentLikeRepository;
 
   @Autowired
   private TestEntityManager testEntityManager;
@@ -187,6 +196,45 @@ public class CommentRepositoryTest {
       // then
       Comment after = commentRepository.findById(savedComment.getId()).orElseThrow();
       assertThat(after.getLikeCount()).isEqualTo(0);
+    }
+  }
+
+  @Nested
+  @DisplayName("댓글 목록 조회하기")
+  class Find {
+
+    @Test
+    @DisplayName("등록순(createdAt DESC) 조회")
+    void 등록순_조회() throws InterruptedException {
+      // given
+      UUID articleId = article.getId();
+
+      Comment firstComment = Comment.create(article, user, "첫 번째 댓글");
+      testEntityManager.persist(firstComment);
+      Thread.sleep(1000);
+
+      Comment secondComment = Comment.create(article, user, "두 번째 댓글"); // 1초 후 댓글 생성
+      testEntityManager.persist(secondComment);
+
+      testEntityManager.flush();
+      testEntityManager.clear();
+
+      CommentQueryCondition condition = new CommentQueryCondition(
+          articleId,
+          CommentOrderBy.CREATED_AT,
+          SortDirection.DESC,
+          null,
+          null,
+          5
+      );
+
+      // when
+      List<Comment> comments = commentRepository.getComments(condition);
+
+      // then
+      assertThat(comments).hasSize(2);
+      assertThat(comments.get(0).getId()).isEqualTo(secondComment.getId());
+      assertThat(comments.get(1).getId()).isEqualTo(firstComment.getId());
     }
   }
 }
