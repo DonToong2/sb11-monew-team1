@@ -5,7 +5,6 @@ import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
-import com.sprint.mission.monew.domain.comment.dto.request.CommentOrderBy;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
@@ -13,6 +12,7 @@ import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.exception.CommentAccessDeniedException;
 import com.sprint.mission.monew.domain.comment.exception.CommentNotFoundException;
 import com.sprint.mission.monew.domain.comment.mapper.CommentMapper;
+import com.sprint.mission.monew.domain.comment.repository.CommentLikeRepository;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.exception.UserNotFoundException;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +34,7 @@ public class CommentService {
   private final CommentRepository commentRepository;
   private final ArticleRepository articleRepository;
   private final UserRepository userRepository;
+  private final CommentLikeRepository commentLikeRepository;
   private final CommentMapper commentMapper;
 
   @Transactional
@@ -142,7 +142,11 @@ public class CommentService {
     }
 
     List<CommentResponse> content = pageComments.stream()
-        .map(comment -> commentMapper.toResponse(comment, false))
+        .map(comment -> {
+          boolean likedByMe = commentLikeRepository.existsByUserIdAndCommentId(requestId, comment.getId());
+
+          return commentMapper.toResponse(comment, likedByMe);
+        })
         .toList();
 
     return CursorPageResponse.of(
