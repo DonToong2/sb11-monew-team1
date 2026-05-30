@@ -1,6 +1,8 @@
 package com.sprint.mission.monew.domain.comment.repository.querydsl.impl;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sprint.mission.monew.domain.comment.dto.request.CommentOrderBy;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.entity.QComment;
@@ -19,11 +21,18 @@ public class CommentRepositoryImpl implements CommentCustomRepository {
 
   @Override
   public List<Comment> getComments(CommentQueryCondition condition) {
-    return queryFactory.selectFrom(comment)
-        .where(comment.article.id.eq(condition.articleId()))
-        .orderBy(comment.createdAt.desc())
-        .limit(condition.limit())
-        .fetch();
+    JPAQuery<Comment> query = queryFactory.selectFrom(comment)
+        .where(comment.article.id.eq(condition.articleId()));
+
+    // 좋아요순(2순위 등록순)
+    if (condition.orderBy() == CommentOrderBy.LIKE_COUNT) {
+      query.orderBy(comment.likeCount.desc(), comment.createdAt.desc());
+    }
+    // 등록순
+    else {
+      query.orderBy(comment.createdAt.desc());
+    }
+    return query.limit(condition.limit()).fetch();
   }
 
   @Override
