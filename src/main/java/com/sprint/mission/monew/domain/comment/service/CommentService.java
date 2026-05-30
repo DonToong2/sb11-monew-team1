@@ -5,6 +5,7 @@ import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
+import com.sprint.mission.monew.domain.comment.dto.request.CommentOrderBy;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
@@ -16,6 +17,7 @@ import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -112,17 +114,31 @@ public class CommentService {
   }
 
   @Transactional(readOnly = true)
-  public CursorPageResponse<CommentResponse> getComments(CommentQueryCondition condition, UUID requestId) {
+  public CursorPageResponse<CommentResponse> getComments(CommentQueryCondition condition,
+      UUID requestId) {
     List<Comment> comments = commentRepository.getComments(condition);
 
     boolean hasNext = comments.size() > condition.limit();
     List<Comment> pageComments = hasNext ? comments.subList(0, condition.limit()) : comments;
 
     String nextCursor = null;
+    Instant nextAfter = null;
 
-    if (hasNext) {
+    if (!pageComments.isEmpty()) {
       Comment lastComment = pageComments.get(pageComments.size() - 1);
-      nextCursor = lastComment.getCreatedAt().toString();
+
+      switch (condition.orderBy()) {
+
+        case CREATED_AT -> {
+          nextCursor = lastComment.getCreatedAt().toString();
+        }
+
+        case LIKE_COUNT -> {
+          nextCursor = String.valueOf(lastComment.getLikeCount());
+        }
+      }
+
+      nextAfter = lastComment.getCreatedAt();
     }
 
     List<CommentResponse> content = pageComments.stream()
@@ -132,7 +148,7 @@ public class CommentService {
     return CursorPageResponse.of(
         content,
         nextCursor,
-        null,
+        nextAfter,
         hasNext,
         content.size(),
         commentRepository.countByArticleId(condition.articleId())
