@@ -337,6 +337,51 @@ public class CommentRepositoryTest {
     }
 
     @Test
+    @DisplayName("좋아요순(2순위 등록순) 커서 조회")
+    void 좋아요순_등록순_조회_cursor() throws InterruptedException {
+      // given
+      UUID articleId = article.getId();
+
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Thread.sleep(1000);
+
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      Thread.sleep(1000);
+
+      Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
+      Thread.sleep(1000);
+
+      // 첫 번째 댓글 : 좋아요 2개
+      commentRepository.increaseLikeCount(firstComment.getId());
+      commentRepository.increaseLikeCount(firstComment.getId());
+
+      // 두 번째 댓글 : 좋아요 2개
+      commentRepository.increaseLikeCount(secondComment.getId());
+      commentRepository.increaseLikeCount(secondComment.getId());
+
+      // 세 번째 댓글 : 좋아요 1개
+      commentRepository.increaseLikeCount(thirdComment.getId());
+
+      CommentQueryCondition condition = new CommentQueryCondition(
+          articleId,
+          CommentOrderBy.LIKE_COUNT,
+          SortDirection.DESC,
+          "2",
+          secondComment.getCreatedAt(),
+          5
+      );
+
+      // when
+      List<Comment> comments = commentRepository.getComments(condition);
+
+      // then
+      // 첫번째(2번째 댓글) 이후 댓글들 (1번째, 3번째) 댓글들이 나와야 함
+      assertThat(comments).hasSize(2);
+      assertThat(comments.get(0).getId()).isEqualTo(firstComment.getId());
+      assertThat(comments.get(1).getId()).isEqualTo(thirdComment.getId());
+    }
+
+    @Test
     @DisplayName("기사별 댓글 수 조회")
     void 기사별_댓글_수_조회() {
       // given
