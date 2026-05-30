@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.domain.comment.repository.querydsl.impl;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentOrderBy;
@@ -7,6 +8,7 @@ import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.entity.QComment;
 import com.sprint.mission.monew.domain.comment.repository.querydsl.CommentCustomRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,8 @@ public class CommentRepositoryImpl implements CommentCustomRepository {
   @Override
   public List<Comment> getComments(CommentQueryCondition condition) {
     JPAQuery<Comment> query = queryFactory.selectFrom(comment)
-        .where(comment.article.id.eq(condition.articleId()));
+        .where(comment.article.id.eq(condition.articleId()),
+            createdAtCursorCondition(condition));
 
     // 좋아요순(2순위 등록순)
     if (condition.orderBy() == CommentOrderBy.LIKE_COUNT) {
@@ -42,6 +45,17 @@ public class CommentRepositoryImpl implements CommentCustomRepository {
         .fetchOne();
 
     return count != null ? count : 0L;
+  }
+
+  private BooleanExpression createdAtCursorCondition(CommentQueryCondition condition) {
+    if (condition.cursor() == null) {
+      return null;
+    }
+
+    Instant cursor = Instant.parse(condition.cursor());
+
+    // lt = less than(createdAt < cursor)
+    return comment.createdAt.lt(cursor);
   }
 
 }
