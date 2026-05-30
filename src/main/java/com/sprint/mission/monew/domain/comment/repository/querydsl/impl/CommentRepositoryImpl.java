@@ -28,7 +28,11 @@ public class CommentRepositoryImpl implements CommentCustomRepository {
 
   @Override
   public long countByArticleId(UUID articleId) {
-    return 0;
+    Long count = queryFactory.select(comment.count()).from(comment)
+        .where(comment.article.id.eq(articleId))
+        .fetchOne();
+
+    return count != null ? count : 0L;
   }
 
 }
