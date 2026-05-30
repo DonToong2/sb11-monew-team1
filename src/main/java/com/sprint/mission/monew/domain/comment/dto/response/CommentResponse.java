@@ -10,7 +10,7 @@ public record CommentResponse(
     UUID userId,
     String userNickname,
     String content,
-    int likeCount,
+    long likeCount,
     boolean likedByMe,
     Instant createdAt
 ) {
