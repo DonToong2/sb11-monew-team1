@@ -116,6 +116,10 @@ public class CommentService {
   @Transactional(readOnly = true)
   public CursorPageResponse<CommentResponse> getComments(CommentQueryCondition condition,
       UUID requestId) {
+    log.debug("[COMMENT_READ_START] 댓글 목록 조회 시작 - 뉴스 기사 ID={}, 정렬={}, 방향={}, 페이지 크기={}, 요청자 ID={}",
+        condition.articleId(), condition.orderBy(), condition.direction(), condition.limit(),
+        requestId);
+
     List<Comment> comments = commentRepository.getComments(condition);
 
     boolean hasNext = comments.size() > condition.limit();
@@ -143,11 +147,15 @@ public class CommentService {
 
     List<CommentResponse> content = pageComments.stream()
         .map(comment -> {
-          boolean likedByMe = commentLikeRepository.existsByUserIdAndCommentId(requestId, comment.getId());
+          boolean likedByMe = commentLikeRepository.existsByUserIdAndCommentId(requestId,
+              comment.getId());
 
           return commentMapper.toResponse(comment, likedByMe);
         })
         .toList();
+
+    log.info("[COMMENT_READ_SUCCESS] 댓글 목록 조회 성공 - 조회된 댓글 수={}, 다음 페이지 여부={}, 다음 커서={}",
+        content.size(), hasNext, nextCursor);
 
     return CursorPageResponse.of(
         content,
