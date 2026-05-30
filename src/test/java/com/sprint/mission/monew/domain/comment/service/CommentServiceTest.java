@@ -7,11 +7,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.sprint.mission.monew.common.dto.CursorPageResponse;
+import com.sprint.mission.monew.common.dto.SortDirection;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
+import com.sprint.mission.monew.domain.comment.dto.request.CommentOrderBy;
+import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
@@ -23,6 +27,7 @@ import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -199,7 +204,8 @@ public class CommentServiceTest {
       given(commentMapper.toResponse(eq(comment), eq(false))).willReturn(expectedResponse);
 
       // when
-      CommentResponse response = commentService.update(comment.getId(), user.getId(), updateRequest);
+      CommentResponse response = commentService.update(comment.getId(), user.getId(),
+          updateRequest);
 
       // then
       assertThat(response).isNotNull();
@@ -282,6 +288,40 @@ public class CommentServiceTest {
 
       // then
       verify(commentRepository).delete(comment);
+    }
+  }
+
+  @Nested
+  @DisplayName("댓글 목록 조회하기")
+  class Service_Comment_Find {
+
+    @Test
+    @DisplayName("댓글 목록 조회")
+    void 댓글_목록_조회() throws InterruptedException {
+      // given
+      Comment firstComment = Comment.create(article, user, content);
+      Thread.sleep(1000);
+      Comment secondComment = Comment.create(article, user, content);
+
+      CommentQueryCondition condition = new CommentQueryCondition(
+          articleId,
+          CommentOrderBy.CREATED_AT,
+          SortDirection.DESC,
+          null,
+          null,
+          5
+      );
+
+      given(commentRepository.getComments(condition)).willReturn(
+          List.of(firstComment, secondComment));
+      given(commentRepository.countByArticleId(article.getId())).willReturn(2L);
+
+      // when
+      CursorPageResponse<CommentResponse> result = commentService.getComments(condition,
+          user.getId());
+
+      // then
+      assertThat(result.content()).hasSize(2);
     }
   }
 }
