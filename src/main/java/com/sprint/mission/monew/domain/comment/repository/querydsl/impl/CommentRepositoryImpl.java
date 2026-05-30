@@ -23,17 +23,21 @@ public class CommentRepositoryImpl implements CommentCustomRepository {
 
   @Override
   public List<Comment> getComments(CommentQueryCondition condition) {
-    JPAQuery<Comment> query = queryFactory.selectFrom(comment)
-        .where(comment.article.id.eq(condition.articleId()),
-            createdAtCursorCondition(condition));
+    JPAQuery<Comment> query = queryFactory.selectFrom(comment);
 
     // 좋아요순(2순위 등록순)
     if (condition.orderBy() == CommentOrderBy.LIKE_COUNT) {
-      query.orderBy(comment.likeCount.desc(), comment.createdAt.desc());
+      query.where(
+          comment.article.id.eq(condition.articleId()),
+              likeCountCursorCondition(condition))
+          .orderBy(comment.likeCount.desc(), comment.createdAt.desc());
     }
     // 등록순
     else {
-      query.orderBy(comment.createdAt.desc());
+      query.where(
+          comment.article.id.eq(condition.articleId()),
+          createdAtCursorCondition(condition))
+          .orderBy(comment.createdAt.desc());
     }
     return query.limit(condition.limit()).fetch();
   }
@@ -56,6 +60,19 @@ public class CommentRepositoryImpl implements CommentCustomRepository {
 
     // lt = less than(createdAt < cursor)
     return comment.createdAt.lt(cursor);
+  }
+
+  private BooleanExpression likeCountCursorCondition(CommentQueryCondition condition) {
+    if (condition.cursor() == null) {
+      return null;
+    }
+
+    long likeCursor = Long.parseLong(condition.cursor());
+
+    // where likeCount < cursor or likeCount = cursor and createdAt < after
+    return comment.likeCount.lt(likeCursor)
+        .or(comment.likeCount.eq(likeCursor)
+            .and(comment.createdAt.lt(condition.after())));
   }
 
 }
