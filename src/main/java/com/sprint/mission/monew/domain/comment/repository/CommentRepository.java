@@ -24,8 +24,4 @@ public interface CommentRepository extends JpaRepository<Comment, UUID>, Comment
             where c.id = :commentId and c.likeCount > 0
       """)
   void decreaseLikeCount(UUID commentId);
-
-  List<Comment> findByArticleIdOrderByCreatedAtDesc(UUID articleId, Pageable pageable);
-
-  List<Comment> findByArticleIdOrderByLikeCountDescCreatedAtDesc(UUID articleId, Pageable pageable);
 }
