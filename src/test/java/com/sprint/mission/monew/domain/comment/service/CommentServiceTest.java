@@ -22,6 +22,7 @@ import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.exception.CommentAccessDeniedException;
 import com.sprint.mission.monew.domain.comment.exception.CommentNotFoundException;
 import com.sprint.mission.monew.domain.comment.mapper.CommentMapper;
+import com.sprint.mission.monew.domain.comment.repository.CommentLikeRepository;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.exception.UserNotFoundException;
@@ -54,6 +55,9 @@ public class CommentServiceTest {
 
   @Mock
   private UserRepository userRepository;
+
+  @Mock
+  private CommentLikeRepository commentLikeRepository;
 
   @Mock
   private CommentMapper commentMapper;
@@ -503,6 +507,88 @@ public class CommentServiceTest {
     }
 
     @Test
+    @DisplayName("likedByMe false 테스트")
+    void likedByMe_false() {
+      // given
+      UUID requestId = UUID.randomUUID();
+      Comment comment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(comment, "createdAt", Instant.now());
+
+      given(commentRepository.getComments(any())).willReturn(List.of(comment));
+
+      given(commentLikeRepository.existsByUserIdAndCommentId(any(), any())).willReturn(false);
+
+      CommentQueryCondition condition = new CommentQueryCondition(
+          articleId,
+          CommentOrderBy.CREATED_AT,
+          SortDirection.DESC,
+          null,
+          null,
+          5
+      );
+
+      CommentResponse expectedResponse = new CommentResponse(
+          comment.getId(),
+          articleId,
+          userId,
+          "닉네임",
+          "댓글 내용",
+          0,
+          false,
+          Instant.now()
+      );
+
+      given(commentMapper.toResponse(eq(comment), eq(false))).willReturn(expectedResponse);
+
+      // when
+      CursorPageResponse<CommentResponse> result = commentService.getComments(condition, requestId);
+
+      // then
+      assertThat(result.content().get(0).likedByMe()).isFalse();
+    }
+
+    @Test
+    @DisplayName("likedByMe true 테스트")
+    void likedByMe_true() {
+      // given
+      UUID requestId = UUID.randomUUID();
+      Comment comment = Comment.create(article, user, content);
+      ReflectionTestUtils.setField(comment, "createdAt", Instant.now());
+
+      given(commentRepository.getComments(any())).willReturn(List.of(comment));
+
+      given(commentLikeRepository.existsByUserIdAndCommentId(any(), any())).willReturn(true);
+
+      CommentQueryCondition condition = new CommentQueryCondition(
+          articleId,
+          CommentOrderBy.CREATED_AT,
+          SortDirection.DESC,
+          null,
+          null,
+          5
+      );
+
+      CommentResponse expectedResponse = new CommentResponse(
+          comment.getId(),
+          articleId,
+          userId,
+          "닉네임",
+          "댓글 내용",
+          0,
+          true,
+          Instant.now()
+      );
+
+      given(commentMapper.toResponse(eq(comment), eq(true))).willReturn(expectedResponse);
+
+      // when
+      CursorPageResponse<CommentResponse> result = commentService.getComments(condition, requestId);
+
+      // then
+      assertThat(result.content().get(0).likedByMe()).isTrue();
+    }
+
+    @Test
     @DisplayName("댓글 목록 조회 성공")
     void 댓글_목록_조회_성공() throws InterruptedException {
       // given
@@ -521,7 +607,7 @@ public class CommentServiceTest {
           5
       );
 
-      given(commentRepository.getComments(condition)).willReturn(
+      given(commentRepository.getComments(any())).willReturn(
           List.of(firstComment, secondComment));
       given(commentRepository.countByArticleId(article.getId())).willReturn(2L);
 
