@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class CommentRepositoryImpl implements CommentCustomRepository {
+public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
   private final JPAQueryFactory queryFactory;
   private final QComment comment = QComment.comment;

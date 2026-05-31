@@ -238,7 +238,8 @@ public class CommentRepositoryTest {
 
       // then
       assertThat(comments).hasSize(2);
-      assertThat(comments).extracting(Comment::getCreatedAt).isSortedAccordingTo(Comparator.reverseOrder());
+      assertThat(comments).extracting(Comment::getCreatedAt)
+          .isSortedAccordingTo(Comparator.reverseOrder());
     }
 
     @Test
