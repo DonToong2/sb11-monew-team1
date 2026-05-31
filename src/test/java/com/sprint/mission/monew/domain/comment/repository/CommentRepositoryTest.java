@@ -27,6 +27,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -200,15 +201,16 @@ public class CommentRepositoryTest {
 
     @Test
     @DisplayName("등록순(createdAt DESC) 조회")
-    void 등록순_조회() throws InterruptedException {
+    void 등록순_조회() {
       // given
       UUID articleId = article.getId();
 
       Comment firstComment = Comment.create(article, user, "첫 번째 댓글");
+      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
       testEntityManager.persist(firstComment);
-      Thread.sleep(1000);
 
       Comment secondComment = Comment.create(article, user, "두 번째 댓글"); // 1초 후 댓글 생성
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
       testEntityManager.persist(secondComment);
 
       testEntityManager.flush();
@@ -234,18 +236,18 @@ public class CommentRepositoryTest {
 
     @Test
     @DisplayName("좋아요순(likeCount DESC), 2순위 등록순(createdAt DESC) 조회")
-    void 좋아요순_등록순_조회() throws InterruptedException {
+    void 좋아요순_등록순_조회() {
       // given
       UUID articleId = article.getId();
 
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
 
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
 
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
       // 첫 번째 댓글 : 좋아요 2개
       commentRepository.increaseLikeCount(firstComment.getId());
@@ -309,13 +311,15 @@ public class CommentRepositoryTest {
 
     @Test
     @DisplayName("등록순 다음 페이지 조회")
-    void 등록순_조회_cursor() throws InterruptedException {
+    void 등록순_조회_cursor() {
       // given
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
+
       testEntityManager.flush();
       testEntityManager.clear();
 
@@ -338,18 +342,18 @@ public class CommentRepositoryTest {
 
     @Test
     @DisplayName("좋아요순(2순위 등록순) 커서 조회")
-    void 좋아요순_등록순_조회_cursor() throws InterruptedException {
+    void 좋아요순_등록순_조회_cursor() {
       // given
       UUID articleId = article.getId();
 
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
 
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
 
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
       // 첫 번째 댓글 : 좋아요 2개
       commentRepository.increaseLikeCount(firstComment.getId());
