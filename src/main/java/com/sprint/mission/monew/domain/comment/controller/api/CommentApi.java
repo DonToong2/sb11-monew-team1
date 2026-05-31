@@ -1,7 +1,10 @@
 package com.sprint.mission.monew.domain.comment.controller.api;
 
+import com.sprint.mission.monew.common.dto.CursorPageResponse;
 import com.sprint.mission.monew.common.dto.ErrorResponse;
+import com.sprint.mission.monew.common.dto.SortDirection;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
+import com.sprint.mission.monew.domain.comment.dto.request.CommentOrderBy;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,11 +15,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "댓글 관리", description = "댓글 관련 API")
 public interface CommentApi {
@@ -75,4 +80,13 @@ public interface CommentApi {
   ResponseEntity<Void> hardDeleteComment(
       @PathVariable @Parameter(description = "댓글 ID") UUID commentId
   );
+
+  ResponseEntity<CursorPageResponse<CommentResponse>> getComments(
+      @RequestParam UUID articleId,
+      @RequestParam CommentOrderBy orderBy,
+      @RequestParam SortDirection direction,
+      @RequestParam(required = false) String cursor,
+      @RequestParam(required = false) Instant after,
+      @RequestParam int limit,
+      @RequestHeader("Monew-Request-User-ID") UUID userId);
 }
