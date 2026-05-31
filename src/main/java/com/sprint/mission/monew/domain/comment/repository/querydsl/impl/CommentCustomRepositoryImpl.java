@@ -30,6 +30,8 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
   // 등록순
   private List<Comment> getCommentsByCreatedAt(CommentQueryCondition condition) {
     return queryFactory.selectFrom(comment)
+        .leftJoin(comment.user).fetchJoin()
+        .leftJoin(comment.article).fetchJoin()
         .where(
             comment.article.id.eq(condition.articleId()),
             createdAtCursorCondition(condition))
@@ -41,6 +43,8 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
   // 좋아요순(2순위 등록순)
   private List<Comment> getCommentsByLikeCount(CommentQueryCondition condition) {
     return queryFactory.selectFrom(comment)
+        .leftJoin(comment.user).fetchJoin()
+        .leftJoin(comment.article).fetchJoin()
         .where(
             comment.article.id.eq(condition.articleId()),
             likeCountCursorCondition(condition))
