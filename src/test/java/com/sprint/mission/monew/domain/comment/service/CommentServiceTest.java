@@ -412,10 +412,9 @@ public class CommentServiceTest {
       Comment thirdComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
-      List<Comment> comments = List.of(thirdComment, secondComment, firstComment);
+      List<Comment> comments = List.of(firstComment, secondComment, thirdComment);
 
-      given(commentRepository.getComments(any())).willReturn(
-          List.of(thirdComment, secondComment, firstComment));
+      given(commentRepository.getComments(any())).willReturn(comments);
 
       given(commentRepository.countByArticleId(articleId)).willReturn(3L);
 
@@ -585,13 +584,12 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("댓글 목록 조회 성공")
-    void 댓글_목록_조회_성공() throws InterruptedException {
+    void 댓글_목록_조회_성공() {
       // given
       Comment firstComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
-      Thread.sleep(1000);
       Comment secondComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
