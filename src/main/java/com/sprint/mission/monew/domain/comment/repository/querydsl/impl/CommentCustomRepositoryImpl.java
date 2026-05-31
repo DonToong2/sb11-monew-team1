@@ -69,6 +69,11 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
     long likeCursor = Long.parseLong(condition.cursor());
 
+    BooleanExpression lessLike = comment.likeCount.lt(likeCursor);
+    if (condition.after() == null) {
+      return lessLike;
+    }
+
     // where likeCount < cursor or likeCount = cursor and createdAt < after
     return comment.likeCount.lt(likeCursor)
         .or(comment.likeCount.eq(likeCursor)
