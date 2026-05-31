@@ -30,6 +30,7 @@ import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -510,7 +511,7 @@ public class CommentServiceTest {
 
       given(commentRepository.getComments(any())).willReturn(List.of(comment));
 
-      given(commentLikeRepository.existsByUserIdAndCommentId(any(), any())).willReturn(false);
+      given(commentLikeRepository.findLikedCommentIds(any(), any())).willReturn(Set.of());
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -551,7 +552,7 @@ public class CommentServiceTest {
 
       given(commentRepository.getComments(any())).willReturn(List.of(comment));
 
-      given(commentLikeRepository.existsByUserIdAndCommentId(any(), any())).willReturn(true);
+      given(commentLikeRepository.findLikedCommentIds(any(), any())).willReturn(Set.of(comment.getId()));
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
