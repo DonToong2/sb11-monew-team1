@@ -300,9 +300,6 @@ public class CommentRepositoryTest {
       testEntityManager.flush();
       testEntityManager.clear();
 
-      firstComment = commentRepository.findById(firstComment.getId()).orElseThrow();
-      secondComment = commentRepository.findById(secondComment.getId()).orElseThrow();
-
       CommentQueryCondition condition = new CommentQueryCondition(
           article.getId(),
           CommentOrderBy.CREATED_AT,
