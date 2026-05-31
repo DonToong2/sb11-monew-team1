@@ -34,6 +34,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
         .leftJoin(comment.article).fetchJoin()
         .where(
             comment.article.id.eq(condition.articleId()),
+            comment.deletedAt.isNull(), // 논리 삭제는 조회 안되도록
             createdAtCursorCondition(condition))
         .orderBy(comment.createdAt.desc())
         .limit(condition.limit())
@@ -47,6 +48,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
         .leftJoin(comment.article).fetchJoin()
         .where(
             comment.article.id.eq(condition.articleId()),
+            comment.deletedAt.isNull(), // 논리 삭제는 조회 안되도록
             likeCountCursorCondition(condition))
         .orderBy(
             comment.likeCount.desc(),
@@ -87,7 +89,8 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
   @Override
   public long countByArticleId(UUID articleId) {
     Long count = queryFactory.select(comment.count()).from(comment)
-        .where(comment.article.id.eq(articleId))
+        .where(comment.article.id.eq(articleId),
+            comment.deletedAt.isNull()) // 논리 삭제는 조회 안되도록
         .fetchOne();
 
     return count != null ? count : 0L;
