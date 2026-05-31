@@ -10,7 +10,6 @@ import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
 import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
 import com.sprint.mission.monew.domain.comment.service.CommentService;
 import jakarta.validation.Valid;
-import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,13 +97,7 @@ public class CommentController implements CommentApi {
   public ResponseEntity<CursorPageResponse<CommentResponse>> getComments(
       @ModelAttribute @Valid CommentQueryCondition condition,
       @RequestHeader("Monew-Request-User-ID") UUID userId) {
-    log.info("[COMMENT_GET_LIST_REQUEST] 댓글 목록 조회 요청 - 뉴스 기사 ID={}, 정렬 기준={}, 정렬 방향={}, 커서={}, after={}, 페이지 크기={}, 요청자 ID={}",
-        condition.articleId(), condition.orderBy(), condition.direction(), condition.cursor(), condition.after(), condition.limit(), userId);
-
     CursorPageResponse<CommentResponse> response = commentService.getComments(condition, userId);
-
-    log.debug("[COMMENT_GET_LIST_RESPONSE] 댓글 목록 조회 응답 - 조회 댓글 수={}, 다음 커서={}, 다음 after={}, hasNext={}, 전체 댓글 수={}",
-        response.size(), response.nextCursor(), response.nextAfter(), response.hasNext(), response.totalElements());
 
     return ResponseEntity.status(HttpStatus.OK).body(response);
   }

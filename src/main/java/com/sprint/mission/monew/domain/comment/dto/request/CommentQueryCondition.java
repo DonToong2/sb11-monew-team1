@@ -8,12 +8,12 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record CommentQueryCondition(
-    @Schema(description = "기사 ID") @NotNull UUID articleId,
-    @Schema(description = "정렬 속성 이름") @NotNull CommentOrderBy orderBy,
-    @Schema(description = "정렬 방향") @NotNull SortDirection direction,
-    @Schema(description = "커서 값") String cursor,
-    @Schema(description = "보조 커서 값")Instant after,
-    @Schema(description = "커서 페이지 크기") @Min(1) int limit
+    UUID articleId,
+    @NotNull CommentOrderBy orderBy,
+    @NotNull SortDirection direction,
+    String cursor,
+    Instant after,
+    @NotNull @Min(1) int limit
 ) {
 
 }
