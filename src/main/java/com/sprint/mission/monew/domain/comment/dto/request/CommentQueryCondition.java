@@ -13,7 +13,7 @@ public record CommentQueryCondition(
     @Schema(description = "정렬 방향") @NotNull SortDirection direction,
     @Schema(description = "커서 값") String cursor,
     @Schema(description = "보조 커서 값") Instant after,
-    @Schema(description = "커서 페이지 크기", example = "50") @NotNull @Min(1) int limit
+    @Schema(description = "커서 페이지 크기", example = "50") @NotNull @Min(1) Integer limit
 ) {
 
 }
