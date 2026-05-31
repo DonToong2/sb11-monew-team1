@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.UUID;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -92,6 +93,6 @@ public interface CommentApi {
           content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   ResponseEntity<CursorPageResponse<CommentResponse>> getComments(
-      @ModelAttribute CommentQueryCondition condition,
+      @ModelAttribute @ParameterObject CommentQueryCondition condition,
       @RequestHeader("Monew-Request-User-ID") @Parameter(description = "요청자 ID") UUID userId);
 }
