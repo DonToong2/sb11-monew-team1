@@ -364,17 +364,7 @@ public class CommentControllerTest {
     @DisplayName("댓글 목록 조회 실패 - orderBy Null(유효성 검증, 400 에러)")
     void 댓글_목록조회_실패_orderBy_Null() throws Exception {
       // given
-      List<CommentResponse> commentResponseList = List.of(firstCommentResponse,
-          secondCommentResponse);
-      given(commentService.getComments(any(), any()))
-          .willReturn(CursorPageResponse.of(
-              commentResponseList,
-              "cursor",
-              Instant.now(),
-              false,
-              2,
-              2L
-          ));
+      // 유효성 검증 실패 시 서비스 호출되지 않음
 
       // when & then
       mockMvc.perform(
@@ -384,23 +374,15 @@ public class CommentControllerTest {
                   .param("limit", "5")
                   .header("Monew-Request-User-ID", userId.toString()))
           .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(commentService);
     }
 
     @Test
     @DisplayName("댓글 목록 조회 실패 - direction Null(유효성 검증, 400 에러)")
     void 댓글_목록조회_실패_direction_Null() throws Exception {
       // given
-      List<CommentResponse> commentResponseList = List.of(firstCommentResponse,
-          secondCommentResponse);
-      given(commentService.getComments(any(), any()))
-          .willReturn(CursorPageResponse.of(
-              commentResponseList,
-              "cursor",
-              Instant.now(),
-              false,
-              2,
-              2L
-          ));
+      // 유효성 검증 실패 시 서비스 호출되지 않음
 
       // when & then
       mockMvc.perform(
@@ -410,6 +392,8 @@ public class CommentControllerTest {
                   .param("limit", "5")
                   .header("Monew-Request-User-ID", userId.toString()))
           .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(commentService);
     }
 
 
@@ -417,17 +401,7 @@ public class CommentControllerTest {
     @DisplayName("댓글 목록 조회 실패 - limit가 Null(유효성 검증, 400 에러)")
     void 댓글_목록조회_실패_limit_Null() throws Exception {
       // given
-      List<CommentResponse> commentResponseList = List.of(firstCommentResponse,
-          secondCommentResponse);
-      given(commentService.getComments(any(), any()))
-          .willReturn(CursorPageResponse.of(
-              commentResponseList,
-              "cursor",
-              Instant.now(),
-              false,
-              2,
-              2L
-          ));
+      // 유효성 검증 실패 시 서비스 호출되지 않음
 
       // when & then
       mockMvc.perform(
@@ -437,23 +411,15 @@ public class CommentControllerTest {
                   .param("direction", "DESC")
                   .header("Monew-Request-User-ID", userId.toString()))
           .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(commentService);
     }
 
     @Test
     @DisplayName("댓글 목록 조회 실패 - limit는 최소 1(유효성 검증, 400 에러)")
     void 댓글_목록조회_실패_limit_Min_One() throws Exception {
       // given
-      List<CommentResponse> commentResponseList = List.of(firstCommentResponse,
-          secondCommentResponse);
-      given(commentService.getComments(any(), any()))
-          .willReturn(CursorPageResponse.of(
-              commentResponseList,
-              "cursor",
-              Instant.now(),
-              false,
-              2,
-              2L
-          ));
+      // 유효성 검증 실패 시 서비스 호출되지 않음
 
       // when & then
       mockMvc.perform(
@@ -464,6 +430,8 @@ public class CommentControllerTest {
                   .param("limit", "0")
                   .header("Monew-Request-User-ID", userId.toString()))
           .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(commentService);
     }
 
     @Test
