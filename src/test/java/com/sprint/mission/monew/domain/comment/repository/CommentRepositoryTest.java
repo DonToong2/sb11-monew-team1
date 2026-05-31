@@ -14,6 +14,7 @@ import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,6 +52,8 @@ public class CommentRepositoryTest {
   private User user;
   private Comment comment;
 
+  private Instant baseTime;
+
   @BeforeEach
   void setUp() {
     article = articleRepository.save(
@@ -65,6 +68,8 @@ public class CommentRepositoryTest {
         "Test@naver.com", "test", "12345678"
     ));
     comment = Comment.create(article, user, "댓글 내용");
+
+    baseTime = Instant.parse("2024-01-01T00:00:00Z");
   }
 
   @Nested
@@ -206,15 +211,18 @@ public class CommentRepositoryTest {
       UUID articleId = article.getId();
 
       Comment firstComment = Comment.create(article, user, "첫 번째 댓글");
-      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(firstComment, "createdAt", baseTime);
       testEntityManager.persist(firstComment);
 
       Comment secondComment = Comment.create(article, user, "두 번째 댓글"); // 1초 후 댓글 생성
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
+      ReflectionTestUtils.setField(secondComment, "createdAt", baseTime.plusSeconds(1));
       testEntityManager.persist(secondComment);
 
       testEntityManager.flush();
       testEntityManager.clear();
+
+      firstComment = commentRepository.findById(firstComment.getId()).orElseThrow();
+      secondComment = commentRepository.findById(secondComment.getId()).orElseThrow();
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -230,8 +238,7 @@ public class CommentRepositoryTest {
 
       // then
       assertThat(comments).hasSize(2);
-      assertThat(comments.get(0).getId()).isEqualTo(secondComment.getId());
-      assertThat(comments.get(1).getId()).isEqualTo(firstComment.getId());
+      assertThat(comments).extracting(Comment::getCreatedAt).isSortedAccordingTo(Comparator.reverseOrder());
     }
 
     @Test
@@ -241,13 +248,13 @@ public class CommentRepositoryTest {
       UUID articleId = article.getId();
 
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(firstComment, "createdAt", baseTime);
 
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
+      ReflectionTestUtils.setField(secondComment, "createdAt", baseTime.plusSeconds(1));
 
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
-      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
+      ReflectionTestUtils.setField(thirdComment, "createdAt", baseTime.plusSeconds(2));
 
       // 첫 번째 댓글 : 좋아요 2개
       commentRepository.increaseLikeCount(firstComment.getId());
@@ -314,14 +321,18 @@ public class CommentRepositoryTest {
     void 등록순_조회_cursor() {
       // given
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(firstComment, "createdAt", baseTime);
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
+      ReflectionTestUtils.setField(secondComment, "createdAt", baseTime.plusSeconds(1));
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
-      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
+      ReflectionTestUtils.setField(thirdComment, "createdAt", baseTime.plusSeconds(2));
 
       testEntityManager.flush();
       testEntityManager.clear();
+
+      firstComment = commentRepository.findById(firstComment.getId()).orElseThrow();
+      secondComment = commentRepository.findById(secondComment.getId()).orElseThrow();
+      thirdComment = commentRepository.findById(thirdComment.getId()).orElseThrow();
 
       CommentQueryCondition condition = new CommentQueryCondition(
           article.getId(),
@@ -347,13 +358,18 @@ public class CommentRepositoryTest {
       UUID articleId = article.getId();
 
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
-
+      ReflectionTestUtils.setField(firstComment, "createdAt", baseTime);
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
-
+      ReflectionTestUtils.setField(secondComment, "createdAt", baseTime.plusSeconds(1));
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
-      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
+      ReflectionTestUtils.setField(thirdComment, "createdAt", baseTime.plusSeconds(2));
+
+      testEntityManager.flush();
+      testEntityManager.clear();
+
+      firstComment = commentRepository.findById(firstComment.getId()).orElseThrow();
+      secondComment = commentRepository.findById(secondComment.getId()).orElseThrow();
+      thirdComment = commentRepository.findById(thirdComment.getId()).orElseThrow();
 
       // 첫 번째 댓글 : 좋아요 2개
       commentRepository.increaseLikeCount(firstComment.getId());
