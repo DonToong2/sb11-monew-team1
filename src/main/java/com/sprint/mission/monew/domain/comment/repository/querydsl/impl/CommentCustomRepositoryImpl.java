@@ -1,7 +1,9 @@
 package com.sprint.mission.monew.domain.comment.repository.querydsl.impl;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sprint.mission.monew.common.dto.SortDirection;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.entity.QComment;
@@ -36,7 +38,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
             comment.article.id.eq(condition.articleId()),
             comment.deletedAt.isNull(), // 논리 삭제는 조회 안되도록
             createdAtCursorCondition(condition))
-        .orderBy(comment.createdAt.desc())
+        .orderBy(createdAtOrder(condition))
         .limit(condition.limit())
         .fetch();
   }
@@ -51,12 +53,25 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
             comment.deletedAt.isNull(), // 논리 삭제는 조회 안되도록
             likeCountCursorCondition(condition))
         .orderBy(
-            comment.likeCount.desc(),
-            comment.createdAt.desc())
+            likeCountOrder(condition),
+            createdAtOrder(condition))
         .limit(condition.limit())
         .fetch();
   }
 
+  // 오름차순/내림차순 정렬(등록순)
+  private OrderSpecifier createdAtOrder(CommentQueryCondition condition) {
+    return condition.direction() == SortDirection.ASC ?
+        comment.createdAt.asc() : comment.createdAt.desc();
+  }
+
+  // 오름차순/내림차순 정렬(좋아요순)
+  private OrderSpecifier likeCountOrder(CommentQueryCondition condition) {
+    return condition.direction() == SortDirection.ASC ?
+        comment.likeCount.asc() : comment.likeCount.desc();
+  }
+
+  // 등록순 커서
   private BooleanExpression createdAtCursorCondition(CommentQueryCondition condition) {
     if (condition.cursor() == null) {
       return null;
@@ -68,6 +83,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
     return comment.createdAt.lt(cursor);
   }
 
+  // 좋아요순 커서
   private BooleanExpression likeCountCursorCondition(CommentQueryCondition condition) {
     if (condition.cursor() == null) {
       return null;
@@ -75,15 +91,15 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
     long likeCursor = Long.parseLong(condition.cursor());
 
+    // after null시 처리
     BooleanExpression lessLike = comment.likeCount.lt(likeCursor);
     if (condition.after() == null) {
       return lessLike;
     }
 
     // where likeCount < cursor or likeCount = cursor and createdAt < after
-    return comment.likeCount.lt(likeCursor)
-        .or(comment.likeCount.eq(likeCursor)
-            .and(comment.createdAt.lt(condition.after())));
+    return lessLike.or(comment.likeCount.eq(likeCursor)
+        .and(comment.createdAt.lt(condition.after())));
   }
 
   @Override
