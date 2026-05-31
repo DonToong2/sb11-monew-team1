@@ -1,6 +1,7 @@
 package com.sprint.mission.monew.domain.comment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -308,6 +309,132 @@ public class CommentIntegrationTest {
 
       // DB 검증
       assertThat(commentRepository.findById(comment.getId())).isEmpty();
+    }
+  }
+
+  @Nested
+  @DisplayName("댓글 목록 조회하기")
+  class Find {
+
+    @Test
+    @DisplayName("댓글 목록 조회 실패 - orderBy Null")
+    void 댓글_목록조회_실패_orderBy_Null() throws Exception {
+      // given
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Thread.sleep(1000);
+
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+
+      // when & then
+      mockMvc.perform(get("/api/comments")
+          .param("articleId", article.getId().toString())
+          .param("direction", "DESC")
+          .param("limit", "5")
+          .header("Monew-Request-User-ID", user.getId()))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 실패 - direction Null")
+    void 댓글_목록조회_실패_direction_Null() throws Exception {
+      // given
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Thread.sleep(1000);
+
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+
+      // when & then
+      mockMvc.perform(get("/api/comments")
+          .param("articleId", article.getId().toString())
+          .param("orderBy", "CREATED_AT")
+          .param("limit", "5")
+          .header("Monew-Request-User-ID", user.getId()))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 실패 - limit가 Null")
+    void 댓글_목록조회_실패_limit_Null() throws Exception {
+      // given
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Thread.sleep(1000);
+
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+
+      // when & then
+      mockMvc.perform(get("/api/comments")
+              .param("articleId", article.getId().toString())
+              .param("orderBy", "CREATED_AT")
+              .param("direction", "DESC")
+              .header("Monew-Request-User-ID", user.getId()))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 실패 - limit는 최소 1")
+    void 댓글_목록조회_실패_limit_Min_One() throws Exception {
+      // given
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Thread.sleep(1000);
+
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+
+      // when & then
+      mockMvc.perform(get("/api/comments")
+              .param("articleId", article.getId().toString())
+              .param("orderBy", "CREATED_AT")
+              .param("direction", "DESC")
+              .param("limit", "0")
+              .header("Monew-Request-User-ID", user.getId()))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 성공 - 등록순")
+    void 댓글_목록조회_성공_등록순() throws Exception {
+      // given
+      // comment도 commentRepository에 save() 되어있음, content.length(), size는 3이 나와야 함
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Thread.sleep(1000);
+
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+
+      // when & then
+      mockMvc.perform(get("/api/comments")
+          .param("articleId", article.getId().toString())
+          .param("orderBy", "CREATED_AT")
+          .param("direction", "DESC")
+          .param("limit", "5")
+          .header("Monew-Request-User-ID", user.getId()))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content").isArray())
+          .andExpect(jsonPath("$.content.length()").value(3))
+          .andExpect(jsonPath("$.size").value(3))
+          .andExpect(jsonPath("$.hasNext").value(false));
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 성공 - 좋아요순")
+    void 댓글_목록조회_성공_좋아요순() throws Exception {
+      // given
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      commentRepository.increaseLikeCount(firstComment.getId());
+      commentRepository.increaseLikeCount(firstComment.getId());
+      Thread.sleep(1000);
+
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      commentRepository.increaseLikeCount(secondComment.getId());
+
+      // when & then
+      mockMvc.perform(get("/api/comments")
+              .param("articleId", article.getId().toString())
+              .param("orderBy", "LIKE_COUNT")
+              .param("direction", "DESC")
+              .param("limit", "5")
+              .header("Monew-Request-User-ID", user.getId()))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.content[0].likeCount").value(2))
+          .andExpect(jsonPath("$.content[1].likeCount").value(1));
     }
   }
 }
