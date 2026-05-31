@@ -70,11 +70,13 @@ public class CommentLikeRepositoryTest {
     @Test
     @DisplayName("save() 테스트")
     void 댓글좋아요_저장_성공() {
-
+      // given
       CommentLike like = CommentLike.create(user, comment);
 
+      // when
       CommentLike saved = commentLikeRepository.save(like);
 
+      // then
       assertThat(saved.getId()).isNotNull();
       assertThat(saved.getUser().getId()).isEqualTo(user.getId());
       assertThat(saved.getComment().getId()).isEqualTo(comment.getId());
@@ -126,7 +128,8 @@ public class CommentLikeRepositoryTest {
       commentLikeRepository.save(CommentLike.create(user, comment));
 
       // when
-      int deletedCount = commentLikeRepository.deleteByUserIdAndCommentId(user.getId(), comment.getId());
+      int deletedCount = commentLikeRepository.deleteByUserIdAndCommentId(user.getId(),
+          comment.getId());
 
       // then
       assertThat(deletedCount).isEqualTo(1);

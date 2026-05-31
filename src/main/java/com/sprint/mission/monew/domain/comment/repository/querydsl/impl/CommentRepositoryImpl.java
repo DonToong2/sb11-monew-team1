@@ -28,15 +28,15 @@ public class CommentRepositoryImpl implements CommentCustomRepository {
     // 좋아요순(2순위 등록순)
     if (condition.orderBy() == CommentOrderBy.LIKE_COUNT) {
       query.where(
-          comment.article.id.eq(condition.articleId()),
+              comment.article.id.eq(condition.articleId()),
               likeCountCursorCondition(condition))
           .orderBy(comment.likeCount.desc(), comment.createdAt.desc());
     }
     // 등록순
     else {
       query.where(
-          comment.article.id.eq(condition.articleId()),
-          createdAtCursorCondition(condition))
+              comment.article.id.eq(condition.articleId()),
+              createdAtCursorCondition(condition))
           .orderBy(comment.createdAt.desc());
     }
     return query.limit(condition.limit()).fetch();

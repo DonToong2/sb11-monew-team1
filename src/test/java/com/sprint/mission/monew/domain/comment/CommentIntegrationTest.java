@@ -196,7 +196,7 @@ public class CommentIntegrationTest {
     @Test
     @DisplayName("댓글 수정 실패 - 수정할 댓글 내용 공백(유효성 검증)")
     void 댓글_수정_실패_수정댓글내용_blank() throws Exception {
-      // when
+      // given
       // comment는 BeforeEach에서 초기화
       String requestBody = """
           {
@@ -327,10 +327,10 @@ public class CommentIntegrationTest {
 
       // when & then
       mockMvc.perform(get("/api/comments")
-          .param("articleId", article.getId().toString())
-          .param("direction", "DESC")
-          .param("limit", "5")
-          .header("Monew-Request-User-ID", user.getId()))
+              .param("articleId", article.getId().toString())
+              .param("direction", "DESC")
+              .param("limit", "5")
+              .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isBadRequest());
     }
 
@@ -345,10 +345,10 @@ public class CommentIntegrationTest {
 
       // when & then
       mockMvc.perform(get("/api/comments")
-          .param("articleId", article.getId().toString())
-          .param("orderBy", "CREATED_AT")
-          .param("limit", "5")
-          .header("Monew-Request-User-ID", user.getId()))
+              .param("articleId", article.getId().toString())
+              .param("orderBy", "CREATED_AT")
+              .param("limit", "5")
+              .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isBadRequest());
     }
 
@@ -401,11 +401,11 @@ public class CommentIntegrationTest {
 
       // when & then
       mockMvc.perform(get("/api/comments")
-          .param("articleId", article.getId().toString())
-          .param("orderBy", "CREATED_AT")
-          .param("direction", "DESC")
-          .param("limit", "5")
-          .header("Monew-Request-User-ID", user.getId()))
+              .param("articleId", article.getId().toString())
+              .param("orderBy", "CREATED_AT")
+              .param("direction", "DESC")
+              .param("limit", "5")
+              .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.content").isArray())
           .andExpect(jsonPath("$.content.length()").value(3))

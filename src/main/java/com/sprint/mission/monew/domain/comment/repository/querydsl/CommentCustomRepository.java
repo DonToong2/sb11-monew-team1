@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CommentCustomRepository {
+
   List<Comment> getComments(CommentQueryCondition condition);
 
   long countByArticleId(UUID articleId);

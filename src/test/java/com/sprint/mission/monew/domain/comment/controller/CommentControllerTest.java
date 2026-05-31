@@ -414,7 +414,7 @@ public class CommentControllerTest {
 
 
     @Test
-    @DisplayName("댓글 목록 조회 실패 - limit는 Null(유효성 검증, 400 에러)")
+    @DisplayName("댓글 목록 조회 실패 - limit가 Null(유효성 검증, 400 에러)")
     void 댓글_목록조회_실패_limit_Null() throws Exception {
       // given
       List<CommentResponse> commentResponseList = List.of(firstCommentResponse,

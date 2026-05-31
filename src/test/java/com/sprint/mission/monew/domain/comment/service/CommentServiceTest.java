@@ -315,7 +315,6 @@ public class CommentServiceTest {
       Comment thirdComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
 
-
       List<Comment> comments = List.of(firstComment, secondComment, thirdComment);
       given(commentRepository.getComments(any())).willReturn(comments);
       given(commentRepository.countByArticleId(article.getId())).willReturn(3L);
@@ -386,7 +385,8 @@ public class CommentServiceTest {
       Comment thirdComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
 
-      given(commentRepository.getComments(any())).willReturn(List.of(thirdComment, secondComment, firstComment));
+      given(commentRepository.getComments(any())).willReturn(
+          List.of(thirdComment, secondComment, firstComment));
 
       given(commentRepository.countByArticleId(articleId)).willReturn(3L);
 
@@ -420,7 +420,8 @@ public class CommentServiceTest {
 
       List<Comment> comments = List.of(thirdComment, secondComment, firstComment);
 
-      given(commentRepository.getComments(any())).willReturn(List.of(thirdComment, secondComment, firstComment));
+      given(commentRepository.getComments(any())).willReturn(
+          List.of(thirdComment, secondComment, firstComment));
 
       given(commentRepository.countByArticleId(articleId)).willReturn(3L);
 
