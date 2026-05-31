@@ -39,7 +39,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
             comment.deletedAt.isNull(), // 논리 삭제는 조회 안되도록
             createdAtCursorCondition(condition))
         .orderBy(createdAtOrder(condition))
-        .limit(condition.limit())
+        .limit(condition.limit() + 1)
         .fetch();
   }
 
@@ -55,7 +55,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
         .orderBy(
             likeCountOrder(condition),
             createdAtOrder(condition))
-        .limit(condition.limit())
+        .limit(condition.limit() + 1)
         .fetch();
   }
 
@@ -80,7 +80,8 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
     Instant cursor = Instant.parse(condition.cursor());
 
     // lt = less than(createdAt < cursor)
-    return comment.createdAt.lt(cursor);
+    return condition.direction() == SortDirection.ASC ?
+        comment.createdAt.gt(cursor) : comment.createdAt.lt(cursor);
   }
 
   // 좋아요순 커서
@@ -92,14 +93,19 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
     long likeCursor = Long.parseLong(condition.cursor());
 
     // after null시 처리
-    BooleanExpression lessLike = comment.likeCount.lt(likeCursor);
     if (condition.after() == null) {
-      return lessLike;
+      return condition.direction() == SortDirection.ASC ?
+          comment.likeCount.gt(likeCursor) : comment.likeCount.lt(likeCursor);
     }
 
     // where likeCount < cursor or likeCount = cursor and createdAt < after
-    return lessLike.or(comment.likeCount.eq(likeCursor)
-        .and(comment.createdAt.lt(condition.after())));
+    return condition.direction() == SortDirection.ASC ?
+        comment.likeCount.gt(likeCursor)
+            .or(comment.likeCount.eq(likeCursor)
+                .and(comment.createdAt.gt(condition.after())))
+        : comment.likeCount.lt(likeCursor)
+            .or(comment.likeCount.eq(likeCursor)
+                .and(comment.createdAt.lt(condition.after())));
   }
 
   @Override
