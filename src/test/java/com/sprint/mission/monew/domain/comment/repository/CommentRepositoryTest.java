@@ -210,13 +210,9 @@ public class CommentRepositoryTest {
       // given
       UUID articleId = article.getId();
 
-      Comment firstComment = Comment.create(article, user, "첫 번째 댓글");
-      ReflectionTestUtils.setField(firstComment, "createdAt", baseTime);
-      testEntityManager.persist(firstComment);
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
 
-      Comment secondComment = Comment.create(article, user, "두 번째 댓글"); // 1초 후 댓글 생성
-      ReflectionTestUtils.setField(secondComment, "createdAt", baseTime.plusSeconds(1));
-      testEntityManager.persist(secondComment);
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
 
       testEntityManager.flush();
       testEntityManager.clear();
@@ -249,13 +245,10 @@ public class CommentRepositoryTest {
       UUID articleId = article.getId();
 
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      ReflectionTestUtils.setField(firstComment, "createdAt", baseTime);
 
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
-      ReflectionTestUtils.setField(secondComment, "createdAt", baseTime.plusSeconds(1));
 
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
-      ReflectionTestUtils.setField(thirdComment, "createdAt", baseTime.plusSeconds(2));
 
       // 첫 번째 댓글 : 좋아요 2개
       commentRepository.increaseLikeCount(firstComment.getId());
@@ -270,6 +263,10 @@ public class CommentRepositoryTest {
 
       testEntityManager.flush();
       testEntityManager.clear();
+
+      firstComment = commentRepository.findById(firstComment.getId()).orElseThrow();
+      secondComment = commentRepository.findById(secondComment.getId()).orElseThrow();
+      thirdComment = commentRepository.findById(thirdComment.getId()).orElseThrow();
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -297,9 +294,14 @@ public class CommentRepositoryTest {
     void 등록순_조회_cursor_null() {
       // given
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+
       testEntityManager.flush();
       testEntityManager.clear();
+
+      firstComment = commentRepository.findById(firstComment.getId()).orElseThrow();
+      secondComment = commentRepository.findById(secondComment.getId()).orElseThrow();
 
       CommentQueryCondition condition = new CommentQueryCondition(
           article.getId(),
@@ -322,11 +324,10 @@ public class CommentRepositoryTest {
     void 등록순_조회_cursor() {
       // given
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      ReflectionTestUtils.setField(firstComment, "createdAt", baseTime);
+
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
-      ReflectionTestUtils.setField(secondComment, "createdAt", baseTime.plusSeconds(1));
+
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
-      ReflectionTestUtils.setField(thirdComment, "createdAt", baseTime.plusSeconds(2));
 
       testEntityManager.flush();
       testEntityManager.clear();
@@ -359,11 +360,11 @@ public class CommentRepositoryTest {
       UUID articleId = article.getId();
 
       Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      ReflectionTestUtils.setField(firstComment, "createdAt", baseTime);
+
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
-      ReflectionTestUtils.setField(secondComment, "createdAt", baseTime.plusSeconds(1));
+
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
-      ReflectionTestUtils.setField(thirdComment, "createdAt", baseTime.plusSeconds(2));
+
 
       testEntityManager.flush();
       testEntityManager.clear();
