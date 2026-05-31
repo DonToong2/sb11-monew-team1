@@ -60,13 +60,13 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
   }
 
   // 오름차순/내림차순 정렬(등록순)
-  private OrderSpecifier createdAtOrder(CommentQueryCondition condition) {
+  private OrderSpecifier<?> createdAtOrder(CommentQueryCondition condition) {
     return condition.direction() == SortDirection.ASC ?
         comment.createdAt.asc() : comment.createdAt.desc();
   }
 
   // 오름차순/내림차순 정렬(좋아요순)
-  private OrderSpecifier likeCountOrder(CommentQueryCondition condition) {
+  private OrderSpecifier<?> likeCountOrder(CommentQueryCondition condition) {
     return condition.direction() == SortDirection.ASC ?
         comment.likeCount.asc() : comment.likeCount.desc();
   }
