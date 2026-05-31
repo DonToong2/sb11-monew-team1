@@ -320,10 +320,7 @@ public class CommentIntegrationTest {
     @DisplayName("댓글 목록 조회 실패 - orderBy Null")
     void 댓글_목록조회_실패_orderBy_Null() throws Exception {
       // given
-      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      Thread.sleep(1000);
-
-      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      // 유효성 검증 실패 시 데이터 불필요
 
       // when & then
       mockMvc.perform(get("/api/comments")
@@ -338,10 +335,7 @@ public class CommentIntegrationTest {
     @DisplayName("댓글 목록 조회 실패 - direction Null")
     void 댓글_목록조회_실패_direction_Null() throws Exception {
       // given
-      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      Thread.sleep(1000);
-
-      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      // 유효성 검증 실패 시 데이터 불필요
 
       // when & then
       mockMvc.perform(get("/api/comments")
@@ -356,10 +350,7 @@ public class CommentIntegrationTest {
     @DisplayName("댓글 목록 조회 실패 - limit가 Null")
     void 댓글_목록조회_실패_limit_Null() throws Exception {
       // given
-      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      Thread.sleep(1000);
-
-      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      // 유효성 검증 실패 시 데이터 불필요
 
       // when & then
       mockMvc.perform(get("/api/comments")
@@ -374,10 +365,7 @@ public class CommentIntegrationTest {
     @DisplayName("댓글 목록 조회 실패 - limit는 최소 1")
     void 댓글_목록조회_실패_limit_Min_One() throws Exception {
       // given
-      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
-      Thread.sleep(1000);
-
-      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      // 유효성 검증 실패 시 데이터 불필요
 
       // when & then
       mockMvc.perform(get("/api/comments")
