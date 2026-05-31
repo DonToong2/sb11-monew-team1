@@ -10,7 +10,12 @@ import org.springframework.data.jpa.repository.Query;
 public interface CommentLikeRepository extends JpaRepository<CommentLike, UUID> {
 
   boolean existsByUserIdAndCommentId(UUID userId, UUID commentId);
-  
+
+  @Query("""
+      select c1.comment.id from CommentLike c1
+      where c1.user.id = :userId
+      and c1.comment.id in :commentIds
+      """)
   Set<UUID> findLikedCommentIds(UUID userId, List<UUID> commentIds);
 
   int deleteByUserIdAndCommentId(UUID userId, UUID commentId);
