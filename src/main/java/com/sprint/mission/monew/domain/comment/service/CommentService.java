@@ -19,6 +19,7 @@ import com.sprint.mission.monew.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -145,13 +146,13 @@ public class CommentService {
       nextAfter = lastComment.getCreatedAt();
     }
 
-    List<CommentResponse> content = pageComments.stream()
-        .map(comment -> {
-          boolean likedByMe = commentLikeRepository.existsByUserIdAndCommentId(requestId,
-              comment.getId());
+    List<UUID> commentIds = pageComments.stream().map(Comment::getId).toList();
 
-          return commentMapper.toResponse(comment, likedByMe);
-        })
+    Set<UUID> likedCommentIds = commentLikeRepository.findLikedCommentIds(requestId, commentIds);
+
+    List<CommentResponse> content = pageComments.stream()
+        .map(comment ->
+            commentMapper.toResponse(comment, likedCommentIds.contains(comment.getId())))
         .toList();
 
     log.info("[COMMENT_READ_SUCCESS] 댓글 목록 조회 성공 - 조회된 댓글 수={}, 다음 페이지 여부={}, 다음 커서={}",
