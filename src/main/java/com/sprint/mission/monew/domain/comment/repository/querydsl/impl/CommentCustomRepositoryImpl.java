@@ -1,9 +1,7 @@
 package com.sprint.mission.monew.domain.comment.repository.querydsl.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sprint.mission.monew.domain.comment.dto.request.CommentOrderBy;
 import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.entity.QComment;
@@ -23,32 +21,34 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
   @Override
   public List<Comment> getComments(CommentQueryCondition condition) {
-    JPAQuery<Comment> query = queryFactory.selectFrom(comment);
-
-    // 좋아요순(2순위 등록순)
-    if (condition.orderBy() == CommentOrderBy.LIKE_COUNT) {
-      query.where(
-              comment.article.id.eq(condition.articleId()),
-              likeCountCursorCondition(condition))
-          .orderBy(comment.likeCount.desc(), comment.createdAt.desc());
-    }
-    // 등록순
-    else {
-      query.where(
-              comment.article.id.eq(condition.articleId()),
-              createdAtCursorCondition(condition))
-          .orderBy(comment.createdAt.desc());
-    }
-    return query.limit(condition.limit()).fetch();
+    return switch (condition.orderBy()) {
+      case CREATED_AT -> getCommentsByCreatedAt(condition);
+      case LIKE_COUNT -> getCommentsByLikeCount(condition);
+    };
   }
 
-  @Override
-  public long countByArticleId(UUID articleId) {
-    Long count = queryFactory.select(comment.count()).from(comment)
-        .where(comment.article.id.eq(articleId))
-        .fetchOne();
+  // 등록순
+  private List<Comment> getCommentsByCreatedAt(CommentQueryCondition condition) {
+    return queryFactory.selectFrom(comment)
+        .where(
+            comment.article.id.eq(condition.articleId()),
+            createdAtCursorCondition(condition))
+        .orderBy(comment.createdAt.desc())
+        .limit(condition.limit())
+        .fetch();
+  }
 
-    return count != null ? count : 0L;
+  // 좋아요순(2순위 등록순)
+  private List<Comment> getCommentsByLikeCount(CommentQueryCondition condition) {
+    return queryFactory.selectFrom(comment)
+        .where(
+            comment.article.id.eq(condition.articleId()),
+            likeCountCursorCondition(condition))
+        .orderBy(
+            comment.likeCount.desc(),
+            comment.createdAt.desc())
+        .limit(condition.limit())
+        .fetch();
   }
 
   private BooleanExpression createdAtCursorCondition(CommentQueryCondition condition) {
@@ -75,4 +75,12 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
             .and(comment.createdAt.lt(condition.after())));
   }
 
+  @Override
+  public long countByArticleId(UUID articleId) {
+    Long count = queryFactory.select(comment.count()).from(comment)
+        .where(comment.article.id.eq(articleId))
+        .fetchOne();
+
+    return count != null ? count : 0L;
+  }
 }
