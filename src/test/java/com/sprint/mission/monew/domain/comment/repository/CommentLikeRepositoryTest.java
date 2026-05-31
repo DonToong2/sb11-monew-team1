@@ -12,6 +12,9 @@ import com.sprint.mission.monew.domain.comment.entity.CommentLike;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -133,6 +136,35 @@ public class CommentLikeRepositoryTest {
 
       // then
       assertThat(deletedCount).isEqualTo(1);
+    }
+  }
+
+  @Nested
+  @DisplayName("유저가 좋아요한 댓글 목록 ID 조회하기")
+  class findLikedCommentIds {
+
+    @Test
+    @DisplayName("유저가 좋아요한 댓글 목록 ID 조회 성공")
+    void 유저가_좋아요한_댓글ID_목록조회_성공() {
+      // given
+      User otherUser = userRepository.save(User.create("test2@naver.com", "test2", "12345678"));
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
+
+      commentLikeRepository.save(CommentLike.create(user, firstComment));
+      commentLikeRepository.save(CommentLike.create(user, secondComment));
+
+      commentLikeRepository.save(CommentLike.create(otherUser, thirdComment));
+
+      // when
+      Set<UUID> result = commentLikeRepository.findLikedCommentIds(user.getId(),
+          List.of(firstComment.getId(), secondComment.getId(), thirdComment.getId()));
+
+      // then
+      assertThat(result).hasSize(2)
+          .containsExactlyInAnyOrder(firstComment.getId(), secondComment.getId());
+
     }
   }
 
