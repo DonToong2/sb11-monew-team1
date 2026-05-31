@@ -302,18 +302,16 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("hasNext True 테스트(임시 limit 2로 고정)")
-    void hasNext_True() throws InterruptedException {
+    void hasNext_True() {
       // given
       Comment firstComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
-      Thread.sleep(1000);
 
       Comment secondComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
 
       Comment thirdComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
       List<Comment> comments = List.of(firstComment, secondComment, thirdComment);
       given(commentRepository.getComments(any())).willReturn(comments);
@@ -337,18 +335,16 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("다음 페이지가 없을 때 hasNext false")
-    void hasNext_False() throws InterruptedException {
+    void hasNext_False() {
       // given
       Comment firstComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
-      Thread.sleep(1000);
 
       Comment secondComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
 
       Comment thirdComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
       List<Comment> comments = List.of(firstComment, secondComment, thirdComment);
       given(commentRepository.getComments(any())).willReturn(comments);
@@ -372,18 +368,16 @@ public class CommentServiceTest {
 
     @Test
     @DisplayName("등록순 조회 시 nextCursor 반환")
-    void 등록순_nextCursor() throws InterruptedException {
+    void 등록순_nextCursor() {
       // given
       Comment firstComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
-      Thread.sleep(1000);
 
       Comment secondComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
-      Thread.sleep(1000);
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
 
       Comment thirdComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
       given(commentRepository.getComments(any())).willReturn(
           List.of(thirdComment, secondComment, firstComment));
@@ -414,9 +408,9 @@ public class CommentServiceTest {
       Comment firstComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
       Comment secondComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
       Comment thirdComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
       List<Comment> comments = List.of(thirdComment, secondComment, firstComment);
 
@@ -449,10 +443,10 @@ public class CommentServiceTest {
       ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
       ReflectionTestUtils.setField(firstComment, "likeCount", 2);
       Comment secondComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
       ReflectionTestUtils.setField(secondComment, "likeCount", 2);
       Comment thirdComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
       ReflectionTestUtils.setField(thirdComment, "likeCount", 1);
 
       List<Comment> comments = List.of(secondComment);
@@ -482,10 +476,10 @@ public class CommentServiceTest {
       ReflectionTestUtils.setField(firstComment, "createdAt", Instant.now());
       ReflectionTestUtils.setField(firstComment, "likeCount", 2);
       Comment secondComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(secondComment, "createdAt", Instant.now().plusSeconds(1));
       ReflectionTestUtils.setField(secondComment, "likeCount", 2);
       Comment thirdComment = Comment.create(article, user, content);
-      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now());
+      ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
       ReflectionTestUtils.setField(thirdComment, "likeCount", 1);
 
       List<Comment> comments = List.of(secondComment);
