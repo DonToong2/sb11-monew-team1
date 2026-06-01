@@ -57,10 +57,7 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
                 createdAtOrder(condition) : likeCountOrder(condition),
 
             // 2순위 등록순 추가
-            comment.createdAt.desc(),
-
-            // 3순위 id순 추가
-            comment.id.desc()
+            comment.createdAt.desc()
         )
         .limit(condition.limit() + 1)
         .fetch();
