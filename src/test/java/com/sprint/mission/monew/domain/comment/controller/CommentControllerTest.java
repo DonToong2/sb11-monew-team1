@@ -444,7 +444,7 @@ public class CommentControllerTest {
       mockMvc.perform(
               get("/api/comments")
                   .param("articleId", articleId.toString())
-                  .param("orderBy", "CREATED_AT")
+                  .param("orderBy", "LIKE_COUNT")
                   .param("direction", "DESC")
                   .param("cursor", "notNumber")
                   .param("limit", "0")
