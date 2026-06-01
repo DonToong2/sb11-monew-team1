@@ -4,7 +4,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.monew.common.dto.SortDirection;
-import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
+import com.sprint.mission.monew.domain.comment.dto.CommentQueryCondition;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.entity.QComment;
 import com.sprint.mission.monew.domain.comment.repository.querydsl.CommentCustomRepository;

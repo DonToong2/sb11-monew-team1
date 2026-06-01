@@ -2,10 +2,10 @@ package com.sprint.mission.monew.domain.comment.controller;
 
 import com.sprint.mission.monew.common.dto.CursorPageResponse;
 import com.sprint.mission.monew.domain.comment.controller.api.CommentApi;
-import com.sprint.mission.monew.domain.comment.dto.request.CommentCreateRequest;
-import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
-import com.sprint.mission.monew.domain.comment.dto.request.CommentUpdateRequest;
-import com.sprint.mission.monew.domain.comment.dto.response.CommentResponse;
+import com.sprint.mission.monew.domain.comment.dto.CommentCreateRequest;
+import com.sprint.mission.monew.domain.comment.dto.CommentQueryCondition;
+import com.sprint.mission.monew.domain.comment.dto.CommentUpdateRequest;
+import com.sprint.mission.monew.domain.comment.dto.CommentResponse;
 import com.sprint.mission.monew.domain.comment.service.CommentService;
 import jakarta.validation.Valid;
 import java.util.UUID;

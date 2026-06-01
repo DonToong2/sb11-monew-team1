@@ -8,8 +8,8 @@ import com.sprint.mission.monew.common.dto.SortDirection;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
-import com.sprint.mission.monew.domain.comment.dto.request.CommentOrderBy;
-import com.sprint.mission.monew.domain.comment.dto.request.CommentQueryCondition;
+import com.sprint.mission.monew.domain.comment.dto.CommentOrderBy;
+import com.sprint.mission.monew.domain.comment.dto.CommentQueryCondition;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
@@ -28,7 +28,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @DataJpaTest
 @ActiveProfiles("test")

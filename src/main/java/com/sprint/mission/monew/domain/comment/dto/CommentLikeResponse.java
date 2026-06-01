@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.domain.comment.dto.response;
+package com.sprint.mission.monew.domain.comment.dto;
 
 import java.time.Instant;
 import java.util.UUID;

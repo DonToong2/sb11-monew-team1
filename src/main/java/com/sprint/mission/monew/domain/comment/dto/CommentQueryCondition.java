@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.domain.comment.dto.request;
+package com.sprint.mission.monew.domain.comment.dto;
 
 import com.sprint.mission.monew.common.dto.SortDirection;
 import io.swagger.v3.oas.annotations.media.Schema;

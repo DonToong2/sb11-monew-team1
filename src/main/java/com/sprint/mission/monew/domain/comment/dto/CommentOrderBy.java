@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.domain.comment.dto.request;
+package com.sprint.mission.monew.domain.comment.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
