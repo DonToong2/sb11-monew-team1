@@ -92,20 +92,9 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
     long likeCursor = Long.parseLong(condition.cursor());
 
-    // after null시 처리
-    if (condition.after() == null) {
-      return condition.direction() == SortDirection.ASC ?
-          comment.likeCount.gt(likeCursor) : comment.likeCount.lt(likeCursor);
-    }
-
     // where likeCount < cursor or likeCount = cursor and createdAt < after
     return condition.direction() == SortDirection.ASC ?
-        comment.likeCount.gt(likeCursor)
-            .or(comment.likeCount.eq(likeCursor)
-                .and(comment.createdAt.gt(condition.after())))
-        : comment.likeCount.lt(likeCursor)
-            .or(comment.likeCount.eq(likeCursor)
-                .and(comment.createdAt.lt(condition.after())));
+        comment.likeCount.gt(likeCursor) : comment.likeCount.lt(likeCursor);
   }
 
   @Override
