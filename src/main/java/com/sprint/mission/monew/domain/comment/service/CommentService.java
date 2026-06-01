@@ -121,39 +121,12 @@ public class CommentService {
         condition.articleId(), condition.orderBy(), condition.direction(), condition.limit(),
         requestId);
 
-    List<CommentResponse> comments = commentRepository.getComments(condition, requestId);
-
-    boolean hasNext = comments.size() > condition.limit();
-    List<CommentResponse> pageComments = hasNext ? comments.subList(0, condition.limit()) : comments;
-
-    String nextCursor = null;
-    Instant nextAfter = null;
-
-    if (!pageComments.isEmpty()) {
-      CommentResponse lastComment = pageComments.get(pageComments.size() - 1);
-
-      nextCursor = createNextCursor(lastComment, condition);
-      nextAfter = lastComment.createdAt();
-    }
+    CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, requestId);
 
     log.info("[COMMENT_READ_SUCCESS] 댓글 목록 조회 성공 - 조회된 댓글 수={}, 다음 페이지 여부={}, 다음 커서={}",
-        pageComments.size(), hasNext, nextCursor);
+        response.content().size(), response.hasNext(), response.nextCursor());
 
-    return CursorPageResponse.of(
-        pageComments,
-        nextCursor,
-        nextAfter,
-        hasNext,
-        pageComments.size(),
-        commentRepository.countByArticleId(condition.articleId())
-    );
-  }
-
-  private String createNextCursor(CommentResponse lastComment, CommentQueryCondition condition) {
-    return switch (condition.orderBy()) {
-      case CREATED_AT -> lastComment.createdAt().toString();
-      case LIKE_COUNT -> String.valueOf(lastComment.likeCount());
-    };
+    return response;
   }
 
 }

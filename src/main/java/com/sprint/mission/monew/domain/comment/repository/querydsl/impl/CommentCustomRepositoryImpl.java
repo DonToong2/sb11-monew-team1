@@ -4,6 +4,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sprint.mission.monew.common.dto.CursorPageResponse;
 import com.sprint.mission.monew.common.dto.SortDirection;
 import com.sprint.mission.monew.domain.comment.dto.CommentOrderBy;
 import com.sprint.mission.monew.domain.comment.dto.CommentQueryCondition;
@@ -26,43 +27,65 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
   private final QCommentLike commentLike = QCommentLike.commentLike;
 
   @Override
-  public List<CommentResponse> getComments(CommentQueryCondition condition, UUID userId) {
+  public CursorPageResponse<CommentResponse> getComments(CommentQueryCondition condition, UUID userId) {
 
-    return queryFactory.select(Projections.constructor(
-              CommentResponse.class,
-              comment.id,
-              comment.article.id,
-              comment.user.id,
-              comment.user.nickname,
-              comment.content,
-              comment.likeCount,
-              commentLike.id.isNotNull(),
-              comment.createdAt
-          ))
-          .from(comment)
-          .leftJoin(comment.user)
-          .leftJoin(commentLike)
-          .on(
-              commentLike.user.id.eq(userId)
-                  .and(commentLike.comment.id.eq(comment.id))
-          )
-          .where(comment.article.id.eq(condition.articleId()),
-              comment.deletedAt.isNull(),
-              condition.orderBy() == CommentOrderBy.CREATED_AT ?
-                  createdAtCursorCondition(condition) : likeCountCursorCondition(condition))
-          .orderBy(
-              // 1순위 등록순일지 좋아요순일지 결정
-              condition.orderBy() == CommentOrderBy.CREATED_AT ?
-                  createdAtOrder(condition) : likeCountOrder(condition),
+    List<CommentResponse> comments = queryFactory.select(Projections.constructor(
+            CommentResponse.class,
+            comment.id,
+            comment.article.id,
+            comment.user.id,
+            comment.user.nickname,
+            comment.content,
+            comment.likeCount,
+            commentLike.id.isNotNull(),
+            comment.createdAt
+        ))
+        .from(comment)
+        .leftJoin(comment.user)
+        .leftJoin(commentLike)
+        .on(
+            commentLike.user.id.eq(userId)
+                .and(commentLike.comment.id.eq(comment.id))
+        )
+        .where(comment.article.id.eq(condition.articleId()),
+            comment.deletedAt.isNull(),
+            condition.orderBy() == CommentOrderBy.CREATED_AT ?
+                createdAtCursorCondition(condition) : likeCountCursorCondition(condition))
+        .orderBy(
+            // 1순위 등록순일지 좋아요순일지 결정
+            condition.orderBy() == CommentOrderBy.CREATED_AT ?
+                createdAtOrder(condition) : likeCountOrder(condition),
 
-              // 2순위 등록순 추가
-              comment.createdAt.desc(),
+            // 2순위 등록순 추가
+            comment.createdAt.desc(),
 
-              // 3순위 id순 추가
-              comment.id.desc()
-          )
-          .limit(condition.limit() + 1)
-          .fetch();
+            // 3순위 id순 추가
+            comment.id.desc()
+        )
+        .limit(condition.limit() + 1)
+        .fetch();
+
+    boolean hasNext = comments.size() > condition.limit();
+    List<CommentResponse> pageComments = hasNext ? comments.subList(0, condition.limit()) : comments;
+
+    String nextCursor = null;
+    Instant nextAfter = null;
+
+    if (!pageComments.isEmpty()) {
+      CommentResponse lastComment = pageComments.get(pageComments.size() - 1);
+
+      nextCursor = createNextCursor(lastComment, condition);
+      nextAfter = lastComment.createdAt();
+    }
+
+    return CursorPageResponse.of(
+        pageComments,
+        nextCursor,
+        nextAfter,
+        hasNext,
+        pageComments.size(),
+        countByArticleId(condition.articleId())
+    );
   }
 
   // 오름차순/내림차순 정렬(등록순)
@@ -92,15 +115,27 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
   // 좋아요순 커서
   private BooleanExpression likeCountCursorCondition(CommentQueryCondition condition) {
-    if (condition.cursor() == null) {
+    if (condition.cursor() == null || condition.after() == null) {
       return null;
     }
 
     long likeCursor = Long.parseLong(condition.cursor());
+    Instant createdAtCursor = condition.after();
 
-    // where likeCount < cursor or likeCount = cursor and createdAt < after
     return condition.direction() == SortDirection.ASC ?
-        comment.likeCount.gt(likeCursor) : comment.likeCount.lt(likeCursor);
+        comment.likeCount.gt(likeCursor)
+            .or(comment.likeCount.eq(likeCursor)
+                .and(comment.createdAt.gt(createdAtCursor)))
+        : comment.likeCount.lt(likeCursor)
+            .or(comment.likeCount.eq(likeCursor)
+                .and(comment.createdAt.lt(createdAtCursor)));
+  }
+
+  private String createNextCursor(CommentResponse lastComment, CommentQueryCondition condition) {
+    return switch (condition.orderBy()) {
+      case CREATED_AT -> lastComment.createdAt().toString();
+      case LIKE_COUNT -> String.valueOf(lastComment.likeCount());
+    };
   }
 
   @Override
