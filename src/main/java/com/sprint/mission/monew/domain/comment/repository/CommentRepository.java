@@ -1,12 +1,13 @@
 package com.sprint.mission.monew.domain.comment.repository;
 
 import com.sprint.mission.monew.domain.comment.entity.Comment;
+import com.sprint.mission.monew.domain.comment.repository.querydsl.CommentCustomRepository;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-public interface CommentRepository extends JpaRepository<Comment, UUID> {
+public interface CommentRepository extends JpaRepository<Comment, UUID>, CommentCustomRepository {
 
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("""
@@ -21,5 +22,4 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
             where c.id = :commentId and c.likeCount > 0
       """)
   void decreaseLikeCount(UUID commentId);
-
 }
