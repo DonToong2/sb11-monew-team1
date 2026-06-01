@@ -30,7 +30,6 @@ import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -314,8 +313,39 @@ public class CommentServiceTest {
       Comment thirdComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
-      List<Comment> comments = List.of(firstComment, secondComment, thirdComment);
-      given(commentRepository.getComments(any())).willReturn(comments);
+      CommentResponse firstResponse = new CommentResponse(
+          firstComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "첫 번째 댓글",
+          0L,
+          false,
+          firstComment.getCreatedAt()
+      );
+      CommentResponse secondResponse = new CommentResponse(
+          secondComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "두 번째 댓글",
+          0L,
+          false,
+          secondComment.getCreatedAt()
+      );
+      CommentResponse thirdResponse = new CommentResponse(
+          thirdComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "세 번째 댓글",
+          0L,
+          false,
+          thirdComment.getCreatedAt()
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(
+          List.of(firstResponse, secondResponse, thirdResponse));
       given(commentRepository.countByArticleId(article.getId())).willReturn(3L);
 
       CommentQueryCondition condition = new CommentQueryCondition(
@@ -347,8 +377,39 @@ public class CommentServiceTest {
       Comment thirdComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
-      List<Comment> comments = List.of(firstComment, secondComment, thirdComment);
-      given(commentRepository.getComments(any())).willReturn(comments);
+      CommentResponse firstResponse = new CommentResponse(
+          firstComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "첫 번째 댓글",
+          0L,
+          false,
+          firstComment.getCreatedAt()
+      );
+      CommentResponse secondResponse = new CommentResponse(
+          secondComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "두 번째 댓글",
+          0L,
+          false,
+          secondComment.getCreatedAt()
+      );
+      CommentResponse thirdResponse = new CommentResponse(
+          thirdComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "세 번째 댓글",
+          0L,
+          false,
+          thirdComment.getCreatedAt()
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(
+          List.of(firstResponse, secondResponse, thirdResponse));
       given(commentRepository.countByArticleId(article.getId())).willReturn(3L);
 
       CommentQueryCondition condition = new CommentQueryCondition(
@@ -380,8 +441,39 @@ public class CommentServiceTest {
       Comment thirdComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
-      given(commentRepository.getComments(any())).willReturn(
-          List.of(thirdComment, secondComment, firstComment));
+      CommentResponse firstResponse = new CommentResponse(
+          firstComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "첫 번째 댓글",
+          0L,
+          false,
+          firstComment.getCreatedAt()
+      );
+      CommentResponse secondResponse = new CommentResponse(
+          secondComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "두 번째 댓글",
+          0L,
+          false,
+          secondComment.getCreatedAt()
+      );
+      CommentResponse thirdResponse = new CommentResponse(
+          thirdComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "세 번째 댓글",
+          0L,
+          false,
+          thirdComment.getCreatedAt()
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(
+          List.of(firstResponse, secondResponse, thirdResponse));
 
       given(commentRepository.countByArticleId(articleId)).willReturn(3L);
 
@@ -413,9 +505,39 @@ public class CommentServiceTest {
       Comment thirdComment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
 
-      List<Comment> comments = List.of(firstComment, secondComment, thirdComment);
+      CommentResponse firstResponse = new CommentResponse(
+          firstComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "첫 번째 댓글",
+          0L,
+          false,
+          firstComment.getCreatedAt()
+      );
+      CommentResponse secondResponse = new CommentResponse(
+          secondComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "두 번째 댓글",
+          0L,
+          false,
+          secondComment.getCreatedAt()
+      );
+      CommentResponse thirdResponse = new CommentResponse(
+          thirdComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "세 번째 댓글",
+          0L,
+          false,
+          thirdComment.getCreatedAt()
+      );
 
-      given(commentRepository.getComments(any())).willReturn(comments);
+      given(commentRepository.getComments(any(), any())).willReturn(
+          List.of(firstResponse, secondResponse, thirdResponse));
 
       given(commentRepository.countByArticleId(articleId)).willReturn(3L);
 
@@ -449,8 +571,39 @@ public class CommentServiceTest {
       ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
       ReflectionTestUtils.setField(thirdComment, "likeCount", 1);
 
-      List<Comment> comments = List.of(secondComment);
-      given(commentRepository.getComments(any())).willReturn(comments);
+      CommentResponse firstResponse = new CommentResponse(
+          firstComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "첫 번째 댓글",
+          2L,
+          false,
+          firstComment.getCreatedAt()
+      );
+      CommentResponse secondResponse = new CommentResponse(
+          secondComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "두 번째 댓글",
+          2L,
+          false,
+          secondComment.getCreatedAt()
+      );
+      CommentResponse thirdResponse = new CommentResponse(
+          thirdComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "세 번째 댓글",
+          1L,
+          false,
+          thirdComment.getCreatedAt()
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(
+          List.of(firstResponse, secondResponse, thirdResponse));
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -482,8 +635,39 @@ public class CommentServiceTest {
       ReflectionTestUtils.setField(thirdComment, "createdAt", Instant.now().plusSeconds(2));
       ReflectionTestUtils.setField(thirdComment, "likeCount", 1);
 
-      List<Comment> comments = List.of(secondComment);
-      given(commentRepository.getComments(any())).willReturn(comments);
+      CommentResponse firstResponse = new CommentResponse(
+          firstComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "첫 번째 댓글",
+          0L,
+          false,
+          firstComment.getCreatedAt()
+      );
+      CommentResponse secondResponse = new CommentResponse(
+          secondComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "두 번째 댓글",
+          0L,
+          false,
+          secondComment.getCreatedAt()
+      );
+      CommentResponse thirdResponse = new CommentResponse(
+          thirdComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "세 번째 댓글",
+          0L,
+          false,
+          thirdComment.getCreatedAt()
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(
+          List.of(firstResponse, secondResponse, thirdResponse));
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -509,9 +693,19 @@ public class CommentServiceTest {
       Comment comment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(comment, "createdAt", Instant.now());
 
-      given(commentRepository.getComments(any())).willReturn(List.of(comment));
+      CommentResponse commentResponse = new CommentResponse(
+          comment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "댓글 내용",
+          0L,
+          false,
+          comment.getCreatedAt()
+      );
+      given(commentRepository.getComments(any(), any())).willReturn(List.of(commentResponse));
 
-      given(commentLikeRepository.findLikedCommentIds(any(), any())).willReturn(Set.of());
+      given(commentRepository.countByArticleId(article.getId())).willReturn(1L);
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -521,19 +715,6 @@ public class CommentServiceTest {
           null,
           5
       );
-
-      CommentResponse expectedResponse = new CommentResponse(
-          comment.getId(),
-          articleId,
-          userId,
-          "닉네임",
-          "댓글 내용",
-          0,
-          false,
-          Instant.now()
-      );
-
-      given(commentMapper.toResponse(eq(comment), eq(false))).willReturn(expectedResponse);
 
       // when
       CursorPageResponse<CommentResponse> result = commentService.getComments(condition, requestId);
@@ -550,9 +731,19 @@ public class CommentServiceTest {
       Comment comment = Comment.create(article, user, content);
       ReflectionTestUtils.setField(comment, "createdAt", Instant.now());
 
-      given(commentRepository.getComments(any())).willReturn(List.of(comment));
+      CommentResponse commentResponse = new CommentResponse(
+          comment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "댓글 내용",
+          0L,
+          true,
+          comment.getCreatedAt()
+      );
+      given(commentRepository.getComments(any(), any())).willReturn(List.of(commentResponse));
 
-      given(commentLikeRepository.findLikedCommentIds(any(), any())).willReturn(Set.of(comment.getId()));
+      given(commentRepository.countByArticleId(article.getId())).willReturn(1L);
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -562,19 +753,6 @@ public class CommentServiceTest {
           null,
           5
       );
-
-      CommentResponse expectedResponse = new CommentResponse(
-          comment.getId(),
-          articleId,
-          userId,
-          "닉네임",
-          "댓글 내용",
-          0,
-          true,
-          Instant.now()
-      );
-
-      given(commentMapper.toResponse(eq(comment), eq(true))).willReturn(expectedResponse);
 
       // when
       CursorPageResponse<CommentResponse> result = commentService.getComments(condition, requestId);
@@ -601,8 +779,29 @@ public class CommentServiceTest {
           5
       );
 
-      given(commentRepository.getComments(any())).willReturn(
-          List.of(firstComment, secondComment));
+      CommentResponse firstResponse = new CommentResponse(
+          firstComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "첫 번째 댓글",
+          0L,
+          false,
+          firstComment.getCreatedAt()
+      );
+      CommentResponse secondResponse = new CommentResponse(
+          secondComment.getId(),
+          article.getId(),
+          user.getId(),
+          user.getNickname(),
+          "첫 번째 댓글",
+          0L,
+          false,
+          secondComment.getCreatedAt()
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(
+          List.of(firstResponse, secondResponse));
       given(commentRepository.countByArticleId(article.getId())).willReturn(2L);
 
       // when

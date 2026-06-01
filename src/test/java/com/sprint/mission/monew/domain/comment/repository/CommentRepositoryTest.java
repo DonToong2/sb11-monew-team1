@@ -10,6 +10,7 @@ import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.dto.CommentOrderBy;
 import com.sprint.mission.monew.domain.comment.dto.CommentQueryCondition;
+import com.sprint.mission.monew.domain.comment.dto.CommentResponse;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
@@ -229,11 +230,11 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<Comment> comments = commentRepository.getComments(condition);
+      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
 
       // then
       assertThat(comments).hasSize(2);
-      assertThat(comments).extracting(Comment::getCreatedAt)
+      assertThat(comments).extracting(CommentResponse::createdAt)
           .isSortedAccordingTo(Comparator.reverseOrder());
     }
 
@@ -277,15 +278,15 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<Comment> comments = commentRepository.getComments(condition);
+      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
 
       // then
       assertThat(comments).hasSize(3);
 
       // 2번째(좋아요2개, 등록순 2번째), 1번째(좋아요 2개, 등록순 1번째), 3번째(좋아요 1개) 순으로 정렬되어야 함
-      assertThat(comments.get(0).getId()).isEqualTo(secondComment.getId());
-      assertThat(comments.get(1).getId()).isEqualTo(firstComment.getId());
-      assertThat(comments.get(2).getId()).isEqualTo(thirdComment.getId());
+      assertThat(comments.get(0).id()).isEqualTo(secondComment.getId());
+      assertThat(comments.get(1).id()).isEqualTo(firstComment.getId());
+      assertThat(comments.get(2).id()).isEqualTo(thirdComment.getId());
     }
 
     @Test
@@ -309,7 +310,7 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<Comment> comments = commentRepository.getComments(condition);
+      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
 
       // then
       assertThat(comments).hasSize(2);
@@ -342,11 +343,11 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<Comment> comments = commentRepository.getComments(condition);
+      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
 
       // then
       assertThat(comments).hasSize(1); // 그래서 size는 3이 아닌 1이 나옴
-      assertThat(comments.get(0).getId()).isEqualTo(firstComment.getId());
+      assertThat(comments.get(0).id()).isEqualTo(firstComment.getId());
     }
 
     @Test
@@ -360,7 +361,6 @@ public class CommentRepositoryTest {
       Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
 
       Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
-
 
       testEntityManager.flush();
       testEntityManager.clear();
@@ -390,13 +390,12 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<Comment> comments = commentRepository.getComments(condition);
+      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
 
       // then
-      // 첫번째(2번째 댓글) 이후 댓글들 (1번째, 3번째) 댓글들이 나와야 함
-      assertThat(comments).hasSize(2);
-      assertThat(comments.get(0).getId()).isEqualTo(firstComment.getId());
-      assertThat(comments.get(1).getId()).isEqualTo(thirdComment.getId());
+      // 첫번째 페이지(2번째, 1번째 댓글) 이후 페이지에 3번째 댓글이 나와야 함
+      assertThat(comments).hasSize(1);
+      assertThat(comments.get(0).id()).isEqualTo(thirdComment.getId());
     }
 
     @Test
