@@ -1,12 +1,15 @@
 package com.sprint.mission.monew.domain.comment.repository.querydsl.impl;
 
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.monew.common.dto.SortDirection;
+import com.sprint.mission.monew.domain.comment.dto.CommentOrderBy;
 import com.sprint.mission.monew.domain.comment.dto.CommentQueryCondition;
-import com.sprint.mission.monew.domain.comment.entity.Comment;
+import com.sprint.mission.monew.domain.comment.dto.CommentResponse;
 import com.sprint.mission.monew.domain.comment.entity.QComment;
+import com.sprint.mission.monew.domain.comment.entity.QCommentLike;
 import com.sprint.mission.monew.domain.comment.repository.querydsl.CommentCustomRepository;
 import java.time.Instant;
 import java.util.List;
@@ -20,43 +23,40 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
   private final JPAQueryFactory queryFactory;
   private final QComment comment = QComment.comment;
+  private final QCommentLike commentLike = QCommentLike.commentLike;
 
   @Override
-  public List<Comment> getComments(CommentQueryCondition condition) {
-    return switch (condition.orderBy()) {
-      case CREATED_AT -> getCommentsByCreatedAt(condition);
-      case LIKE_COUNT -> getCommentsByLikeCount(condition);
-    };
-  }
+  public List<CommentResponse> getComments(CommentQueryCondition condition, UUID userId) {
 
-  // 등록순
-  private List<Comment> getCommentsByCreatedAt(CommentQueryCondition condition) {
-    return queryFactory.selectFrom(comment)
-        .leftJoin(comment.user).fetchJoin()
-        .leftJoin(comment.article).fetchJoin()
-        .where(
-            comment.article.id.eq(condition.articleId()),
-            comment.deletedAt.isNull(), // 논리 삭제는 조회 안되도록
-            createdAtCursorCondition(condition))
-        .orderBy(createdAtOrder(condition))
-        .limit(condition.limit() + 1)
-        .fetch();
-  }
-
-  // 좋아요순(2순위 등록순)
-  private List<Comment> getCommentsByLikeCount(CommentQueryCondition condition) {
-    return queryFactory.selectFrom(comment)
-        .leftJoin(comment.user).fetchJoin()
-        .leftJoin(comment.article).fetchJoin()
-        .where(
-            comment.article.id.eq(condition.articleId()),
-            comment.deletedAt.isNull(), // 논리 삭제는 조회 안되도록
-            likeCountCursorCondition(condition))
-        .orderBy(
-            likeCountOrder(condition),
-            createdAtOrder(condition))
-        .limit(condition.limit() + 1)
-        .fetch();
+    return queryFactory.select(Projections.constructor(
+              CommentResponse.class,
+              comment.id,
+              comment.article.id,
+              comment.user.id,
+              comment.user.nickname,
+              comment.content,
+              comment.likeCount,
+              commentLike.id.isNotNull(),
+              comment.createdAt
+          ))
+          .from(comment)
+          .leftJoin(comment.user)
+          .leftJoin(commentLike)
+          .on(
+              commentLike.user.id.eq(userId)
+                  .and(commentLike.comment.id.eq(comment.id))
+          )
+          .where(comment.article.id.eq(condition.articleId()),
+              comment.deletedAt.isNull(),
+              condition.orderBy() == CommentOrderBy.CREATED_AT ?
+                  createdAtCursorCondition(condition) : likeCountCursorCondition(condition))
+          .orderBy(
+              condition.orderBy() == CommentOrderBy.CREATED_AT ?
+                  createdAtOrder(condition) : likeCountOrder(condition),
+              createdAtOrder(condition)
+          )
+          .limit(condition.limit() + 1)
+          .fetch();
   }
 
   // 오름차순/내림차순 정렬(등록순)

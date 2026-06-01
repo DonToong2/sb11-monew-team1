@@ -121,51 +121,39 @@ public class CommentService {
         condition.articleId(), condition.orderBy(), condition.direction(), condition.limit(),
         requestId);
 
-    List<Comment> comments = commentRepository.getComments(condition);
+    List<CommentResponse> comments = commentRepository.getComments(condition, requestId);
 
     boolean hasNext = comments.size() > condition.limit();
-    List<Comment> pageComments = hasNext ? comments.subList(0, condition.limit()) : comments;
+    List<CommentResponse> pageComments = hasNext ? comments.subList(0, condition.limit()) : comments;
 
     String nextCursor = null;
     Instant nextAfter = null;
 
     if (!pageComments.isEmpty()) {
-      Comment lastComment = pageComments.get(pageComments.size() - 1);
+      CommentResponse lastComment = pageComments.get(pageComments.size() - 1);
 
-      switch (condition.orderBy()) {
-
-        case CREATED_AT -> {
-          nextCursor = lastComment.getCreatedAt().toString();
-        }
-
-        case LIKE_COUNT -> {
-          nextCursor = String.valueOf(lastComment.getLikeCount());
-        }
-      }
-
-      nextAfter = lastComment.getCreatedAt();
+      nextCursor = createNextCursor(lastComment, condition);
+      nextAfter = lastComment.createdAt();
     }
 
-    List<UUID> commentIds = pageComments.stream().map(Comment::getId).toList();
-
-    Set<UUID> likedCommentIds = commentLikeRepository.findLikedCommentIds(requestId, commentIds);
-
-    List<CommentResponse> content = pageComments.stream()
-        .map(comment ->
-            commentMapper.toResponse(comment, likedCommentIds.contains(comment.getId())))
-        .toList();
-
     log.info("[COMMENT_READ_SUCCESS] 댓글 목록 조회 성공 - 조회된 댓글 수={}, 다음 페이지 여부={}, 다음 커서={}",
-        content.size(), hasNext, nextCursor);
+        pageComments.size(), hasNext, nextCursor);
 
     return CursorPageResponse.of(
-        content,
+        pageComments,
         nextCursor,
         nextAfter,
         hasNext,
-        content.size(),
+        pageComments.size(),
         commentRepository.countByArticleId(condition.articleId())
     );
+  }
+
+  private String createNextCursor(CommentResponse lastComment, CommentQueryCondition condition) {
+    return switch (condition.orderBy()) {
+      case CREATED_AT -> lastComment.createdAt().toString();
+      case LIKE_COUNT -> String.valueOf(lastComment.likeCount());
+    };
   }
 
 }
