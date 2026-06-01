@@ -2,6 +2,7 @@ package com.sprint.mission.monew.domain.comment.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.sprint.mission.monew.common.config.JpaConfig;
 import com.sprint.mission.monew.common.config.QuerydslConfig;
 import com.sprint.mission.monew.common.dto.CursorPageResponse;
@@ -20,6 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,6 +32,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -231,7 +234,8 @@ public class CommentRepositoryTest {
       );
 
       // when
-      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition,
+          user.getId());
       List<CommentResponse> comments = response.content();
 
       // then
@@ -280,7 +284,8 @@ public class CommentRepositoryTest {
       );
 
       // when
-      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition,
+          user.getId());
       List<CommentResponse> comments = response.content();
 
       // then
@@ -313,7 +318,8 @@ public class CommentRepositoryTest {
       );
 
       // when
-      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition,
+          user.getId());
       List<CommentResponse> comments = response.content();
 
       // then
@@ -347,7 +353,8 @@ public class CommentRepositoryTest {
       );
 
       // when
-      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition,
+          user.getId());
       List<CommentResponse> comments = response.content();
 
       // then
@@ -395,7 +402,8 @@ public class CommentRepositoryTest {
       );
 
       // when
-      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition,
+          user.getId());
       List<CommentResponse> comments = response.content();
 
       // then
@@ -403,6 +411,94 @@ public class CommentRepositoryTest {
       assertThat(comments).hasSize(2);
       assertThat(comments.get(0).id()).isEqualTo(firstComment.getId());
       assertThat(comments.get(1).id()).isEqualTo(thirdComment.getId());
+    }
+
+    @Test
+    @DisplayName("좋아요 수가 같을 때 2순위 등록순 정렬(좋아요순 ASC)")
+    void 좋아요순_오름차순_동일_2순위_등록순_조회() throws InterruptedException {
+      // given
+      UUID articleId = article.getId();
+
+      Comment firstComment = commentRepository.save(Comment.create(article, user, "첫 번째 댓글"));
+      Thread.sleep(100);
+      Comment secondComment = commentRepository.save(Comment.create(article, user, "두 번째 댓글"));
+      Thread.sleep(100);
+      Comment thirdComment = commentRepository.save(Comment.create(article, user, "세 번째 댓글"));
+      Thread.sleep(100);
+      Comment fourthComment = commentRepository.save(Comment.create(article, user, "네 번째 댓글"));
+
+      // 좋아요 수 세팅(첫 번째 : 1, 두 번째 : 2, 세 번째 : 2, 네 번째 : 3)
+      commentRepository.increaseLikeCount(firstComment.getId());
+
+      commentRepository.increaseLikeCount(secondComment.getId());
+      commentRepository.increaseLikeCount(secondComment.getId());
+
+      commentRepository.increaseLikeCount(thirdComment.getId());
+      commentRepository.increaseLikeCount(thirdComment.getId());
+
+      commentRepository.increaseLikeCount(fourthComment.getId());
+      commentRepository.increaseLikeCount(fourthComment.getId());
+      commentRepository.increaseLikeCount(fourthComment.getId());
+
+      testEntityManager.flush();
+      testEntityManager.clear();
+
+      firstComment = commentRepository.findById(firstComment.getId()).orElseThrow();
+      secondComment = commentRepository.findById(secondComment.getId()).orElseThrow();
+      thirdComment = commentRepository.findById(thirdComment.getId()).orElseThrow();
+      fourthComment = commentRepository.findById(fourthComment.getId()).orElseThrow();
+
+      CommentQueryCondition firstCondition = new CommentQueryCondition(
+          articleId,
+          CommentOrderBy.LIKE_COUNT,
+          SortDirection.ASC,
+          null,
+          null,
+          2
+      );
+
+      // when
+      CursorPageResponse<CommentResponse> response1 = commentRepository.getComments(firstCondition,
+          user.getId());
+      List<CommentResponse> comments1 = response1.content();
+
+      // then
+      // 첫 페이지
+      assertThat(comments1)
+          .extracting(CommentResponse::likeCount)
+          .contains(1L, 2L);
+
+      CommentResponse lastOfTwoGroup = comments1.stream()
+          .filter(c -> c.likeCount() == 2L)
+          .max(Comparator.comparing(CommentResponse::createdAt))
+          .orElseThrow();
+
+      CommentQueryCondition secondCondition = new CommentQueryCondition(
+          articleId,
+          CommentOrderBy.LIKE_COUNT,
+          SortDirection.ASC,
+          String.valueOf(lastOfTwoGroup.likeCount()),
+          lastOfTwoGroup.createdAt(),
+          5
+      );
+
+      CursorPageResponse<CommentResponse> response2 = commentRepository.getComments(secondCondition,
+          user.getId());
+      List<CommentResponse> comments2 = response2.content();
+
+      // 2 페이지
+      assertThat(comments2)
+          .extracting(CommentResponse::likeCount)
+          .contains(2L, 3L);
+
+      // tie-break 검증
+      List<CommentResponse> tieGroup = Stream.concat(comments1.stream(), comments2.stream())
+          .filter(c -> c.likeCount() == 2L)
+          .toList();
+
+      assertThat(tieGroup)
+          .extracting(CommentResponse::createdAt)
+          .isSortedAccordingTo(Comparator.naturalOrder()); // ASC 기준
     }
 
     @Test
