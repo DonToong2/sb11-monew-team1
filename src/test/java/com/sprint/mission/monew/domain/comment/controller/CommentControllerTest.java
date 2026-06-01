@@ -56,6 +56,8 @@ public class CommentControllerTest {
   private CommentResponse firstCommentResponse;
   private CommentResponse secondCommentResponse;
 
+  private Instant fixedTime;
+
   @BeforeEach
   void setUp() {
     articleId = UUID.randomUUID();
@@ -100,7 +102,7 @@ public class CommentControllerTest {
         "첫 번째 댓글",
         1,
         false,
-        Instant.now()
+        Instant.parse("2024-01-01T00:00:00Z")
     );
 
     secondCommentResponse = new CommentResponse(
@@ -111,8 +113,10 @@ public class CommentControllerTest {
         "두 번째 댓글",
         2,
         false,
-        Instant.now()
+        Instant.parse("2024-01-01T00:00:01Z") // 1초 후 생성
     );
+
+     fixedTime = Instant.parse("2024-01-01T00:00:00Z");
   }
 
   @Nested
@@ -463,8 +467,8 @@ public class CommentControllerTest {
       given(commentService.getComments(any(), any()))
           .willReturn(CursorPageResponse.of(
               commentResponseList,
-              "cursor",
-              Instant.now(),
+              "1",
+              fixedTime,
               false,
               2,
               2L
@@ -473,12 +477,16 @@ public class CommentControllerTest {
       // when & then
       mockMvc.perform(get("/api/comments")
               .param("articleId", articleId.toString())
-              .param("orderBy", "CREATED_AT")
+              .param("orderBy", "LIKE_COUNT")
               .param("direction", "DESC")
+              .param("cursor", "1")
+              .param("after", "2024-01-01T00:00:00Z")
               .param("limit", "5")
               .header("Monew-Request-User-ID", userId.toString()))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content").isArray());
+          .andExpect(jsonPath("$.content").isArray())
+          .andExpect(jsonPath("$.content.length()").value(2))
+          .andExpect(jsonPath("$.nextCursor").exists());
     }
   }
 }

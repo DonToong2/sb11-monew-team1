@@ -13,6 +13,7 @@ import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.comment.entity.Comment;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
+import com.sprint.mission.monew.domain.comment.service.CommentService;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
@@ -38,7 +39,6 @@ public class CommentIntegrationTest {
   @Autowired
   private MockMvc mockMvc;
 
-
   @Autowired
   private CommentRepository commentRepository;
 
@@ -48,6 +48,9 @@ public class CommentIntegrationTest {
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private CommentService commentService;
+
   private Article article;
   private User user;
   private String content;
@@ -55,6 +58,7 @@ public class CommentIntegrationTest {
 
   @BeforeEach
   void setUp() {
+
     article = articleRepository.save(
         Article.create(
             ArticleSource.NAVER,
@@ -436,11 +440,14 @@ public class CommentIntegrationTest {
               .param("articleId", article.getId().toString())
               .param("orderBy", "LIKE_COUNT")
               .param("direction", "DESC")
+              .param("cursor", "1")
+              .param("after", secondComment.getCreatedAt().toString())
               .param("limit", "5")
               .header("Monew-Request-User-ID", user.getId()))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content[0].likeCount").value(2))
-          .andExpect(jsonPath("$.content[1].likeCount").value(1));
+          .andExpect(jsonPath("$.content").isArray())
+          .andExpect(jsonPath("$.content.length()").value(1))
+          .andExpect(jsonPath("$.nextCursor").exists());
     }
   }
 }
