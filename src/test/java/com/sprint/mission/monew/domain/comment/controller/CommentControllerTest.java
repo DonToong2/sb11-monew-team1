@@ -435,6 +435,26 @@ public class CommentControllerTest {
     }
 
     @Test
+    @DisplayName("댓글 목록 조회 실패 - LIKE_COUNT가 숫자가 아님(유효성 검증, 400 에러)")
+    void 댓글_목록조회_실패_LIKE_COUNT가_숫자아님() throws Exception {
+      // given
+      // 유효성 검증 실패 시 서비스 호출되지 않음
+
+      // when & then
+      mockMvc.perform(
+              get("/api/comments")
+                  .param("articleId", articleId.toString())
+                  .param("orderBy", "CREATED_AT")
+                  .param("direction", "DESC")
+                  .param("cursor", "notNumber")
+                  .param("limit", "0")
+                  .header("Monew-Request-User-ID", userId.toString()))
+          .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(commentService);
+    }
+
+    @Test
     @DisplayName("댓글 목록 조회 성공")
     void 댓글_목록조회_성공() throws Exception {
       // given
