@@ -51,9 +51,15 @@ public class CommentCustomRepositoryImpl implements CommentCustomRepository {
               condition.orderBy() == CommentOrderBy.CREATED_AT ?
                   createdAtCursorCondition(condition) : likeCountCursorCondition(condition))
           .orderBy(
+              // 1순위 등록순일지 좋아요순일지 결정
               condition.orderBy() == CommentOrderBy.CREATED_AT ?
                   createdAtOrder(condition) : likeCountOrder(condition),
-              createdAtOrder(condition)
+
+              // 2순위 등록순 추가
+              comment.createdAt.desc(),
+
+              // 3순위 id순 추가
+              comment.id.desc()
           )
           .limit(condition.limit() + 1)
           .fetch();
