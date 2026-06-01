@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.monew.common.config.JpaConfig;
 import com.sprint.mission.monew.common.config.QuerydslConfig;
+import com.sprint.mission.monew.common.dto.CursorPageResponse;
 import com.sprint.mission.monew.common.dto.SortDirection;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
@@ -230,7 +231,8 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      List<CommentResponse> comments = response.content();
 
       // then
       assertThat(comments).hasSize(2);
@@ -278,7 +280,8 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      List<CommentResponse> comments = response.content();
 
       // then
       assertThat(comments).hasSize(3);
@@ -310,7 +313,8 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      List<CommentResponse> comments = response.content();
 
       // then
       assertThat(comments).hasSize(2);
@@ -343,7 +347,8 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      List<CommentResponse> comments = response.content();
 
       // then
       assertThat(comments).hasSize(1); // 그래서 size는 3이 아닌 1이 나옴
@@ -390,12 +395,14 @@ public class CommentRepositoryTest {
       );
 
       // when
-      List<CommentResponse> comments = commentRepository.getComments(condition, user.getId());
+      CursorPageResponse<CommentResponse> response = commentRepository.getComments(condition, user.getId());
+      List<CommentResponse> comments = response.content();
 
       // then
-      // 첫번째 페이지(2번째, 1번째 댓글) 이후 페이지에 3번째 댓글이 나와야 함
-      assertThat(comments).hasSize(1);
-      assertThat(comments.get(0).id()).isEqualTo(thirdComment.getId());
+      // 첫번째 페이지(2번째 댓글) 이후 다음 페이지에 1번째, 3번째 댓글이 나와야 함
+      assertThat(comments).hasSize(2);
+      assertThat(comments.get(0).id()).isEqualTo(firstComment.getId());
+      assertThat(comments.get(1).id()).isEqualTo(thirdComment.getId());
     }
 
     @Test

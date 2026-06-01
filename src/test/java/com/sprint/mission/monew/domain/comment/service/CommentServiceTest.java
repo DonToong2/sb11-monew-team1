@@ -344,9 +344,16 @@ public class CommentServiceTest {
           thirdComment.getCreatedAt()
       );
 
-      given(commentRepository.getComments(any(), any())).willReturn(
-          List.of(firstResponse, secondResponse, thirdResponse));
-      given(commentRepository.countByArticleId(article.getId())).willReturn(3L);
+      CursorPageResponse<CommentResponse> response = CursorPageResponse.of(
+          List.of(firstResponse, secondResponse),
+          "cursor",
+          secondResponse.createdAt(),
+          true,
+          2,
+          3L
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(response);
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -362,6 +369,7 @@ public class CommentServiceTest {
 
       // then
       assertThat(result.hasNext()).isTrue();
+      assertThat(result.content().size()).isEqualTo(2);
     }
 
     @Test
@@ -408,9 +416,16 @@ public class CommentServiceTest {
           thirdComment.getCreatedAt()
       );
 
-      given(commentRepository.getComments(any(), any())).willReturn(
-          List.of(firstResponse, secondResponse, thirdResponse));
-      given(commentRepository.countByArticleId(article.getId())).willReturn(3L);
+      CursorPageResponse<CommentResponse> response = CursorPageResponse.of(
+          List.of(firstResponse, secondResponse),
+          "cursor",
+          secondResponse.createdAt(),
+          false,
+          2,
+          3L
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(response);
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -472,10 +487,16 @@ public class CommentServiceTest {
           thirdComment.getCreatedAt()
       );
 
-      given(commentRepository.getComments(any(), any())).willReturn(
-          List.of(firstResponse, secondResponse, thirdResponse));
+      CursorPageResponse<CommentResponse> response = CursorPageResponse.of(
+          List.of(firstResponse, secondResponse),
+          secondResponse.createdAt().toString(),
+          secondResponse.createdAt(),
+          true,
+          2,
+          3L
+      );
 
-      given(commentRepository.countByArticleId(articleId)).willReturn(3L);
+      given(commentRepository.getComments(any(), any())).willReturn(response);
 
       CommentQueryCondition condition =
           new CommentQueryCondition(
@@ -536,10 +557,16 @@ public class CommentServiceTest {
           thirdComment.getCreatedAt()
       );
 
-      given(commentRepository.getComments(any(), any())).willReturn(
-          List.of(firstResponse, secondResponse, thirdResponse));
+      CursorPageResponse<CommentResponse> response = CursorPageResponse.of(
+          List.of(firstResponse, secondResponse),
+          "cursor",
+          secondResponse.createdAt(),
+          true,
+          2,
+          3L
+      );
 
-      given(commentRepository.countByArticleId(articleId)).willReturn(3L);
+      given(commentRepository.getComments(any(), any())).willReturn(response);
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -602,8 +629,16 @@ public class CommentServiceTest {
           thirdComment.getCreatedAt()
       );
 
-      given(commentRepository.getComments(any(), any())).willReturn(
-          List.of(firstResponse, secondResponse, thirdResponse));
+      CursorPageResponse<CommentResponse> response = CursorPageResponse.of(
+          List.of(firstResponse, secondResponse),
+          String.valueOf(secondResponse.likeCount()),
+          secondResponse.createdAt(),
+          true,
+          2,
+          3L
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(response);
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -666,8 +701,16 @@ public class CommentServiceTest {
           thirdComment.getCreatedAt()
       );
 
-      given(commentRepository.getComments(any(), any())).willReturn(
-          List.of(firstResponse, secondResponse, thirdResponse));
+      CursorPageResponse<CommentResponse> response = CursorPageResponse.of(
+          List.of(firstResponse, secondResponse),
+          "cursor",
+          secondResponse.createdAt(),
+          true,
+          2,
+          3L
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(response);
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -703,9 +746,16 @@ public class CommentServiceTest {
           false,
           comment.getCreatedAt()
       );
-      given(commentRepository.getComments(any(), any())).willReturn(List.of(commentResponse));
+      CursorPageResponse<CommentResponse> response = CursorPageResponse.of(
+          List.of(commentResponse),
+          "cursor",
+          commentResponse.createdAt(),
+          true,
+          2,
+          1L
+      );
 
-      given(commentRepository.countByArticleId(article.getId())).willReturn(1L);
+      given(commentRepository.getComments(any(), any())).willReturn(response);
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -741,9 +791,16 @@ public class CommentServiceTest {
           true,
           comment.getCreatedAt()
       );
-      given(commentRepository.getComments(any(), any())).willReturn(List.of(commentResponse));
+      CursorPageResponse<CommentResponse> response = CursorPageResponse.of(
+          List.of(commentResponse),
+          "cursor",
+          commentResponse.createdAt(),
+          true,
+          2,
+          1L
+      );
 
-      given(commentRepository.countByArticleId(article.getId())).willReturn(1L);
+      given(commentRepository.getComments(any(), any())).willReturn(response);
 
       CommentQueryCondition condition = new CommentQueryCondition(
           articleId,
@@ -800,9 +857,16 @@ public class CommentServiceTest {
           secondComment.getCreatedAt()
       );
 
-      given(commentRepository.getComments(any(), any())).willReturn(
-          List.of(firstResponse, secondResponse));
-      given(commentRepository.countByArticleId(article.getId())).willReturn(2L);
+      CursorPageResponse<CommentResponse> response = CursorPageResponse.of(
+          List.of(firstResponse, secondResponse),
+          "cursor",
+          secondResponse.createdAt(),
+          true,
+          2,
+          2L
+      );
+
+      given(commentRepository.getComments(any(), any())).willReturn(response);
 
       // when
       CursorPageResponse<CommentResponse> result = commentService.getComments(condition,
