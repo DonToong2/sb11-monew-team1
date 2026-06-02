@@ -26,6 +26,11 @@ public class UserCleanupScheduler {
   public void cleanUpDeletedUsers() throws Exception {
     log.debug("물리 삭제 스케줄러 실행");
 
+    JobParameters params = new JobParametersBuilder()
+        .addLong("time", Instant.now().toEpochMilli()).toJobParameters();
+
+    jobLauncher.run(userDeleteJob, params);
+
     log.info("물리 삭제 완료");
   }
 }
