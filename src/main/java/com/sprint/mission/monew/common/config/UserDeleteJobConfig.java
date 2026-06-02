@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -17,10 +18,12 @@ public class UserDeleteJobConfig {
 
   private final UserDeleteTasklet userDeleteTasklet;
 
+  @Bean
   public Job userDeleteJob() {
     return null;
   }
 
+  @Bean
   public Step userDeleteStep() {
     return null;
   }

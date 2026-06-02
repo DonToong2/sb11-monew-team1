@@ -32,6 +32,7 @@ public class UserDeleteTaskletTest {
   void setUp() {
     threshold = Instant.now();
   }
+
   @Nested
   @DisplayName("execute 호출하기")
   class Execute {
