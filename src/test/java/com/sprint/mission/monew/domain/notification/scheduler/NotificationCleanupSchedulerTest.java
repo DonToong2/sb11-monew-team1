@@ -1,35 +1,47 @@
 package com.sprint.mission.monew.domain.notification.scheduler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 
-import com.sprint.mission.monew.domain.notification.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.JobLauncher;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationCleanupSchedulerTest {
 
-  private NotificationCleanupScheduler scheduler;
+  @Mock
+  private JobLauncher jobLauncher;
 
   @Mock
-  NotificationService notificationService;
+  private Job notificationDeleteJob;
+
+  private NotificationCleanupScheduler scheduler;
 
   @BeforeEach
   void setUp() {
-    scheduler = new NotificationCleanupScheduler(notificationService);
+    scheduler = new NotificationCleanupScheduler(jobLauncher, notificationDeleteJob);
   }
 
   @Test
-  @DisplayName("만료 알림 삭제 스케줄러 실행 시 서비스에 위임한다")
-  void 만료_알림_삭제_스케줄러_실행_시_서비스에_위임한다() {
+  @DisplayName("스케줄러가 Batch Job을 호출한다")
+  void 스케줄러가_Batch_Job의_만료_알림_삭제_메서드를_호출한다() throws Exception {
+    // given
+
     // when
     scheduler.cleanUpExpiredNotifications();
 
     // then
-    then(notificationService).should().deleteExpiredNotifications();
+    ArgumentCaptor<JobParameters> captor = ArgumentCaptor.forClass(JobParameters.class);
+    then(jobLauncher).should().run(eq(notificationDeleteJob), captor.capture());
+    assertThat(captor.getValue().getParameters()).containsKey("time");
   }
 }
