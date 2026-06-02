@@ -5,6 +5,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,13 +19,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserCleanupScheduler {
 
-  private final UserService userService;
+  private final JobLauncher jobLauncher;
+  private final Job userDeleteJob;
 
   @Scheduled(cron = "${scheduler.user-cleanup.cron}")
-  public void cleanUpDeletedUsers() {
+  public void cleanUpDeletedUsers() throws Exception {
     log.debug("물리 삭제 스케줄러 실행");
-    Instant threshold = Instant.now().minus(1, ChronoUnit.DAYS);
-    userService.deleteExpiredUsers(threshold);
+
     log.info("물리 삭제 완료");
   }
 }
