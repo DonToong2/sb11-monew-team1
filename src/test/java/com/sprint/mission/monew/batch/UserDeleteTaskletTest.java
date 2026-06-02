@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,11 @@ public class UserDeleteTaskletTest {
   @Mock
   private UserRepository userRepository;
 
+  private Instant threshold;
+  @BeforeEach
+  void setUp() {
+    threshold = Instant.now();
+  }
   @Nested
   @DisplayName("execute 호출하기")
   class Execute {
@@ -33,7 +39,7 @@ public class UserDeleteTaskletTest {
     @DisplayName("execute 호출 - deleteAllByDeletedAtBefore")
     void execute_호출_deleteAllByDeletedAtBefore() {
       // given
-      Instant threshold = Instant.now();
+      threshold = Instant.now();
       when(userRepository.deleteAllByDeletedAtBefore(any())).thenReturn(3); // 3개가 삭제됨
 
       // when
