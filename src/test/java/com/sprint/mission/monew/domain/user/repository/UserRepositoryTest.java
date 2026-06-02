@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.common.config.JpaConfig;
 import com.sprint.mission.monew.common.config.QuerydslConfig;
+import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -99,6 +101,32 @@ class UserRepositoryTest {
 
       // then
       assertThat(result).isEmpty();
+    }
+  }
+
+  @Nested
+  @DisplayName("deletedAt이 지난 유저는 삭제하기")
+  class DeleteByDeletedAt {
+    @Test
+    @DisplayName("deletedAt이 지난 유저 삭제")
+    void deletedAt이_지난_유저_삭제() {
+      // given
+      Instant now = Instant.now();
+      User user1 = User.create("test1@naver.com", "test1", "12345678");
+      User user2 = User.create("test2@naver.com", "test2", "12345678");
+
+      ReflectionTestUtils.setField(user1, "deletedAt", now.minusSeconds(10));
+      ReflectionTestUtils.setField(user2, "deletedAt", now.plusSeconds(10));
+
+      userRepository.save(user1);
+      userRepository.save(user2);
+
+      // when
+      int deletedCount = userRepository.deleteAllByDeletedAtBefore(now);
+
+      // then
+      assertThat(deletedCount).isEqualTo(1); // user1 삭제
+      assertThat(userRepository.findById(user2.getId())).isPresent(); // user2 유지
     }
   }
 }
