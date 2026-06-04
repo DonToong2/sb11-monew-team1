@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sprint.mission.monew.batch.processor.LogBackupProcessor;
 import com.sprint.mission.monew.batch.reader.LogBackupReader;
 import com.sprint.mission.monew.batch.writer.LogBackupWriter;
-import com.sprint.mission.monew.common.config.LogBackupConfig;
+import com.sprint.mission.monew.common.config.LogBackupJobConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-    LogBackupConfig.class
+    LogBackupJobConfig.class
 })
 @TestPropertySource(properties = {
     "batch.log-backup.chunk-size=1000"

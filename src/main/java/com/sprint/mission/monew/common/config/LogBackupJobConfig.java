@@ -18,7 +18,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
-public class LogBackupConfig {
+public class LogBackupJobConfig {
 
   private final JobRepository jobRepository;
   private final PlatformTransactionManager transactionManager;
