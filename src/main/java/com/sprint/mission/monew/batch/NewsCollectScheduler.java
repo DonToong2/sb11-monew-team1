@@ -17,7 +17,6 @@ public class NewsCollectScheduler {
   @Scheduled(cron = "${scheduler.news-collect.cron}")
   public void collect() {
     log.info("뉴스 수집 배치 시작");
-    newsCollectService.collect();
     log.info("뉴스 수집 배치 완료");
   }
 }
