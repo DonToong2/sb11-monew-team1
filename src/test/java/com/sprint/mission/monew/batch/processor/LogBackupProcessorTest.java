@@ -22,7 +22,7 @@ public class LogBackupProcessorTest {
   Path tempDir;
 
   @InjectMocks
-  LogProcessor processor;
+  LogBackupProcessor processor;
 
   private LocalDate yesterday;
   private Path file;

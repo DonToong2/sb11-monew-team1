@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.zip.GZIPOutputStream;
 import org.springframework.batch.item.ItemProcessor;
 
-public class LogProcessor implements ItemProcessor<Path, UploadPayload> {
+public class LogBackupProcessor implements ItemProcessor<Path, UploadPayload> {
 
   private static final DateTimeFormatter PATH_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
   private static final DateTimeFormatter FILE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");

@@ -2,13 +2,12 @@ package com.sprint.mission.monew.batch.reader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.stream.Stream;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
 
-public class LogFileReader implements ItemReader<Path> {
+public class LogBackupReader implements ItemReader<Path> {
 
   @Value("${monew.log-dir}")
   private String logDir;
