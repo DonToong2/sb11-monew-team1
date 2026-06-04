@@ -38,7 +38,7 @@ class LogBackupSchedulerTest {
     @DisplayName("uploadLogs 호출 시 LogBackupService에 위임한다")
     void uploadLogs_호출_시_서비스에_위임한다() throws Exception {
       // when
-      logBackupScheduler.uploadLogs();
+      logBackupScheduler.upload();
 
       // then
       ArgumentCaptor<JobParameters> captor = ArgumentCaptor.forClass(JobParameters.class);

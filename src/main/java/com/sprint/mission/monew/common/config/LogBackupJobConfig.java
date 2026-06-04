@@ -31,7 +31,7 @@ public class LogBackupJobConfig {
   private int chunkSize;
 
   @Bean
-  public Job logBackJob() {
+  public Job logBackupJob() {
     return new JobBuilder("logBackupJob", jobRepository)
         .start(logBackupStep())
         .build();

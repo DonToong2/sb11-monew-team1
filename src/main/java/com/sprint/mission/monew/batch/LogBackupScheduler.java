@@ -22,7 +22,7 @@ public class LogBackupScheduler {
   private final Job logBackupJob;
 
   @Scheduled(cron = "${scheduler.log-upload.cron}")
-  public void uploadLogs() throws Exception {
+  public void upload() throws Exception {
     log.info("로그 백업 배치 시작");
 
     JobParameters params = new JobParametersBuilder()
