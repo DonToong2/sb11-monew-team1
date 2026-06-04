@@ -8,7 +8,9 @@ import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,11 +32,18 @@ public class LogBackupConfig {
 
   @Bean
   public Job logBackJob() {
-    return null
+    return new JobBuilder("logBackupJob", jobRepository)
+        .start(logBackupStep())
+        .build();
   }
 
   @Bean
   public Step logBackupStep() {
-    return null
+    return new StepBuilder("logBackupStep", jobRepository)
+        .<Path, UploadPayload> chunk(chunkSize, transactionManager)
+        .reader(logBackupReader)
+        .processor(logBackupProcessor)
+        .writer(logBackupWriter)
+        .build();
   }
 }
