@@ -16,6 +16,6 @@ public class LogBackupScheduler {
 
   @Scheduled(cron = "${scheduler.log-upload.cron}")
   public void uploadLogs() {
-    logBackupService.upload();
+
   }
 }
