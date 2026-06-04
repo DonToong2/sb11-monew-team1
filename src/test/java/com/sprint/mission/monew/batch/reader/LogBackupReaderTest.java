@@ -22,7 +22,7 @@ public class LogBackupReaderTest {
   Path tempDir;
 
   @InjectMocks
-  LogBackupReader reader;
+  private LogBackupReader reader;
 
   @BeforeEach
   void setUp() {
@@ -30,7 +30,7 @@ public class LogBackupReaderTest {
   }
 
   @Nested
-  @DisplayName("뉴스 기사 읽기")
+  @DisplayName("백업 로그 파일 읽기")
   class Reader {
 
     @Test
