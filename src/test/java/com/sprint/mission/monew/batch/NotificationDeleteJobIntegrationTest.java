@@ -66,7 +66,7 @@ public class NotificationDeleteJobIntegrationTest {
 
   @Nested
   @DisplayName("알림 삭제 배치 통합 테스트하기")
-  class UserDeleteBatchIntegrationTest {
+  class NotificationDeleteBatchIntegrationTest {
 
     @Test
     @DisplayName("알림 삭제 배치 통합테스트")

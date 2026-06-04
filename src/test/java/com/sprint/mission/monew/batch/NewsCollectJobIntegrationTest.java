@@ -22,9 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(properties = {
-    "scheduler.news-collect.cron=0 0 * * * *"
-})
+@SpringBootTest
 @ActiveProfiles("test")
 public class NewsCollectJobIntegrationTest {
 
@@ -54,7 +52,7 @@ public class NewsCollectJobIntegrationTest {
 
   @Nested
   @DisplayName("뉴스 수집 배치 통합 테스트하기")
-  class UserDeleteBatchIntegrationTest {
+  class NewsCollectIntegrationTest {
 
     @Test
     @DisplayName("뉴스 수집 배치 통합테스트")
