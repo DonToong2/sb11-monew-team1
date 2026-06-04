@@ -8,9 +8,11 @@ import com.sprint.mission.monew.external.naver.dto.NaverNewsItem;
 import com.sprint.mission.monew.external.rss.RssNewsParser;
 import com.sprint.mission.monew.external.rss.dto.RssArticleDto;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
@@ -57,8 +59,15 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
 
     try {
       List<NaverNewsItem> fetched = naverNewsClient.fetchNews();
-
+      int nUpserted = 0;
       for (NaverNewsItem item : fetched) {
+        Optional<Instant> publishDate = NaverNewsClient.parseNaverDate(item.pubDate());
+
+        if (publishDate.isEmpty()) {
+          log.warn("날짜 파싱 실패로 기사를 건너뜁니다: link={}", item.link());
+          continue;
+        }
+
         String sourceUrl = item.originallink() != null && !item.originallink().isBlank()
             ? item.originallink() : item.link();
 
@@ -67,14 +76,16 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
                 ArticleSource.NAVER,
                 sourceUrl,
                 NaverNewsClient.stripHtml(item.title()),
-                NaverNewsClient.parseNaverDate(item.pubDate()),
+                publishDate.get(),
                 NaverNewsClient.stripHtml(item.description())
             )
         );
+
+        nUpserted++;
       }
 
-      newsCollectMetrics.countCollected(ArticleSource.NAVER, fetched.size());
-      log.info("Naver 뉴스 수집 완료: {}건", fetched.size());
+      newsCollectMetrics.countCollected(ArticleSource.NAVER, nUpserted);
+      log.info("Naver 뉴스 수집 완료: {}건", nUpserted);
 
     } catch (Exception e) {
       log.error("Naver 뉴스 수집 실패", e);
