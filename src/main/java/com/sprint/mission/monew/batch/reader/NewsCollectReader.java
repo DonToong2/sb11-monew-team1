@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.configuration.annotation.StepScope;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
-@StepScope
 @RequiredArgsConstructor
 public class NewsCollectReader implements ItemReader<NewsCollectItem> {
 
@@ -45,37 +45,53 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
   }
 
   private void loadNaver(List<NewsCollectItem> items) {
-    List<NaverNewsItem> fetched = naverNewsClient.fetchNews();
 
-    for (NaverNewsItem item : fetched) {
-      String sourceUrl = item.originallink() != null && !item.originallink().isBlank()
-          ? item.originallink() : item.link();
+    try {
+      List<NaverNewsItem> fetched = naverNewsClient.fetchNews();
 
-      items.add(
-          new NewsCollectItem(
-              ArticleSource.NAVER,
-              sourceUrl,
-              NaverNewsClient.stripHtml(item.title()),
-              NaverNewsClient.parseNaverDate(item.pubDate()),
-              NaverNewsClient.stripHtml(item.description())
-          )
-      );
+      for (NaverNewsItem item : fetched) {
+        String sourceUrl = item.originallink() != null && !item.originallink().isBlank()
+            ? item.originallink() : item.link();
+
+        items.add(
+            new NewsCollectItem(
+                ArticleSource.NAVER,
+                sourceUrl,
+                NaverNewsClient.stripHtml(item.title()),
+                NaverNewsClient.parseNaverDate(item.pubDate()),
+                NaverNewsClient.stripHtml(item.description())
+            )
+        );
+      }
+
+      log.info("Naver 뉴스 수집 완료: {}건", fetched.size());
+
+    } catch (Exception e) {
+      log.error("Naver 뉴스 수집 실패", e);
     }
   }
 
   private void loadRss(List<NewsCollectItem> items, ArticleSource source) {
-    List<RssArticleDto> fetched = rssNewsParser.parse(source);
 
-    for (RssArticleDto item : fetched) {
-      items.add(
-          new NewsCollectItem(
-              source,
-              item.sourceUrl(),
-              item.title(),
-              item.publishDate(),
-              item.summary()
-          )
-      );
+    try {
+      List<RssArticleDto> fetched = rssNewsParser.parse(source);
+
+      for (RssArticleDto item : fetched) {
+        items.add(
+            new NewsCollectItem(
+                source,
+                item.sourceUrl(),
+                item.title(),
+                item.publishDate(),
+                item.summary()
+            )
+        );
+      }
+
+      log.info("{} RSS 수집 완료: {}건", source, fetched.size());
+
+    } catch (Exception e) {
+      log.error("{} RSS 수집 실패", source, e);
     }
   }
 }
