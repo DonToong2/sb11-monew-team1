@@ -1,7 +1,10 @@
 package com.sprint.mission.monew.batch.reader;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.Iterator;
+import java.util.stream.Stream;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -15,6 +18,20 @@ public class LogFileReader implements ItemReader<Path> {
   @Override
   public Path read() throws Exception {
 
-    return null;
+    if (iterator == null) {
+
+      try (Stream<Path> stream = Files.list(Path.of(logDir))) {
+        iterator = stream
+            .filter(Files::isRegularFile)
+            .filter(p -> p.getFileName().toString().startsWith("monew."))
+            .filter(p -> p.getFileName().toString().endsWith(".log"))
+            .sorted()
+            .toList()
+            .iterator();
+      }
+
+    }
+
+    return iterator.hasNext() ? iterator.next() : null;
   }
 }
