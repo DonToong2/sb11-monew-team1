@@ -9,6 +9,7 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sprint.mission.monew.batch.NewsCollectMetrics;
 import com.sprint.mission.monew.batch.dto.NewsCollectItem;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.external.naver.NaverNewsClient;
@@ -34,13 +35,17 @@ public class NewsCollectReaderTest {
   @Mock
   private RssNewsParser rssNewsParser;
 
+  @Mock
+  private NewsCollectMetrics newsCollectMetrics;
+
   private NewsCollectReader reader;
 
   @BeforeEach
   void setup() {
     reader = new NewsCollectReader(
         naverNewsClient,
-        rssNewsParser
+        rssNewsParser,
+        newsCollectMetrics
     );
   }
 
@@ -65,6 +70,8 @@ public class NewsCollectReaderTest {
       // then
       assertThat(result).isNotNull();
       assertThat(result.source()).isEqualTo(ArticleSource.NAVER);
+
+      verify(newsCollectMetrics).countCollected(ArticleSource.NAVER, 1);
     }
 
     @Test
@@ -86,6 +93,8 @@ public class NewsCollectReaderTest {
       // then
       assertThat(result).isNotNull();
       assertThat(result.source()).isEqualTo(ArticleSource.HANKYUNG);
+
+      verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 1);
     }
 
     @Test
@@ -106,6 +115,8 @@ public class NewsCollectReaderTest {
       // then
       assertThat(result).isNotNull();
       assertThat(result.source()).isEqualTo(ArticleSource.HANKYUNG);
+
+      verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 1);
     }
 
     @Test
@@ -125,6 +136,8 @@ public class NewsCollectReaderTest {
       // then
       assertThat(result).isNotNull();
       assertThat(result.source()).isEqualTo(ArticleSource.CHOSUN);
+
+      verify(newsCollectMetrics).countCollected(ArticleSource.CHOSUN, 1);
     }
 
     @Test
@@ -142,6 +155,7 @@ public class NewsCollectReaderTest {
       // then
       assertThat(result).isNotNull();
       assertThat(result.sourceUrl()).isNull();
+      verify(newsCollectMetrics).countCollected(ArticleSource.NAVER, 1);
     }
   }
 }

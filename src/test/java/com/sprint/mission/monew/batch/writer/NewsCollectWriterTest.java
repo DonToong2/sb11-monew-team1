@@ -5,6 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.sprint.mission.monew.batch.ArticleUpsertService;
+import com.sprint.mission.monew.batch.NewsCollectMetrics;
 import com.sprint.mission.monew.batch.dto.NewsCollectItem;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import java.time.Instant;
@@ -24,11 +25,17 @@ public class NewsCollectWriterTest {
   @Mock
   private ArticleUpsertService articleUpsertService;
 
-  private NewsCollectWriter newsCollectWriter;
+  @Mock
+  private NewsCollectMetrics newsCollectMetrics;
+
+  private NewsCollectWriter writer;
 
   @BeforeEach
   void setUp() {
-    newsCollectWriter = new NewsCollectWriter(articleUpsertService);
+    writer = new NewsCollectWriter(
+        articleUpsertService,
+        newsCollectMetrics
+    );
   }
 
   @Nested
@@ -37,7 +44,7 @@ public class NewsCollectWriterTest {
 
     @Test
     @DisplayName("기사 단건 저장")
-    void 기사_단건_저장() throws Exception {
+    void 기사_단건_저장() {
       // given
       Instant publishDate = Instant.now();
       NewsCollectItem item = new NewsCollectItem(
@@ -46,11 +53,12 @@ public class NewsCollectWriterTest {
       Chunk<NewsCollectItem> chunk = new Chunk<>(List.of(item));
 
       // when
-      newsCollectWriter.write(chunk);
+      writer.write(chunk);
 
       // then
       verify(articleUpsertService).upsert(
           ArticleSource.HANKYUNG, "https://hankyung.com/1", "한경 기사", publishDate, "요약");
+      verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 1);
     }
 
     @Test
@@ -77,12 +85,15 @@ public class NewsCollectWriterTest {
       Chunk<NewsCollectItem> chunk = new Chunk<>(List.of(first, second, third, fourth));
 
       // when
-      newsCollectWriter.write(chunk);
+      writer.write(chunk);
 
       // then
       // ArticleUpsertService가 4번 호출되어야함
       verify(articleUpsertService, times(4))
           .upsert(any(), any(), any(), any(), any());
+      verify(newsCollectMetrics).countCollected(ArticleSource.NAVER, 1);
+      verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 2);
+      verify(newsCollectMetrics).countCollected(ArticleSource.CHOSUN, 1);
     }
   }
 }
