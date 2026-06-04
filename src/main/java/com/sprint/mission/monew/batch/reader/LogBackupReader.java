@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LogBackupReader implements ItemReader<Path> {
 
   @Value("${monew.log-dir}")
