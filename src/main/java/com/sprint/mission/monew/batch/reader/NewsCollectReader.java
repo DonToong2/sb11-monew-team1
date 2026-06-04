@@ -1,11 +1,13 @@
 package com.sprint.mission.monew.batch.reader;
 
+import com.sprint.mission.monew.batch.NewsCollectMetrics;
 import com.sprint.mission.monew.batch.dto.NewsCollectItem;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.external.naver.NaverNewsClient;
 import com.sprint.mission.monew.external.naver.dto.NaverNewsItem;
 import com.sprint.mission.monew.external.rss.RssNewsParser;
 import com.sprint.mission.monew.external.rss.dto.RssArticleDto;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,13 +23,19 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
 
   private final NaverNewsClient naverNewsClient;
   private final RssNewsParser rssNewsParser;
+  private final NewsCollectMetrics newsCollectMetrics;
 
   private Iterator<NewsCollectItem> iterator;
 
   @Override
   public NewsCollectItem read() {
     if (iterator == null) {
-      iterator = loadItems().iterator();
+      long start = System.nanoTime();
+
+      List<NewsCollectItem> items = loadItems();
+      newsCollectMetrics.recordCollectDuration(Duration.ofNanos(System.nanoTime() - start));
+
+      iterator = items.iterator();
     }
 
     return iterator.hasNext() ? iterator.next() : null;
@@ -35,6 +43,7 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
 
   private List<NewsCollectItem> loadItems() {
     List<NewsCollectItem> items = new ArrayList<>();
+
 
     loadNaver(items);
     loadRss(items, ArticleSource.HANKYUNG);
@@ -64,10 +73,12 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
         );
       }
 
+      newsCollectMetrics.countCollected(ArticleSource.NAVER, fetched.size());
       log.info("Naver 뉴스 수집 완료: {}건", fetched.size());
 
     } catch (Exception e) {
       log.error("Naver 뉴스 수집 실패", e);
+      newsCollectMetrics.countFailed(ArticleSource.NAVER);
     }
   }
 
@@ -88,10 +99,12 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
         );
       }
 
+      newsCollectMetrics.countCollected(source, fetched.size());
       log.info("{} RSS 수집 완료: {}건", source, fetched.size());
 
     } catch (Exception e) {
       log.error("{} RSS 수집 실패", source, e);
+      newsCollectMetrics.countFailed(source);
     }
   }
 }
