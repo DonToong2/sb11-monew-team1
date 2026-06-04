@@ -39,8 +39,9 @@ public class NewsCollectWriterTest {
     @DisplayName("기사 단건 저장")
     void 기사_단건_저장() throws Exception {
       // given
+      Instant publishDate = Instant.now();
       NewsCollectItem item = new NewsCollectItem(
-          ArticleSource.HANKYUNG, "https://hankyung.com/1", "한경 기사", Instant.now(), "요약");
+          ArticleSource.HANKYUNG, "https://hankyung.com/1", "한경 기사", publishDate, "요약");
 
       Chunk<NewsCollectItem> chunk = new Chunk<>(List.of(item));
 
@@ -49,7 +50,7 @@ public class NewsCollectWriterTest {
 
       // then
       verify(articleUpsertService).upsert(
-          ArticleSource.HANKYUNG, "https://hankyung.com/1", "한경 기사", Instant.now(), "요약");
+          ArticleSource.HANKYUNG, "https://hankyung.com/1", "한경 기사", publishDate, "요약");
     }
 
     @Test
