@@ -16,6 +16,21 @@ public class NewsCollectWriter implements ItemWriter<NewsCollectItem> {
 
   @Override
   public void write(@NonNull Chunk<? extends NewsCollectItem> chunk) {
+
+    for (NewsCollectItem item : chunk.getItems()) {
+
+      try {
+        articleUpsertService.upsert(
+            item.source(),
+            item.sourceUrl(),
+            item.title(),
+            item.publishDate(),
+            item.summary()
+        );
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
 }
