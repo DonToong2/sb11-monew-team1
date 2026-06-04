@@ -29,11 +29,16 @@ public class NewsCollectJobConfig {
 
   @Bean
   public Job newsCollectJob() {
-   return null;
+   return new JobBuilder("newsCollectJob", jobRepository)
+       .start(newsCollectStep()).build();
   }
 
   @Bean
   public Step newsCollectStep() {
-    return null;
+    return new StepBuilder("newsCollectStep", jobRepository)
+        .<NewsCollectItem, NewsCollectItem> chunk(chunkSize, transactionManager)
+        .reader(newsCollectReader)
+        .writer(newsCollectWriter)
+        .build();
   }
 }
