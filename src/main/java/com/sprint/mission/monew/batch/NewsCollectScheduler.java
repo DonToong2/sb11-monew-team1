@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch;
 
+import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ public class NewsCollectScheduler {
   private final JobLauncher jobLauncher;
   private final Job newsCollectJob;
 
+  @Timed(value = "monew.news.collect.job.duration", description = "뉴스 수집 배치 Job 전체 소요 시간")
   @Scheduled(cron = "${scheduler.news-collect.cron}")
   public void collect() throws Exception {
     log.info("뉴스 수집 배치 시작");

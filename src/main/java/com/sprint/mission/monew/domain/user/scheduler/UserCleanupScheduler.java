@@ -23,7 +23,7 @@ public class UserCleanupScheduler {
   private final JobLauncher jobLauncher;
   private final Job userDeleteJob;
 
-  @Timed(value = "monew.user.cleanup.duration", description = "만료 사용자 물리 삭제 배치 1회 소요 시간")
+  @Timed(value = "monew.user.cleanup.job.duration", description = "만료 사용자 물리 삭제 배치 Job 전체 소요 시간")
   @Scheduled(cron = "${scheduler.user-cleanup.cron}")
   public void cleanUpDeletedUsers() throws Exception {
     log.debug("물리 삭제 스케줄러 실행");

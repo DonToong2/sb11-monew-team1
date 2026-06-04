@@ -1,6 +1,7 @@
 package com.sprint.mission.monew.domain.notification.scheduler;
 
 import com.sprint.mission.monew.domain.notification.service.NotificationService;
+import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class NotificationCleanupScheduler {
   private final JobLauncher jobLauncher;
   private final Job notificationDeleteJob;
 
+  @Timed(value = "monew.notification.cleanup.job.duration", description = "만료 알림 정리 배치 Job 전체 소요 시간")
   @Scheduled(cron = "${scheduler.notification-cleanup.cron}")
   public void cleanUpExpiredNotifications() throws Exception {
     log.debug("만료 알림 삭제 스케줄러 실행");
