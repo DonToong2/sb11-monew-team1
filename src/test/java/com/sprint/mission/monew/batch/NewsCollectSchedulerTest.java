@@ -27,12 +27,9 @@ class NewsCollectSchedulerTest {
   @Mock
   private Job newsCollectJob;
 
+  @InjectMocks
   private NewsCollectScheduler scheduler;
-
-  @BeforeEach
-  void setUp() {
-    scheduler = new NewsCollectScheduler(jobLauncher, newsCollectJob);
-  }
+  
   @Nested
   @DisplayName("뉴스 수집 스케줄러")
   class Collect {

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.core.Job;
@@ -24,12 +25,8 @@ class NotificationCleanupSchedulerTest {
   @Mock
   private Job notificationDeleteJob;
 
+  @InjectMocks
   private NotificationCleanupScheduler scheduler;
-
-  @BeforeEach
-  void setUp() {
-    scheduler = new NotificationCleanupScheduler(jobLauncher, notificationDeleteJob);
-  }
 
   @Test
   @DisplayName("스케줄러가 Batch Job을 호출한다")
