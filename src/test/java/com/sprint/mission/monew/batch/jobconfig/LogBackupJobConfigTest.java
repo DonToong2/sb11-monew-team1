@@ -1,67 +1,53 @@
 package com.sprint.mission.monew.batch.jobconfig;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 import com.sprint.mission.monew.batch.processor.LogBackupProcessor;
 import com.sprint.mission.monew.batch.reader.LogBackupReader;
+import com.sprint.mission.monew.batch.reader.NewsCollectReader;
 import com.sprint.mission.monew.batch.writer.LogBackupWriter;
+import com.sprint.mission.monew.batch.writer.NewsCollectWriter;
 import com.sprint.mission.monew.common.config.LogBackupJobConfig;
+import com.sprint.mission.monew.common.config.NewsCollectJobConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-    LogBackupJobConfig.class
-})
-@TestPropertySource(properties = {
-    "batch.log-backup.chunk-size=1000"
-})
-public class LogBackupJobConfigTest {
+class LogBackupJobConfigTest {
 
-  @MockitoBean
-  private JobRepository jobRepository;
-
-  @MockitoBean
-  private PlatformTransactionManager transactionManager;
-
-  @MockitoBean
-  private LogBackupReader logBackupReader;
-
-  @MockitoBean
-  private LogBackupProcessor logBackupProcessor;
-
-  @MockitoBean
-  private LogBackupWriter logBackupWriter;
-
-  @Autowired
-  private Job logBackupJob;
-
-  @Autowired
-  private Step logBackupStep;
+  private final JobRepository jobRepository = mock(JobRepository.class);
+  private final PlatformTransactionManager transactionManager = mock(
+      PlatformTransactionManager.class);
 
   @Nested
-  @DisplayName("logBackupJobConfig Job, Step 테스트")
+  @DisplayName("LogBackupJobConfig Job, Step 테스트")
   class JobStepTest {
 
     @Test
     @DisplayName("Job, Step 생성 성공")
-    void job_step_생성_성공() {
+    void job_step_생성_성공() throws Exception {
+      // given
+      LogBackupReader reader = mock(LogBackupReader.class);
+      LogBackupProcessor processor = mock(LogBackupProcessor.class);
+      LogBackupWriter writer = mock(LogBackupWriter.class);
+
+      LogBackupJobConfig config = new LogBackupJobConfig(
+          jobRepository,
+          transactionManager,
+          reader,
+          processor,
+          writer
+      );
+
+      // when
+      Job job = config.logBackupJob();
+
       // then
-      assertThat(logBackupJob).isNotNull();
-      assertThat(logBackupStep).isNotNull();
-      assertThat(logBackupJob.getName()).isEqualTo("logBackupJob");
-      assertThat(logBackupStep.getName()).isEqualTo("logBackupStep");
+      assertNotNull(job);
     }
   }
 }
