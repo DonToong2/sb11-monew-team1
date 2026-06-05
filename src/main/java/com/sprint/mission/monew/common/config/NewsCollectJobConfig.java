@@ -27,7 +27,7 @@ public class NewsCollectJobConfig {
   @Value("${batch.news-collect.chunk-size}")
   private int chunkSize;
 
-  @Bean
+  @Bean(name = "newsCollectJob")
   public Job newsCollectJob() {
     return new JobBuilder("newsCollectJob", jobRepository)
         .start(newsCollectStep()).build();

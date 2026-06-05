@@ -29,7 +29,7 @@ public class NotificationCleanupJobConfig {
   @Value("${batch.notification-cleanup.chunk-size}")
   private int chunkSize;
 
-  @Bean
+  @Bean(name = "notificationCleanupJob")
   public Job notificationCleanupJob() {
     return new JobBuilder("notificationCleanupJob", jobRepository)
         .start(notificationCleanupStep()).build();

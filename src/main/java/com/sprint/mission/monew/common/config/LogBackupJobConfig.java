@@ -26,7 +26,7 @@ public class LogBackupJobConfig {
   private final LogBackupProcessor logBackupProcessor;
   private final LogBackupWriter logBackupWriter;
 
-  @Bean
+  @Bean(name = "logBackupJob")
   public Job logBackupJob() {
     return new JobBuilder("logBackupJob", jobRepository)
         .start(logBackupStep())

@@ -29,7 +29,7 @@ public class UserCleanupJobConfig {
   @Value("${batch.user-cleanup.chunk-size}")
   private int chunkSize;
 
-  @Bean
+  @Bean(name = "userCleanupJob")
   public Job userCleanupJob() {
     return new JobBuilder("userCleanupJob", jobRepository)
         .start(userCleanupStep()).build();
