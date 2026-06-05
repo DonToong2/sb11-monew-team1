@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -11,6 +12,7 @@ import com.sprint.mission.monew.batch.exception.NotificationCleanupJobFailedExce
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -57,5 +59,9 @@ class NotificationCleanupServiceTest {
     // then
     verify(jobLauncher, times(1))
         .run(eq(notificationCleanupJob), any(JobParameters.class));
+
+    ArgumentCaptor<JobParameters> paramsCaptor = ArgumentCaptor.forClass(JobParameters.class);
+    verify(jobLauncher, times(1)).run(eq(notificationCleanupJob), paramsCaptor.capture());
+    assertThat(paramsCaptor.getValue().getParameters()).containsKey("time");
   }
 }
