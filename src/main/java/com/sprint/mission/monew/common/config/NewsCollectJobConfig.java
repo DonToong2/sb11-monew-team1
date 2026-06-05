@@ -29,14 +29,14 @@ public class NewsCollectJobConfig {
 
   @Bean
   public Job newsCollectJob() {
-   return new JobBuilder("newsCollectJob", jobRepository)
-       .start(newsCollectStep()).build();
+    return new JobBuilder("newsCollectJob", jobRepository)
+        .start(newsCollectStep()).build();
   }
 
   @Bean
   public Step newsCollectStep() {
     return new StepBuilder("newsCollectStep", jobRepository)
-        .<NewsCollectItem, NewsCollectItem> chunk(chunkSize, transactionManager)
+        .<NewsCollectItem, NewsCollectItem>chunk(chunkSize, transactionManager)
         .reader(newsCollectReader)
         .writer(newsCollectWriter)
         .build();

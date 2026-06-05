@@ -29,6 +29,7 @@ import org.springframework.transaction.PlatformTransactionManager;
     "batch.notification-cleanup.chunk-size=1000"
 })
 public class NotificationCleanupJobConfigTest {
+
   @MockitoBean
   private JobRepository jobRepository;
 

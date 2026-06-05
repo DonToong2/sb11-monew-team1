@@ -38,7 +38,7 @@ public class NotificationCleanupJobConfig {
   @Bean
   public Step notificationCleanupStep() {
     return new StepBuilder("notificationCleanupStep", jobRepository)
-        .<NotificationCleanupItem, NotificationCleanupItem> chunk(chunkSize, transactionManager)
+        .<NotificationCleanupItem, NotificationCleanupItem>chunk(chunkSize, transactionManager)
         .reader(notificationCleanupReader)
         .writer(notificationCleanupWriter)
         .listener(notificationCleanupStepListener)

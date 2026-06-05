@@ -38,7 +38,7 @@ public class UserCleanupJobConfig {
   @Bean
   public Step userCleanupStep() {
     return new StepBuilder("userCleanupStep", jobRepository)
-        .<UserCleanupItem, UserCleanupItem> chunk(chunkSize, transactionManager)
+        .<UserCleanupItem, UserCleanupItem>chunk(chunkSize, transactionManager)
         .reader(userCleanupReader)
         .writer(userCleanupWriter)
         .listener(userCleanupStepListener)
