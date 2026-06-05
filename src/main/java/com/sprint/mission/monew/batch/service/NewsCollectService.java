@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.service;
 
+import com.sprint.mission.monew.batch.exception.NewsCollectJobFailedException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -15,10 +16,14 @@ public class NewsCollectService {
   private final JobLauncher jobLauncher;
   private final Job newsCollectJob;
 
-  public void executeCollect() throws Exception {
-    JobParameters params = new JobParametersBuilder()
-        .addLong("time", Instant.now().toEpochMilli())
-        .toJobParameters();
-    jobLauncher.run(newsCollectJob, params);
+  public void executeCollect() {
+    try {
+      JobParameters params = new JobParametersBuilder()
+          .addLong("time", Instant.now().toEpochMilli())
+          .toJobParameters();
+      jobLauncher.run(newsCollectJob, params);
+    } catch (Exception e) {
+      throw NewsCollectJobFailedException.wrap(e);
+    }
   }
 }

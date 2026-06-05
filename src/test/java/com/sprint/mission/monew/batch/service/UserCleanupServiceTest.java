@@ -1,11 +1,13 @@
 package com.sprint.mission.monew.batch.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sprint.mission.monew.batch.exception.UserCleanupJobFailedException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +28,20 @@ class UserCleanupServiceTest {
   private Job userCleanupJob;
 
   @InjectMocks
-  private NotificationCleanupService userCleanupService;
+  private UserCleanupService userCleanupService;
+
+  @Test
+  @DisplayName("Job 실행 실패 시 UserCleanupJobFailedException으로 감싼다")
+  void executeCollect_fail() throws Exception {
+
+    // given
+    when(jobLauncher.run(eq(userCleanupJob), any(JobParameters.class)))
+        .thenThrow(new RuntimeException("batch fail"));
+
+    // when & then
+    assertThatThrownBy(() -> userCleanupService.executeCleanup())
+        .isInstanceOf(UserCleanupJobFailedException.class);
+  }
 
   @Test
   @DisplayName("logBackupJob이 JobLauncher를 통해 정상 실행된다")

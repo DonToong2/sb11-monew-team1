@@ -1,7 +1,7 @@
 package com.sprint.mission.monew.batch.writer;
 
-import com.sprint.mission.monew.batch.LogBackupDeleteFailedException;
-import com.sprint.mission.monew.batch.LogBackupFailedException;
+import com.sprint.mission.monew.batch.exception.LogBackupDeleteFailedException;
+import com.sprint.mission.monew.batch.exception.LogBackupFailedException;
 import com.sprint.mission.monew.batch.LogBackupMetrics;
 import com.sprint.mission.monew.batch.dto.UploadPayload;
 import java.io.IOException;

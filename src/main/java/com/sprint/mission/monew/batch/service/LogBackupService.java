@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.service;
 
+import com.sprint.mission.monew.batch.exception.LogBackupJobFailedException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -15,10 +16,14 @@ public class LogBackupService {
   private final JobLauncher jobLauncher;
   private final Job logBackupJob;
 
-  public void executeBackup() throws Exception {
-    JobParameters params = new JobParametersBuilder()
-        .addLong("time", Instant.now().toEpochMilli())
-        .toJobParameters();
-    jobLauncher.run(logBackupJob, params);
+  public void executeBackup() {
+    try {
+      JobParameters params = new JobParametersBuilder()
+          .addLong("time", Instant.now().toEpochMilli())
+          .toJobParameters();
+      jobLauncher.run(logBackupJob, params);
+    } catch (Exception e) {
+      throw LogBackupJobFailedException.wrap(e);
+    }
   }
 }
