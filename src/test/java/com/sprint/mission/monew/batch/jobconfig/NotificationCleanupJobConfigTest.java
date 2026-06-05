@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.jobconfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

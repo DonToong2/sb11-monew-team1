@@ -1,7 +1,6 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
@@ -19,30 +18,32 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 
 @ExtendWith(MockitoExtension.class)
-class LogBackupSchedulerTest {
+class NewsCollectSchedulerTest {
 
   @Mock
   private JobLauncher jobLauncher;
 
   @Mock
-  private Job logBackupJob;
+  private Job newsCollectJob;
 
   @InjectMocks
-  private LogBackupScheduler logBackupScheduler;
-
+  private NewsCollectScheduler scheduler;
+  
   @Nested
-  @DisplayName("로그 파일 S3 업로드 스케줄러")
-  class UploadLogs {
+  @DisplayName("뉴스 수집 스케줄러")
+  class Collect {
 
     @Test
-    @DisplayName("uploadLogs 호출 시 LogBackupService에 위임한다")
-    void uploadLogs_호출_시_서비스에_위임한다() throws Exception {
+    @DisplayName("스케줄러가 Batch Job을 호출한다")
+    void 스케줄러가_Batch_Job의_collect_메서드를_호출한다() throws Exception {
+      // given
+
       // when
-      logBackupScheduler.upload();
+      scheduler.collect();
 
       // then
       ArgumentCaptor<JobParameters> captor = ArgumentCaptor.forClass(JobParameters.class);
-      then(jobLauncher).should().run(eq(logBackupJob), captor.capture());
+      then(jobLauncher).should().run(eq(newsCollectJob), captor.capture());
       assertThat(captor.getValue().getParameters()).containsKey("time");
     }
   }
