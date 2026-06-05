@@ -23,7 +23,7 @@ class NotificationCleanupSchedulerTest {
   private JobLauncher jobLauncher;
 
   @Mock
-  private Job notificationDeleteJob;
+  private Job notificationCleanupJob;
 
   @InjectMocks
   private NotificationCleanupScheduler scheduler;
@@ -38,7 +38,7 @@ class NotificationCleanupSchedulerTest {
 
     // then
     ArgumentCaptor<JobParameters> captor = ArgumentCaptor.forClass(JobParameters.class);
-    then(jobLauncher).should().run(eq(notificationDeleteJob), captor.capture());
+    then(jobLauncher).should().run(eq(notificationCleanupJob), captor.capture());
     assertThat(captor.getValue().getParameters()).containsKey("time");
   }
 }

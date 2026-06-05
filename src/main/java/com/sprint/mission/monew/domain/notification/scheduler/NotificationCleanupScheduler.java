@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class NotificationCleanupScheduler {
 
   private final JobLauncher jobLauncher;
-  private final Job notificationDeleteJob;
+  private final Job notificationCleanupJob;
 
   @Timed(value = "monew.notification.cleanup.job.duration", description = "만료 알림 정리 배치 Job 전체 소요 시간")
   @Scheduled(cron = "${scheduler.notification-cleanup.cron}")
@@ -30,7 +30,7 @@ public class NotificationCleanupScheduler {
     JobParameters params = new JobParametersBuilder()
         .addLong("time", Instant.now().toEpochMilli()).toJobParameters();
 
-    jobLauncher.run(notificationDeleteJob, params);
+    jobLauncher.run(notificationCleanupJob, params);
 
     log.info("만료 알림 삭제 완료");
   }
