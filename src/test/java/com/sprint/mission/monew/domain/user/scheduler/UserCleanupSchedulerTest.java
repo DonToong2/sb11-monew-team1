@@ -26,7 +26,7 @@ class UserCleanupSchedulerTest {
   private JobLauncher jobLauncher;
 
   @Mock
-  private Job userDeleteJob;
+  private Job userCleanupJob;
 
   @InjectMocks
   private UserCleanupScheduler scheduler;
@@ -41,7 +41,7 @@ class UserCleanupSchedulerTest {
 
     // then
     ArgumentCaptor<JobParameters> captor = ArgumentCaptor.forClass(JobParameters.class);
-    then(jobLauncher).should().run(eq(userDeleteJob), captor.capture());
+    then(jobLauncher).should().run(eq(userCleanupJob), captor.capture());
     assertThat(captor.getValue().getParameters()).containsKey("time");
   }
 }

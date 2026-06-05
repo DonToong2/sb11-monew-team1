@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class UserCleanupScheduler {
 
   private final JobLauncher jobLauncher;
-  private final Job userDeleteJob;
+  private final Job userCleanupJob;
 
   @Timed(value = "monew.user.cleanup.job.duration", description = "만료 사용자 물리 삭제 배치 Job 전체 소요 시간")
   @Scheduled(cron = "${scheduler.user-cleanup.cron}")
@@ -31,7 +31,7 @@ public class UserCleanupScheduler {
     JobParameters params = new JobParametersBuilder()
         .addLong("time", Instant.now().toEpochMilli()).toJobParameters();
 
-    jobLauncher.run(userDeleteJob, params);
+    jobLauncher.run(userCleanupJob, params);
 
     log.info("물리 삭제 완료");
   }

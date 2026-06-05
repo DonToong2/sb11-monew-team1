@@ -2,7 +2,7 @@ package com.sprint.mission.monew.batch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sprint.mission.monew.common.config.UserDeleteJobConfig;
+import com.sprint.mission.monew.common.config.UserCleanupJobConfig;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,10 +19,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-    UserDeleteJobConfig.class,
+    UserCleanupJobConfig.class,
     UserDeleteTasklet.class
 })
-public class UserDeleteJobConfigTest {
+public class UserCleanupJobConfigTest {
 
   @MockitoBean
   private JobRepository jobRepository;
@@ -34,23 +34,23 @@ public class UserDeleteJobConfigTest {
   private UserRepository userRepository;
 
   @Autowired
-  private Job userDeleteJob;
+  private Job userCleanupJob;
 
   @Autowired
-  private Step userDeleteStep;
+  private Step userCleanupStep;
 
   @Nested
-  @DisplayName("UserDeleteJobConfig Job, Step 테스트")
+  @DisplayName("UserCleanupJobConfig Job, Step 테스트")
   class JobStepTest {
 
     @Test
     @DisplayName("Job, Step 생성 성공")
     void job_step_생성_성공() {
       // then
-      assertThat(userDeleteJob).isNotNull();
-      assertThat(userDeleteStep).isNotNull();
-      assertThat(userDeleteJob.getName()).isEqualTo("userDeleteJob");
-      assertThat(userDeleteStep.getName()).isEqualTo("userDeleteStep");
+      assertThat(userCleanupJob).isNotNull();
+      assertThat(userCleanupStep).isNotNull();
+      assertThat(userCleanupJob.getName()).isEqualTo("userCleanupJob");
+      assertThat(userCleanupStep.getName()).isEqualTo("userCleanupStep");
     }
   }
 
