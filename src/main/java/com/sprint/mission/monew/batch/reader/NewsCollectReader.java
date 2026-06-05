@@ -14,10 +14,12 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.stereotype.Component;
 
 @Slf4j
+@StepScope
 @Component
 @RequiredArgsConstructor
 public class NewsCollectReader implements ItemReader<NewsCollectItem> {
