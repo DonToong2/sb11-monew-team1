@@ -31,7 +31,7 @@ public class UserCleanupReaderTest {
 
   @BeforeEach
   void setUp() {
-    ReflectionTestUtils.setField(reader, "chunkSize", 10);
+    ReflectionTestUtils.setField(reader, "chunkSize", 1000);
   }
 
   @Nested
