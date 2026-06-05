@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE INDEX IF NOT EXISTS idx_users_deleted_at ON users (deleted_at)
     WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_users_deleted_at_batch ON users (deleted_at)
+CREATE INDEX idx_user_cleanup_batch ON user (deleted_at, id)
     WHERE deleted_at IS NOT NULL;
 
 -- =====================
