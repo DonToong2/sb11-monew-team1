@@ -34,7 +34,7 @@ class UserCleanupServiceTest {
 
   @Test
   @DisplayName("Job 실행 실패 시 UserCleanupJobFailedException으로 감싼다")
-  void executeCollect_fail() throws Exception {
+  void executeCleanup_fail() throws Exception {
 
     // given
     when(jobLauncher.run(eq(userCleanupJob), any(JobParameters.class)))

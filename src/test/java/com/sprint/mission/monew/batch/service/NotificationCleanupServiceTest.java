@@ -34,7 +34,7 @@ class NotificationCleanupServiceTest {
 
   @Test
   @DisplayName("Job 실행 실패 시 NotificationCleanupJobFailedException으로 감싼다")
-  void executeCollect_fail() throws Exception {
+  void executeCleanup_fail() throws Exception {
 
     // given
     when(jobLauncher.run(eq(notificationCleanupJob), any(JobParameters.class)))
