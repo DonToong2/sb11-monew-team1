@@ -70,6 +70,11 @@ public class NewsCollectWriter implements ItemWriter<NewsCollectItem> {
 
       log.info("뉴스 수집 writer 완료 | sources={}", grouped.keySet());
 
+    } catch (Exception e) {
+      log.error("뉴스 수집 메트릭 기록 실패", e);
+    }
+
+    try {
       interestNotificationService.notifyNewArticles(batchStartTime);
     } catch (Exception e) {
       log.error("알림 전송 실패", e);
