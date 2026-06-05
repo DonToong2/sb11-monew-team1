@@ -34,7 +34,7 @@ public class LogBackupProcessor implements ItemProcessor<Path, UploadPayload> {
   private LocalDate extractDate(Path file) {
     String name = file.getFileName().toString();
     String dateStr = name.replace("monew.", "").replace(".log", "");
-    return LocalDate.parse(dateStr);
+    return LocalDate.parse(dateStr, FILE_FORMATTER);
   }
 
   private byte[] gzip(byte[] data) throws IOException {
