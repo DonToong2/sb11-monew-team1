@@ -62,7 +62,7 @@ public class LogBackupProcessorTest {
           "logs/" + yesterday.format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd")) +
               "/app-" + yesterday.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")) +
               ".log.gz";
-      
+
       assertThat(result.s3Key()).isEqualTo(expectedKey);
       assertThat(result.s3Key()).contains("logs/").contains(String.valueOf(yesterday.getYear()));
 

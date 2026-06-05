@@ -61,6 +61,23 @@ public class LogBackupReaderTest {
       assertThat(result).isNotNull();
       assertThat(result).isEqualTo(logFile);
     }
+
+    @Test
+    @DisplayName("read()를 두 번 호출하면 두 번째는 null을 반환한다")
+    void read를_두_번_호출하면_두_번째는_null을_반환한다() throws Exception {
+      // given
+      LocalDate yesterday = LocalDate.now().minusDays(1);
+      Path logFile = tempDir.resolve("monew." + yesterday + ".log");
+      Files.writeString(logFile, "log content");
+
+      // when
+      Path firstResult = reader.read();
+      Path secondResult = reader.read();
+
+      // then
+      assertThat(firstResult).isNotNull();
+      assertThat(secondResult).isNull();
+    }
   }
 
 }
