@@ -1,6 +1,11 @@
 package com.sprint.mission.monew.batch.writer;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -8,6 +13,7 @@ import com.sprint.mission.monew.batch.ArticleUpsertService;
 import com.sprint.mission.monew.batch.NewsCollectMetrics;
 import com.sprint.mission.monew.batch.dto.NewsCollectItem;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
+import com.sprint.mission.monew.domain.interest.service.InterestNotificationService;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,22 +33,29 @@ public class NewsCollectWriterTest {
   private ArticleUpsertService articleUpsertService;
 
   @Mock
+  private InterestNotificationService interestNotificationService;
+
+  @Mock
   private NewsCollectMetrics newsCollectMetrics;
 
   @InjectMocks
   private NewsCollectWriter writer;
 
-  @BeforeEach
-  void setUp() {
-    writer = new NewsCollectWriter(
-        articleUpsertService,
-        newsCollectMetrics
-    );
-  }
-
   @Nested
   @DisplayName("기사 저장하기")
   class Writer {
+
+    @Test
+    @DisplayName("chunk가 비어있으면 upsertAll 호출되지 않는다")
+    void empty_chunk() {
+
+      Chunk<NewsCollectItem> chunk = new Chunk<>(List.of());
+
+      writer.write(chunk);
+
+      verify(articleUpsertService, never()).upsertAll(any(), anyList());
+      verify(newsCollectMetrics, never()).countCollected(any(), anyInt());
+    }
 
     @Test
     @DisplayName("기사 단건 저장")
@@ -58,8 +71,7 @@ public class NewsCollectWriterTest {
       writer.write(chunk);
 
       // then
-      verify(articleUpsertService).upsert(
-          ArticleSource.HANKYUNG, "https://hankyung.com/1", "한경 기사", publishDate, "요약");
+      verify(articleUpsertService, times(1)).upsertAll(eq(ArticleSource.HANKYUNG), anyList());
       verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 1);
     }
 
@@ -90,9 +102,9 @@ public class NewsCollectWriterTest {
       writer.write(chunk);
 
       // then
-      // ArticleUpsertService가 4번 호출되어야함
-      verify(articleUpsertService, times(4))
-          .upsert(any(), any(), any(), any(), any());
+      // ArticleUpsertService가 3번 호출되어야함(네이버1, 한경2, 조선1)
+      verify(articleUpsertService, times(3)).upsertAll(any(), anyList());
+      verify(articleUpsertService).upsertAll(eq(ArticleSource.NAVER), anyList());
       verify(newsCollectMetrics).countCollected(ArticleSource.NAVER, 1);
       verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 2);
       verify(newsCollectMetrics).countCollected(ArticleSource.CHOSUN, 1);

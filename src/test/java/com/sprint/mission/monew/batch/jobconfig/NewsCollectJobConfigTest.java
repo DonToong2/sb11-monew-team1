@@ -2,7 +2,6 @@ package com.sprint.mission.monew.batch.jobconfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sprint.mission.monew.batch.NotificationDeleteTasklet;
 import com.sprint.mission.monew.batch.reader.NewsCollectReader;
 import com.sprint.mission.monew.batch.writer.NewsCollectWriter;
 import com.sprint.mission.monew.common.config.NewsCollectJobConfig;

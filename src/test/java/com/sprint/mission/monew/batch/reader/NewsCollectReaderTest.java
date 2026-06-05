@@ -2,6 +2,7 @@ package com.sprint.mission.monew.batch.reader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
@@ -40,15 +41,6 @@ public class NewsCollectReaderTest {
 
   @InjectMocks
   private NewsCollectReader reader;
-
-  @BeforeEach
-  void setup() {
-    reader = new NewsCollectReader(
-        naverNewsClient,
-        rssNewsParser,
-        newsCollectMetrics
-    );
-  }
 
   @Nested
   @DisplayName("뉴스 기사 읽기")
@@ -126,6 +118,7 @@ public class NewsCollectReaderTest {
       // given
       RssArticleDto chosunItem = new RssArticleDto(
           ArticleSource.CHOSUN, "https://chosun.com/1", "조선 기사", Instant.now(), "요약");
+
       given(naverNewsClient.fetchNews()).willReturn(List.of());
       given(rssNewsParser.parse(eq(ArticleSource.HANKYUNG))).willThrow(
           new RuntimeException("RSS 오류"));
@@ -143,11 +136,18 @@ public class NewsCollectReaderTest {
     }
 
     @Test
-    @DisplayName("originallink·link 모두 null인 Naver 기사는 null sourceUrl로 NewsCollectItem이 생성된다")
-    void originallink_link_모두_null인_Naver_기사는_null_sourceUrl로_NewsCollectItem이_생성된다() {
-      // given — originallink, link 모두 null → sourceUrl = null (skip은 ArticleUpsertService 내부 처리)
-      NaverNewsItem item = new NaverNewsItem("제목", null, null, "요약",
-          "Mon, 29 May 2026 00:00:00 +0900");
+    @DisplayName("originallink·link 모두 null인 Naver 기사는 Reader에서 생성되지 않고 건너뛴다")
+    void originallink_link_모두_null인_기사는_건너뛴다() {
+
+      // given
+      NaverNewsItem item = new NaverNewsItem(
+          "제목",
+          null,
+          null,
+          "요약",
+          "Mon, 29 May 2026 00:00:00 +0900"
+      );
+
       given(naverNewsClient.fetchNews()).willReturn(List.of(item));
       given(rssNewsParser.parse(any())).willReturn(List.of());
 
@@ -155,9 +155,8 @@ public class NewsCollectReaderTest {
       NewsCollectItem result = reader.read();
 
       // then
-      assertThat(result).isNotNull();
-      assertThat(result.sourceUrl()).isNull();
-      verify(newsCollectMetrics).countCollected(ArticleSource.NAVER, 1);
+      assertThat(result).isNull();
+      verify(newsCollectMetrics).countCollected(ArticleSource.NAVER, 0);
     }
 
     @Test
@@ -173,6 +172,38 @@ public class NewsCollectReaderTest {
       NewsCollectItem result = reader.read();
 
       // then
+      assertThat(result).isNull();
+      verify(newsCollectMetrics).countCollected(ArticleSource.NAVER, 0);
+    }
+
+    @Test
+    @DisplayName("RSS sourceUrl이 null이면 NewsCollectItem이 생성되지 않는다")
+    void RSS_sourceUrl_null_이면_아이템이_생성되지_않는다() {
+
+      RssArticleDto item = new RssArticleDto(
+          ArticleSource.HANKYUNG, null, "기사", Instant.now(), "요약");
+
+      given(naverNewsClient.fetchNews()).willReturn(List.of());
+      given(rssNewsParser.parse(eq(ArticleSource.HANKYUNG))).willReturn(List.of(item));
+
+      NewsCollectItem result = reader.read();
+
+      assertThat(result).isNull();
+      verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 0);
+    }
+
+    @Test
+    @DisplayName("RSS sourceUrl이 blank이면 NewsCollectItem이 생성되지 않는다")
+    void RSS_sourceUrl_blank_이면_아이템이_생성되지_않는다() {
+
+      RssArticleDto item = new RssArticleDto(
+          ArticleSource.HANKYUNG, "   ", "기사", Instant.now(), "요약");
+
+      given(naverNewsClient.fetchNews()).willReturn(List.of());
+      given(rssNewsParser.parse(eq(ArticleSource.HANKYUNG))).willReturn(List.of(item));
+
+      NewsCollectItem result = reader.read();
+
       assertThat(result).isNull();
     }
   }

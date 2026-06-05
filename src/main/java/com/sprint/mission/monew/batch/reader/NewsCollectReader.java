@@ -7,7 +7,6 @@ import com.sprint.mission.monew.external.naver.NaverNewsClient;
 import com.sprint.mission.monew.external.naver.dto.NaverNewsItem;
 import com.sprint.mission.monew.external.rss.RssNewsParser;
 import com.sprint.mission.monew.external.rss.dto.RssArticleDto;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,61 +30,66 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
 
   @Override
   public NewsCollectItem read() {
+
     if (iterator == null) {
-      long start = System.nanoTime();
-
-      List<NewsCollectItem> items = loadItems();
-      newsCollectMetrics.recordCollectDuration(Duration.ofNanos(System.nanoTime() - start));
-
-      iterator = items.iterator();
+      iterator = loadAll().iterator();
     }
 
     return iterator.hasNext() ? iterator.next() : null;
   }
 
-  private List<NewsCollectItem> loadItems() {
+  private List<NewsCollectItem> loadAll() {
+
     List<NewsCollectItem> items = new ArrayList<>();
 
-
-    loadNaver(items);
-    loadRss(items, ArticleSource.HANKYUNG);
-    loadRss(items, ArticleSource.CHOSUN);
-    loadRss(items, ArticleSource.YONHAP);
+    collectNaver(items);
+    collectRss(items, ArticleSource.HANKYUNG);
+    collectRss(items, ArticleSource.CHOSUN);
+    collectRss(items, ArticleSource.YONHAP);
 
     return items;
   }
 
-  private void loadNaver(List<NewsCollectItem> items) {
+  private void collectNaver(List<NewsCollectItem> items) {
 
     try {
-      List<NaverNewsItem> fetched = naverNewsClient.fetchNews();
-      int nUpserted = 0;
-      for (NaverNewsItem item : fetched) {
-        Optional<Instant> publishDate = NaverNewsClient.parseNaverDate(item.pubDate());
+      List<NaverNewsItem> naverItems = naverNewsClient.fetchNews();
+
+      int successCount = 0;
+
+      for (NaverNewsItem item : naverItems) {
+
+        Optional<Instant> publishDate =
+            NaverNewsClient.parseNaverDate(item.pubDate());
 
         if (publishDate.isEmpty()) {
           log.warn("날짜 파싱 실패로 기사를 건너뜁니다: link={}", item.link());
           continue;
         }
 
-        String sourceUrl = item.originallink() != null && !item.originallink().isBlank()
-            ? item.originallink() : item.link();
+        String sourceUrl =
+            item.originallink() != null && !item.originallink().isBlank()
+                ? item.originallink()
+                : item.link();
 
-        items.add(
-            new NewsCollectItem(
-                ArticleSource.NAVER,
-                sourceUrl,
-                NaverNewsClient.stripHtml(item.title()),
-                publishDate.get(),
-                NaverNewsClient.stripHtml(item.description())
-            )
-        );
+        if (sourceUrl == null || sourceUrl.isBlank()) {
+          log.warn("sourceUrl이 없어 기사를 건너뜁니다: pubDate={}", item.pubDate());
+          continue;
+        }
 
-        nUpserted++;
+        items.add(new NewsCollectItem(
+            ArticleSource.NAVER,
+            sourceUrl,
+            NaverNewsClient.stripHtml(item.title()),
+            publishDate.get(),
+            NaverNewsClient.stripHtml(item.description())
+        ));
+
+        successCount++;
       }
 
-      newsCollectMetrics.countCollected(ArticleSource.NAVER, nUpserted);
-      log.info("Naver 뉴스 수집 완료: {}건", nUpserted);
+      newsCollectMetrics.countCollected(ArticleSource.NAVER, successCount);
+      log.info("Naver 뉴스 수집 완료 | count={}", successCount);
 
     } catch (Exception e) {
       log.error("Naver 뉴스 수집 실패", e);
@@ -93,25 +97,38 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
     }
   }
 
-  private void loadRss(List<NewsCollectItem> items, ArticleSource source) {
+  private void collectRss(List<NewsCollectItem> items, ArticleSource source) {
 
     try {
-      List<RssArticleDto> fetched = rssNewsParser.parse(source);
+      List<RssArticleDto> rssItems = rssNewsParser.parse(source);
 
-      for (RssArticleDto item : fetched) {
-        items.add(
-            new NewsCollectItem(
-                source,
-                item.sourceUrl(),
-                item.title(),
-                item.publishDate(),
-                item.summary()
-            )
-        );
+      int successCount = 0;
+      int skipped = 0;
+
+      for (RssArticleDto item : rssItems) {
+
+        if (item.sourceUrl() == null || item.sourceUrl().isBlank()) {
+          skipped++;
+          continue;
+        }
+
+        items.add(new NewsCollectItem(
+            source,
+            item.sourceUrl(),
+            item.title(),
+            item.publishDate(),
+            item.summary()
+        ));
+        successCount++;
       }
 
-      newsCollectMetrics.countCollected(source, fetched.size());
-      log.info("{} RSS 수집 완료: {}건", source, fetched.size());
+      if (skipped > 0) {
+        log.warn("{} RSS 기사 중 sourceUrl 누락 {}건을 건너뜁니다",
+            source, skipped);
+      }
+
+      newsCollectMetrics.countCollected(source, successCount);
+      log.info("{} RSS 수집 완료 | count={}", source, successCount);
 
     } catch (Exception e) {
       log.error("{} RSS 수집 실패", source, e);
