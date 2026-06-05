@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.jobconfig;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -46,9 +48,14 @@ class UserCleanupJobConfigTest {
 
       // when
       Job job = config.userCleanupJob();
+      Step step = config.userCleanupStep();
 
       // then
       assertNotNull(job);
+      assertThat(job.getName()).isEqualTo("userCleanupJob");
+
+      assertNotNull(step);
+      assertThat(step.getName()).isEqualTo("userCleanupStep");
     }
   }
 }
