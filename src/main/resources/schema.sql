@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE INDEX IF NOT EXISTS idx_users_deleted_at ON users (deleted_at)
     WHERE deleted_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_user_cleanup_batch ON user (deleted_at, id)
+CREATE INDEX IF NOT EXISTS idx_user_cleanup_batch ON users (deleted_at, id)
     WHERE deleted_at IS NOT NULL;
 
 -- =====================
@@ -211,7 +211,7 @@ CREATE TABLE IF NOT EXISTS notifications
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications (user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_unconfirmed ON notifications (user_id, created_at)
     WHERE confirmed_at IS NULL;
-CREATE INDEX IF NOT EXISTS idx_notification_cleanup_batch ON notification (confirmed_at, id)
+CREATE INDEX IF NOT EXISTS idx_notification_cleanup_batch ON notifications (confirmed_at, id)
     WHERE confirmed_at IS NOT NULL;
 
 -- =====================
