@@ -58,6 +58,14 @@ public class LogBackupProcessorTest {
       // S3 key 검증
       assertThat(result.s3Key()).contains("logs/").contains(String.valueOf(yesterday.getYear()));
 
+      String expectedKey =
+          "logs/" + yesterday.format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd")) +
+              "/app-" + yesterday.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")) +
+              ".log.gz";
+      
+      assertThat(result.s3Key()).isEqualTo(expectedKey);
+      assertThat(result.s3Key()).contains("logs/").contains(String.valueOf(yesterday.getYear()));
+
       // gzip로 압축됐는지 검증
       assertThat(result.compressedData()).isNotEmpty();
     }
