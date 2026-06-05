@@ -27,9 +27,6 @@ public class LogBackupJobConfig {
   private final LogBackupProcessor logBackupProcessor;
   private final LogBackupWriter logBackupWriter;
 
-  @Value("${batch.log-backup.chunk-size}")
-  private int chunkSize;
-
   @Bean
   public Job logBackupJob() {
     return new JobBuilder("logBackupJob", jobRepository)
@@ -40,7 +37,7 @@ public class LogBackupJobConfig {
   @Bean
   public Step logBackupStep() {
     return new StepBuilder("logBackupStep", jobRepository)
-        .<Path, UploadPayload> chunk(chunkSize, transactionManager)
+        .<Path, UploadPayload> chunk(1, transactionManager)
         .reader(logBackupReader)
         .processor(logBackupProcessor)
         .writer(logBackupWriter)

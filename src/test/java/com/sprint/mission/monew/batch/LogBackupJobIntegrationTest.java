@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +31,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -83,7 +83,7 @@ public class LogBackupJobIntegrationTest {
       // given
       Files.writeString(logFile, "log content");
 
-      given(s3Client.headObject(any(HeadObjectRequest.class)))
+      given(s3Client.headObject(any(Consumer.class)))
           .willThrow(NoSuchKeyException.builder().build());
 
       given(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))

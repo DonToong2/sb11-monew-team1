@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,6 +20,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,6 +30,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -74,6 +77,9 @@ public class LogBackupWriterTest {
     @DisplayName("S3 업로드 실패 시 LogBackupFailedException 발생으로 Job이 실패한다")
     void S3_업로드_실패_시_LogBackupFailedException_발생() {
       // given
+      given(s3Client.headObject(any(Consumer.class)))
+          .willThrow(NoSuchKeyException.builder().build());
+
       given(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
           .willThrow(new RuntimeException("S3 장애"));
 
@@ -90,6 +96,12 @@ public class LogBackupWriterTest {
       // given
       Files.writeString(logFile, "log content");
 
+      given(s3Client.headObject(any(Consumer.class)))
+          .willThrow(NoSuchKeyException.builder().build());
+
+      given(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+          .willReturn(null);
+
       Chunk<UploadPayload> chunk = new Chunk<>(List.of(payload));
 
       try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
@@ -105,9 +117,13 @@ public class LogBackupWriterTest {
 
     @Test
     @DisplayName("S3에 파일 업로드")
-    void S3에_파일_업로드() throws Exception {
+    void S3에_파일_업로드() throws IOException {
       // given
       Files.writeString(logFile, "log content");
+
+      given(s3Client.headObject(any(Consumer.class)))
+          .willThrow(NoSuchKeyException.builder().build());
+
       Chunk<UploadPayload> chunk = new Chunk<>(List.of(payload));
 
       // when
@@ -122,6 +138,8 @@ public class LogBackupWriterTest {
     void 로그_파일이_존재하고_S3에_없으면_업로드_후_로컬_파일을_삭제한다() throws IOException {
       // given
       Files.writeString(logFile, "log content");
+      given(s3Client.headObject(any(Consumer.class)))
+          .willThrow(NoSuchKeyException.builder().build());
       Chunk<UploadPayload> chunk = new Chunk<>(List.of(payload));
 
       // when
@@ -137,6 +155,9 @@ public class LogBackupWriterTest {
     void 업로드_성공_시_업로드_건수_바이트_소요_시간을_집계한다() throws IOException {
       // given
       Files.writeString(logFile, "log content");
+      given(s3Client.headObject(any(Consumer.class)))
+          .willThrow(NoSuchKeyException.builder().build());
+
       Chunk<UploadPayload> chunk = new Chunk<>(List.of(payload));
 
       // when
