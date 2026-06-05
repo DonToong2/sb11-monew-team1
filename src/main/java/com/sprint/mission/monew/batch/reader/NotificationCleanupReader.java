@@ -40,7 +40,7 @@ public class NotificationCleanupReader implements ItemReader<NotificationCleanup
       lastConfirmedAt = Instant.EPOCH;
       lastId = new UUID(0L, 0L);
 
-      log.info("User Cleanup Reader 시작: threshold={}, chunkSize={}", cutoff, chunkSize);
+      log.info("Notification Cleanup Reader 시작: threshold={}, chunkSize={}", cutoff, chunkSize);
     }
 
     while (iterator == null || !iterator.hasNext()) {
