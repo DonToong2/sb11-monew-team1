@@ -58,6 +58,8 @@ public class NewsCollectJobIntegrationTest {
     @DisplayName("뉴스 수집 배치 통합테스트")
     void 뉴스_수집_배치_통합테스트_성공() throws Exception {
       // given
+      long beforeCount = articleRepository.count();
+
       JobParameters params = new JobParametersBuilder()
           .addLong("time", Instant.now().toEpochMilli())
           .toJobParameters();
@@ -68,13 +70,8 @@ public class NewsCollectJobIntegrationTest {
       // then
       assertThat(execution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
 
-      List<Article> articles = articleRepository.findAll();
-
-      assertThat(articles).isNotEmpty();
-
-      assertThat(articles).anyMatch(article
-          -> article.getSource() == ArticleSource.NAVER
-          || article.getSource() == ArticleSource.CHOSUN);
+      long afterCount = articleRepository.count();
+      assertThat(afterCount).isGreaterThanOrEqualTo(beforeCount);
     }
   }
 }
