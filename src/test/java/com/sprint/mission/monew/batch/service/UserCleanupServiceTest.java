@@ -46,7 +46,7 @@ class UserCleanupServiceTest {
   }
 
   @Test
-  @DisplayName("logBackupJob이 JobLauncher를 통해 정상 실행된다")
+  @DisplayName("userCleanupJob이 JobLauncher를 통해 정상 실행된다")
   void executeBackup_success() throws Exception {
 
     // given
