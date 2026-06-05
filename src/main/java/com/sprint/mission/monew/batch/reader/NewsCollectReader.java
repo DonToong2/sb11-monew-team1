@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -34,30 +35,28 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
   public NewsCollectItem read() {
 
     if (iterator == null) {
-      iterator = loadAll().iterator();
+      iterator = Stream.concat(
+          collectNaver(),
+          Stream.concat(
+              collectRss(ArticleSource.HANKYUNG),
+              Stream.concat(
+                  collectRss(ArticleSource.CHOSUN),
+                  collectRss(ArticleSource.YONHAP))
+          )
+      ).iterator();
     }
 
     return iterator.hasNext() ? iterator.next() : null;
   }
 
-  private List<NewsCollectItem> loadAll() {
-
-    List<NewsCollectItem> items = new ArrayList<>();
-
-    collectNaver(items);
-    collectRss(items, ArticleSource.HANKYUNG);
-    collectRss(items, ArticleSource.CHOSUN);
-    collectRss(items, ArticleSource.YONHAP);
-
-    return items;
-  }
-
-  private void collectNaver(List<NewsCollectItem> items) {
+  private Stream<NewsCollectItem> collectNaver() {
 
     try {
       List<NaverNewsItem> naverItems = naverNewsClient.fetchNews();
 
       int successCount = 0;
+
+      List<NewsCollectItem> result = new ArrayList<>();
 
       for (NaverNewsItem item : naverItems) {
 
@@ -79,7 +78,7 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
           continue;
         }
 
-        items.add(new NewsCollectItem(
+        result.add(new NewsCollectItem(
             ArticleSource.NAVER,
             sourceUrl,
             NaverNewsClient.stripHtml(item.title()),
@@ -93,19 +92,25 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
       newsCollectMetrics.countCollected(ArticleSource.NAVER, successCount);
       log.info("Naver 뉴스 수집 완료 | count={}", successCount);
 
+      return result.stream();
+
     } catch (Exception e) {
       log.error("Naver 뉴스 수집 실패", e);
       newsCollectMetrics.countFailed(ArticleSource.NAVER);
+
+      return Stream.empty();
     }
   }
 
-  private void collectRss(List<NewsCollectItem> items, ArticleSource source) {
+  private Stream<NewsCollectItem> collectRss(ArticleSource source) {
 
     try {
       List<RssArticleDto> rssItems = rssNewsParser.parse(source);
 
       int successCount = 0;
       int skipped = 0;
+
+      List<NewsCollectItem> result = new ArrayList<>();
 
       for (RssArticleDto item : rssItems) {
 
@@ -114,7 +119,7 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
           continue;
         }
 
-        items.add(new NewsCollectItem(
+        result.add(new NewsCollectItem(
             source,
             item.sourceUrl(),
             item.title(),
@@ -132,9 +137,13 @@ public class NewsCollectReader implements ItemReader<NewsCollectItem> {
       newsCollectMetrics.countCollected(source, successCount);
       log.info("{} RSS 수집 완료 | count={}", source, successCount);
 
+      return result.stream();
+
     } catch (Exception e) {
       log.error("{} RSS 수집 실패", source, e);
       newsCollectMetrics.countFailed(source);
+
+      return Stream.empty();
     }
   }
 }
