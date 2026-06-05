@@ -6,6 +6,7 @@ import com.sprint.mission.monew.batch.dto.UploadPayload;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +31,8 @@ public class LogBackupProcessorTest {
   @BeforeEach
   void setUp() {
     yesterday = LocalDate.now().minusDays(1);
-    file = tempDir.resolve("monew." + yesterday + ".log");
+    file = tempDir
+        .resolve("monew." + yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".log");
   }
 
   @Nested
