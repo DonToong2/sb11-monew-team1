@@ -2,11 +2,15 @@ package com.sprint.mission.monew.domain.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sprint.mission.monew.batch.dto.UserCleanupItem;
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.common.config.JpaConfig;
 import com.sprint.mission.monew.common.config.QuerydslConfig;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -127,6 +132,46 @@ class UserRepositoryTest {
       // then
       assertThat(deletedCount).isEqualTo(1); // user1 삭제
       assertThat(userRepository.findById(user2.getId())).isPresent(); // user2 유지
+    }
+  }
+
+  @Nested
+  @DisplayName("deletedAt + id 기준 cursor 조회가 정렬된 순서로 반환하기")
+  class FindUsersForCleanup {
+    @Test
+    @DisplayName("deletedAt + id 기준 cursor 조회가 정렬된 순서로 반환된다")
+    void findUsersForCleanup_ordering_test() {
+      // given
+      Instant base = Instant.now().minus(Duration.ofDays(2));
+
+      User user1 = User.create("test1@naver.com", "test1", "12345678");
+      User user2 = User.create("test2@naver.com", "test2", "12345678");
+      User user3 = User.create("test3@naver.com", "test3", "12345678");
+
+      ReflectionTestUtils.setField(user1, "deletedAt", base.minusSeconds(10));
+      ReflectionTestUtils.setField(user2, "deletedAt", base.plusSeconds(10));
+      ReflectionTestUtils.setField(user3, "deletedAt", base.plusSeconds(20));
+
+      userRepository.save(user1);
+      userRepository.save(user2);
+      userRepository.save(user3);
+
+      // when
+      List<UserCleanupItem> result = userRepository.findUsersForCleanup(
+          Instant.now(),
+          Instant.EPOCH,
+          UUID.randomUUID(),
+          PageRequest.of(0, 10)
+      );
+
+      // then
+      assertThat(result)
+          .extracting(UserCleanupItem::id)
+          .containsExactly(
+              user1.getId(),
+              user2.getId(),
+              user3.getId()
+          );
     }
   }
 }
