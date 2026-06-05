@@ -103,6 +103,8 @@ public class NewsCollectWriterTest {
       // ArticleUpsertService가 3번 호출되어야함(네이버1, 한경2, 조선1)
       verify(articleUpsertService, times(3)).upsertAll(any(), anyList());
       verify(articleUpsertService).upsertAll(eq(ArticleSource.NAVER), anyList());
+      verify(articleUpsertService).upsertAll(eq(ArticleSource.HANKYUNG), anyList());
+      verify(articleUpsertService).upsertAll(eq(ArticleSource.CHOSUN), anyList());
       verify(newsCollectMetrics).countCollected(ArticleSource.NAVER, 1);
       verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 2);
       verify(newsCollectMetrics).countCollected(ArticleSource.CHOSUN, 1);
