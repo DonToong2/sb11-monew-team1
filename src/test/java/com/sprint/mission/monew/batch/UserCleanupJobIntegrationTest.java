@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.monew.domain.user.entity.User;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,13 +23,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class UserDeleteJobIntegrationTest {
+public class UserCleanupJobIntegrationTest {
 
   @Autowired
   private JobLauncher jobLauncher;
 
   @Autowired
-  private Job userDeleteJob;
+  private Job userCleanupJob;
 
   @Autowired
   private UserRepository userRepository;
@@ -62,7 +61,7 @@ public class UserDeleteJobIntegrationTest {
           .toJobParameters();
 
       // when
-      JobExecution execution = jobLauncher.run(userDeleteJob, params);
+      JobExecution execution = jobLauncher.run(userCleanupJob, params);
 
       // then
       List<User> users = userRepository.findAll();
