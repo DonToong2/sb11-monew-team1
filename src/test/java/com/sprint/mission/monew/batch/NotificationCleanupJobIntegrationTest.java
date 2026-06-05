@@ -26,13 +26,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class NotificationDeleteJobIntegrationTest {
+public class NotificationCleanupJobIntegrationTest {
 
   @Autowired
   private JobLauncher jobLauncher;
 
   @Autowired
-  private Job notificationDeleteJob;
+  private Job notificationCleanupJob;
 
   @Autowired
   private NotificationRepository notificationRepository;
@@ -78,7 +78,7 @@ public class NotificationDeleteJobIntegrationTest {
           .toJobParameters();
 
       // when
-      JobExecution execution = jobLauncher.run(notificationDeleteJob, params);
+      JobExecution execution = jobLauncher.run(notificationCleanupJob, params);
 
       // then
       List<Notification> notifications = notificationRepository.findAll();
