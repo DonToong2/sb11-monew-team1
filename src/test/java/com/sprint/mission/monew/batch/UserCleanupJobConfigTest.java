@@ -2,6 +2,9 @@ package com.sprint.mission.monew.batch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sprint.mission.monew.batch.listener.UserCleanupStepListener;
+import com.sprint.mission.monew.batch.reader.UserCleanupReader;
+import com.sprint.mission.monew.batch.writer.UserCleanupWriter;
 import com.sprint.mission.monew.common.config.UserCleanupJobConfig;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -13,14 +16,17 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-    UserCleanupJobConfig.class,
-    UserDeleteTasklet.class
+    UserCleanupJobConfig.class
+})
+@TestPropertySource(properties = {
+    "batch.user-cleanup.chunk-size=1000"
 })
 public class UserCleanupJobConfigTest {
 
@@ -32,6 +38,15 @@ public class UserCleanupJobConfigTest {
 
   @MockitoBean
   private UserRepository userRepository;
+
+  @MockitoBean
+  private UserCleanupReader userCleanupReader;
+
+  @MockitoBean
+  private UserCleanupWriter userCleanupWriter;
+
+  @MockitoBean
+  private UserCleanupStepListener userCleanupStepListener;
 
   @Autowired
   private Job userCleanupJob;
