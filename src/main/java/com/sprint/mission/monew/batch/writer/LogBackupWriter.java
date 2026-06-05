@@ -6,6 +6,7 @@ import com.sprint.mission.monew.batch.LogBackupMetrics;
 import com.sprint.mission.monew.batch.dto.UploadPayload;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
@@ -31,16 +32,22 @@ public class LogBackupWriter implements ItemWriter<UploadPayload> {
   @Override
   public void write(Chunk<? extends UploadPayload> chunk) {
 
-    for (UploadPayload item : chunk) {
+    long start = System.nanoTime();
 
-      if (exists(item.s3Key())) {
-        log.info("이미 존재 → skip: {}", item.s3Key());
-        metrics.countSkipped();
-        continue;
+    try {
+      for (UploadPayload item : chunk) {
+
+        if (exists(item.s3Key())) {
+          log.info("이미 존재 → skip: {}", item.s3Key());
+          metrics.countSkipped();
+          continue;
+        }
+
+        doUpload(item);
+        deleteLocalFile(item);
       }
-
-      doUpload(item);
-      deleteLocalFile(item);
+    } finally {
+      metrics.recordDuration(Duration.ofNanos(System.nanoTime() - start));
     }
   }
 

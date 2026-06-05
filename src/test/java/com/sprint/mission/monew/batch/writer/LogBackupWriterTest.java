@@ -16,6 +16,7 @@ import com.sprint.mission.monew.batch.dto.UploadPayload;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
@@ -160,6 +161,7 @@ public class LogBackupWriterTest {
       // then
       verify(metrics).countUploaded();
       verify(metrics).recordBytes(anyLong());
+      verify(metrics).recordDuration(any(Duration.class));
     }
   }
 }
