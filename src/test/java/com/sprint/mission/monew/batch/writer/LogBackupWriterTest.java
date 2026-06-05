@@ -30,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.batch.item.Chunk;
+import org.springframework.test.util.ReflectionTestUtils;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -59,6 +60,7 @@ public class LogBackupWriterTest {
     yesterday = LocalDate.now().minusDays(1);
     logFile = tempDir.resolve("monew." + yesterday + ".log");
     payload = new UploadPayload(logFile, "key", "data".getBytes());
+    ReflectionTestUtils.setField(writer, "bucket", "test-bucket");
   }
 
   @Nested

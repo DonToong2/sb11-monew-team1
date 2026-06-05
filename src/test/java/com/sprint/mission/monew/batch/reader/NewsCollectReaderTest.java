@@ -202,6 +202,7 @@ public class NewsCollectReaderTest {
       NewsCollectItem result = reader.read();
 
       assertThat(result).isNull();
+      verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 0);
     }
   }
 }
