@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class LogBackupService {
+public class NotificationCleanupService {
 
   private final JobLauncher jobLauncher;
-  private final Job logBackupJob;
+  private final Job notificationCleanupJob;
 
-  public void executeBackup() throws Exception {
+  public void executeCleanup() throws Exception {
     JobParameters params = new JobParametersBuilder()
         .addLong("time", Instant.now().toEpochMilli())
         .toJobParameters();
-    jobLauncher.run(logBackupJob, params);
+    jobLauncher.run(notificationCleanupJob, params);
   }
 }
