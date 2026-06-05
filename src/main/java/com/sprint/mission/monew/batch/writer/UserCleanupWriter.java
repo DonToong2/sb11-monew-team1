@@ -25,6 +25,10 @@ public class UserCleanupWriter implements ItemWriter<UserCleanupItem> {
         .map(UserCleanupItem::id)
         .toList();
 
+    log.info("User Cleanup Writer 실행: delete size={}", ids.size());
+
     userRepository.deleteAllByIdInBatch(ids);
+
+    log.info("User Cleanup Writer 완료");
   }
 }

@@ -2,19 +2,20 @@ package com.sprint.mission.monew.batch.reader;
 
 import com.sprint.mission.monew.batch.dto.UserCleanupItem;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @StepScope
 @RequiredArgsConstructor
@@ -38,6 +39,8 @@ public class UserCleanupReader implements ItemReader<UserCleanupItem> {
       threshold = Instant.now().minus(Duration.ofDays(1));
       lastDeletedAt = Instant.EPOCH;
       lastId = new UUID(0L, 0L);
+
+      log.info("User Cleanup Reader 시작: threshold={}, chunkSize={}", threshold, chunkSize);
     }
 
     while (iterator == null || !iterator.hasNext()) {
@@ -55,6 +58,7 @@ public class UserCleanupReader implements ItemReader<UserCleanupItem> {
       }
 
       iterator = items.iterator();
+      log.info("User Cleanup Reader chunk load 완료: size={}", items.size());
     }
 
     UserCleanupItem item = iterator.next();
