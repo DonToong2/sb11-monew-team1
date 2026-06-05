@@ -57,9 +57,6 @@ class NotificationCleanupServiceTest {
     notificationCleanupService.executeCleanup();
 
     // then
-    verify(jobLauncher, times(1))
-        .run(eq(notificationCleanupJob), any(JobParameters.class));
-
     ArgumentCaptor<JobParameters> paramsCaptor = ArgumentCaptor.forClass(JobParameters.class);
     verify(jobLauncher, times(1)).run(eq(notificationCleanupJob), paramsCaptor.capture());
     assertThat(paramsCaptor.getValue().getParameters()).containsKey("time");

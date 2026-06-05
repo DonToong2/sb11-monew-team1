@@ -57,9 +57,6 @@ class LogBackupServiceTest {
     logBackupService.executeBackup();
 
     // then
-    verify(jobLauncher, times(1))
-        .run(eq(logBackupJob), any(JobParameters.class));
-
     ArgumentCaptor<JobParameters> paramsCaptor = ArgumentCaptor.forClass(JobParameters.class);
     verify(jobLauncher, times(1)).run(eq(logBackupJob), paramsCaptor.capture());
     assertThat(paramsCaptor.getValue().getParameters()).containsKey("time");

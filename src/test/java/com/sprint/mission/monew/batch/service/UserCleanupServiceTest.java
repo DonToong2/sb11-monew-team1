@@ -57,9 +57,6 @@ class UserCleanupServiceTest {
     userCleanupService.executeCleanup();
 
     // then
-    verify(jobLauncher, times(1))
-        .run(eq(userCleanupJob), any(JobParameters.class));
-
     ArgumentCaptor<JobParameters> paramsCaptor = ArgumentCaptor.forClass(JobParameters.class);
     verify(jobLauncher, times(1)).run(eq(userCleanupJob), paramsCaptor.capture());
     assertThat(paramsCaptor.getValue().getParameters()).containsKey("time");

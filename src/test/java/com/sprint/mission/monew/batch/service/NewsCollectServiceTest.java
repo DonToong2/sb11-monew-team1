@@ -57,9 +57,6 @@ class NewsCollectServiceTest {
     newsCollectService.executeCollect();
 
     // then
-    verify(jobLauncher, times(1))
-        .run(eq(newsCollectJob), any(JobParameters.class));
-
     ArgumentCaptor<JobParameters> paramsCaptor = ArgumentCaptor.forClass(JobParameters.class);
     verify(jobLauncher, times(1)).run(eq(newsCollectJob), paramsCaptor.capture());
     assertThat(paramsCaptor.getValue().getParameters()).containsKey("time");
