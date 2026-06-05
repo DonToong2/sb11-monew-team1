@@ -47,8 +47,8 @@ public class NewsCollectWriter implements ItemWriter<NewsCollectItem> {
           ));
     }
 
-    try {
-      grouped.forEach((source, candidates) -> {
+    grouped.forEach((source, candidates) -> {
+      try {
 
         if (candidates.isEmpty()) {
           return;
@@ -58,23 +58,21 @@ public class NewsCollectWriter implements ItemWriter<NewsCollectItem> {
         newsCollectMetrics.countCollected(source, candidates.size());
 
         log.info("{} 뉴스 수집 완료 | count={}", source, candidates.size());
-      });
 
-    } catch (Exception e) {
-
-      grouped.forEach((source, candidates) -> {
+      } catch (Exception e) {
         newsCollectMetrics.countFailed(source);
-      });
+        log.error("{} 뉴스 수집 실패", source, e);
+      }
+    });
 
-      log.error("뉴스 수집 실패", e);
-
-    } finally {
-
+    try {
       newsCollectMetrics.recordCollectDuration(Duration.ofNanos(System.nanoTime() - start));
 
       log.info("뉴스 수집 writer 완료 | sources={}", grouped.keySet());
 
       interestNotificationService.notifyNewArticles(batchStartTime);
+    } catch (Exception e) {
+      log.error("알림 전송 실패", e);
     }
   }
 }
