@@ -34,7 +34,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-@SpringBootTest
+@SpringBootTest(properties = {"monew.log-dir=${java.io.tmpdir}/monew-test"})
 @ActiveProfiles("test")
 public class LogBackupJobIntegrationTest {
 
@@ -53,24 +53,15 @@ public class LogBackupJobIntegrationTest {
   private LocalDate yesterday;
   private Path logFile;
 
-  private static Path tempDir;
-
-  @TempDir
-  private static Path injectedTempDir;
-
-  @DynamicPropertySource
-  static void overrideProps(DynamicPropertyRegistry registry) {
-    tempDir = injectedTempDir;
-
-    registry.add("monew.log-dir", () -> tempDir.toString());
-  }
+  private Path baseDir;
 
   @BeforeEach
   void setUp() throws IOException {
     yesterday = LocalDate.now().minusDays(1);
-    Path base = tempDir;
-    Files.createDirectories(base);
-    logFile = base.resolve("monew." + yesterday + ".log");
+    baseDir = Path.of(System.getProperty("java.io.tmpdir"), "monew-test");
+
+    Files.createDirectories(baseDir);
+    logFile = baseDir.resolve("monew." + yesterday + ".log");
   }
 
   @Nested
