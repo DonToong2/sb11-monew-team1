@@ -20,7 +20,7 @@ public class UserCleanupStepListener implements StepExecutionListener {
 
     long deleted = stepExecution.getWriteCount();
 
-    userMetrics.countDeleted((int) deleted);
+    userMetrics.countDeleted(deleted);
 
     log.info("User Cleanup Step 완료 | deleted={}", deleted);
 

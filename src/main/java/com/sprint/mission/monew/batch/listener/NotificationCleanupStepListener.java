@@ -20,7 +20,7 @@ public class NotificationCleanupStepListener implements StepExecutionListener {
 
     long deleted = stepExecution.getWriteCount();
 
-    notificationMetrics.countDeleted((int) deleted);
+    notificationMetrics.countDeleted(deleted);
 
     log.info("Notification Cleanup Step 완료 | deleted={}", deleted);
 
