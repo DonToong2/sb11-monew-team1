@@ -4,10 +4,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.sprint.mission.monew.batch.ArticleCandidate;
 import com.sprint.mission.monew.batch.ArticleUpsertService;
 import com.sprint.mission.monew.batch.NewsCollectMetrics;
 import com.sprint.mission.monew.batch.dto.NewsCollectItem;
@@ -44,13 +48,90 @@ public class NewsCollectWriterTest {
   class Writer {
 
     @Test
-    @DisplayName("chunk가 비어있으면 upsertAll 호출되지 않는다")
-    void empty_chunk() {
+    @DisplayName("기사 저장 중 예외 발생 시 실패 건수를 기록한다")
+    void 기사_저장_중_예외_발생_시_실패_건수_기록() {
+      // given
+      NewsCollectItem item = new NewsCollectItem(
+          ArticleSource.HANKYUNG,
+          "https://hankyung.com/1",
+          "한경 기사",
+          Instant.now(),
+          "요약");
 
-      Chunk<NewsCollectItem> chunk = new Chunk<>(List.of());
+      Chunk<NewsCollectItem> chunk = new Chunk<>(List.of(item));
 
+      willThrow(new RuntimeException("DB 장애"))
+          .given(articleUpsertService)
+          .upsertAll(eq(ArticleSource.HANKYUNG), anyList());
+
+      // when
       writer.write(chunk);
 
+      // then
+      verify(newsCollectMetrics).countFailed(ArticleSource.HANKYUNG);
+      verify(newsCollectMetrics, never()).countCollected(eq(ArticleSource.HANKYUNG), anyInt());
+    }
+
+    @Test
+    @DisplayName("메트릭 기록 실패 시 예외를 전파하지 않는다")
+    void 메트릭_기록_실패_시_예외를_전파하지_않는다() {
+      // given
+      NewsCollectItem item = new NewsCollectItem(
+          ArticleSource.HANKYUNG,
+          "https://hankyung.com/1",
+          "한경 기사",
+          Instant.now(),
+          "요약");
+
+      Chunk<NewsCollectItem> chunk = new Chunk<>(List.of(item));
+
+      willThrow(new RuntimeException("metric fail"))
+          .given(newsCollectMetrics)
+          .recordCollectDuration(any());
+
+      // when
+      writer.write(chunk);
+
+      // then
+      verify(articleUpsertService).upsertAll(eq(ArticleSource.HANKYUNG), anyList());
+      verify(interestNotificationService).notifyNewArticles(any());
+    }
+
+    @Test
+    @DisplayName("알림 전송 실패 시 예외를 전파하지 않는다")
+    void 알림_전송_실패_시_예외를_전파하지_않는다() {
+      // given
+      NewsCollectItem item = new NewsCollectItem(
+          ArticleSource.HANKYUNG,
+          "https://hankyung.com/1",
+          "한경 기사",
+          Instant.now(),
+          "요약");
+
+      Chunk<NewsCollectItem> chunk = new Chunk<>(List.of(item));
+
+      willThrow(new RuntimeException("notify fail"))
+          .given(interestNotificationService)
+          .notifyNewArticles(any());
+
+      // when
+      writer.write(chunk);
+
+      // then
+      verify(articleUpsertService).upsertAll(eq(ArticleSource.HANKYUNG), anyList());
+      verify(newsCollectMetrics).countCollected(ArticleSource.HANKYUNG, 1);
+    }
+
+    @Test
+    @DisplayName("chunk가 비어있으면 upsertAll 호출되지 않는다")
+    void chunk가_empty면_upsertAll_호출되지_않는다() {
+      // given
+      Chunk<NewsCollectItem> chunk = new Chunk<>(List.of());
+
+      // when
+      writer.write(chunk);
+
+      // then
       verify(articleUpsertService, never()).upsertAll(any(), anyList());
       verify(newsCollectMetrics, never()).countCollected(any(), anyInt());
     }

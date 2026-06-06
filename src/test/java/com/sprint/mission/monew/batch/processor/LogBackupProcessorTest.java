@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,6 +39,28 @@ public class LogBackupProcessorTest {
   @Nested
   @DisplayName("백업 로그 파일 변환하기")
   class Processor {
+
+    @Test
+    @DisplayName("compressedData 조회 시 내부 배열이 변하지 않고 보호된다")
+    void compressedData_getter_오버라이딩_방어적_복사() {
+      // given
+      byte[] original = {1, 2, 3};
+      UploadPayload payload = new UploadPayload(
+          Path.of("test.log"),
+          "s3-key",
+          original
+      );
+
+      // when
+      byte[] copy = payload.compressedData();
+
+      // 원본, 복사 배열 첫번째 값을 1에서 99로 설정
+      original[0] = 99;
+      copy[0] = 99;
+
+      // then
+      assertThat(payload.compressedData()[0]).isEqualTo((byte) 1);
+    }
 
     @Test
     @DisplayName("백업 로그 파일 변환")

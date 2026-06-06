@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -67,6 +68,38 @@ public class LogBackupWriterTest {
   @Nested
   @DisplayName("백업 로그 파일 저장하기")
   class Writer {
+
+    @Test
+    @DisplayName("이미 S3에 존재하면 업로드를 건너뛴다")
+    void 이미_S3에_존재하면_skip() {
+      // given
+      Chunk<UploadPayload> chunk = new Chunk<>(List.of(payload));
+
+      // headObject 성공 = 이미 존재
+      given(s3Client.headObject(any(Consumer.class)))
+          .willReturn(null);
+
+      // when
+      writer.write(chunk);
+
+      // then
+      verify(metrics).countSkipped();
+      verify(s3Client, never()).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+    }
+
+    @Test
+    @DisplayName("S3 존재 여부 확인 실패 시 LogBackupFailedException 발생으로 Job이 실패한다")
+    void S3_존재여부_확인_실패() {
+      // given
+      Chunk<UploadPayload> chunk = new Chunk<>(List.of(payload));
+
+      given(s3Client.headObject(any(Consumer.class)))
+          .willThrow(new RuntimeException("S3 장애"));
+
+      // when & then
+      assertThatThrownBy(() -> writer.write(chunk))
+          .isInstanceOf(LogBackupFailedException.class);
+    }
 
     @Test
     @DisplayName("S3 업로드 실패 시 LogBackupFailedException 발생으로 Job이 실패한다")
