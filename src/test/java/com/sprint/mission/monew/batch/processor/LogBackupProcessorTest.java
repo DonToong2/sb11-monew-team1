@@ -32,7 +32,7 @@ public class LogBackupProcessorTest {
   void setUp() {
     yesterday = LocalDate.now().minusDays(1);
     file = tempDir
-        .resolve("monew." + yesterday.format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".log");
+        .resolve("monew." + yesterday + ".log");
   }
 
   @Nested

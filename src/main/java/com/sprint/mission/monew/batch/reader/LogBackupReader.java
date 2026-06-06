@@ -18,7 +18,7 @@ public class LogBackupReader implements ItemReader<Path> {
   private boolean read = false;
 
   @Override
-  public Path read() throws Exception {
+  public Path read() {
 
     if (read) {
       return null;
