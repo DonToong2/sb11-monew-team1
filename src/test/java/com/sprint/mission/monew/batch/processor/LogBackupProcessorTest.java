@@ -2,12 +2,11 @@ package com.sprint.mission.monew.batch.processor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sprint.mission.monew.batch.BatchGzipUtils;
 import com.sprint.mission.monew.batch.dto.UploadPayload;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -84,9 +83,9 @@ public class LogBackupProcessorTest {
       assertThat(result.s3Key()).contains("logs/").contains(String.valueOf(yesterday.getYear()));
 
       String expectedKey =
-          "logs/" + yesterday.format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM/dd")) +
-              "/app-" + yesterday.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")) +
-              ".log.gz";
+          "logs/" + yesterday.format(BatchGzipUtils.PATH_FORMATTER)
+              + "/app-" + yesterday.format(BatchGzipUtils.FILE_FORMATTER)
+              + ".log.gz";
 
       assertThat(result.s3Key()).isEqualTo(expectedKey);
       assertThat(result.s3Key()).contains("logs/").contains(String.valueOf(yesterday.getYear()));

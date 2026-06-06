@@ -70,9 +70,10 @@ public class LogBackupWriterTest {
   class Writer {
 
     @Test
-    @DisplayName("이미 S3에 존재하면 업로드를 건너뛴다")
-    void 이미_S3에_존재하면_skip() {
+    @DisplayName("이미 S3에 존재하면 업로드를 건너뛰고 로컬 파일을 삭제한다")
+    void 이미_S3에_존재하면_skip() throws IOException {
       // given
+      Files.writeString(logFile, "log content");
       Chunk<UploadPayload> chunk = new Chunk<>(List.of(payload));
 
       // headObject 성공 = 이미 존재
@@ -85,6 +86,9 @@ public class LogBackupWriterTest {
       // then
       verify(metrics).countSkipped();
       verify(s3Client, never()).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+
+      // 로컬 파일 삭제됐는지 검증
+      assertThat(logFile).doesNotExist();
     }
 
     @Test

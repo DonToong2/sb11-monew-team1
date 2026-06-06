@@ -40,6 +40,8 @@ public class LogBackupWriter implements ItemWriter<UploadPayload> {
         if (exists(item.s3Key())) {
           log.info("이미 존재 → skip: {}", item.s3Key());
           metrics.countSkipped();
+          deleteLocalFile(item);
+
           continue;
         }
 
