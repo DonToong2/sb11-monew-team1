@@ -1,7 +1,5 @@
 package com.sprint.mission.monew.domain.user.scheduler;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 
 import com.sprint.mission.monew.batch.service.UserCleanupService;
