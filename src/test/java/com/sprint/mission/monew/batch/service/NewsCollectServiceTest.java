@@ -34,7 +34,7 @@ class NewsCollectServiceTest {
 
   @Test
   @DisplayName("Job 실행 실패 시 NewsCollectJobFailedException으로 감싼다")
-  void executeCollect_fail() throws Exception {
+  void newsCollectJob_실행중_NewsCollectJobFailedException_예외_발생() throws Exception {
 
     // given
     when(jobLauncher.run(eq(newsCollectJob), any(JobParameters.class)))
@@ -47,7 +47,7 @@ class NewsCollectServiceTest {
 
   @Test
   @DisplayName("newsCollectJob이 JobLauncher를 통해 정상 실행된다")
-  void executeBackup_success() throws Exception {
+  void newsCollectJob이_JobLauncher를_통해_정상_실행된다() throws Exception {
 
     // given
     when(jobLauncher.run(any(Job.class), any(JobParameters.class)))
