@@ -8,7 +8,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
-import com.sprint.mission.monew.common.exception.ErrorCode;
+import com.sprint.mission.monew.common.exception.CommonErrorCode;
 import com.sprint.mission.monew.common.exception.MonewException;
 
 import com.sprint.mission.monew.domain.user.repository.UserSessionRepository;
@@ -276,7 +276,7 @@ class AuthFilterTest {
       then(handlerExceptionResolver).should().resolveException(
           any(), any(), isNull(),
           argThat(e -> e instanceof MonewException
-              && ((MonewException) e).getErrorCode() == ErrorCode.FORBIDDEN_ADMIN)
+              && ((MonewException) e).getErrorCode() == CommonErrorCode.FORBIDDEN_ADMIN)
       );
     }
 
@@ -296,7 +296,7 @@ class AuthFilterTest {
       then(handlerExceptionResolver).should().resolveException(
           any(), any(), isNull(),
           argThat(e -> e instanceof MonewException
-              && ((MonewException) e).getErrorCode() == ErrorCode.FORBIDDEN_ADMIN)
+              && ((MonewException) e).getErrorCode() == CommonErrorCode.FORBIDDEN_ADMIN)
       );
     }
 
@@ -316,7 +316,7 @@ class AuthFilterTest {
       then(handlerExceptionResolver).should().resolveException(
           any(), any(), isNull(),
           argThat(e -> e instanceof MonewException
-              && ((MonewException) e).getErrorCode() == ErrorCode.FORBIDDEN_ADMIN)
+              && ((MonewException) e).getErrorCode() == CommonErrorCode.FORBIDDEN_ADMIN)
       );
     }
 
