@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.dto;
 
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;

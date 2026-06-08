@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -9,6 +9,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import com.sprint.mission.monew.batch.dto.ArticleCandidate;
+import com.sprint.mission.monew.batch.metrics.NewsCollectMetrics;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleInterest;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
@@ -31,11 +33,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ArticleUpsertServiceTest {
 
-  @InjectMocks ArticleUpsertService articleUpsertService;
+  @InjectMocks
+  ArticleUpsertService articleUpsertService;
   @Mock ArticleRepository articleRepository;
   @Mock ArticleInterestRepository articleInterestRepository;
   @Mock InterestRepository interestRepository;
-  @Mock NewsCollectMetrics newsCollectMetrics;
+  @Mock
+  NewsCollectMetrics newsCollectMetrics;
 
   @BeforeEach
   void setUp() {

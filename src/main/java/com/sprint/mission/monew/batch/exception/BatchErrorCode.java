@@ -1,11 +1,11 @@
-package com.sprint.mission.monew.common.exception;
+package com.sprint.mission.monew.batch.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum InternalErrorCode {
+public enum BatchErrorCode {
 
   USER_CLEANUP_JOB_FAILED("사용자 삭제 배치 실행 실패"),
   NOTIFICATION_CLEANUP_JOB_FAILED("알림 삭제 배치 실행 실패"),

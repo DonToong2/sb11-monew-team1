@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.dto;
 
 import java.time.Instant;
 

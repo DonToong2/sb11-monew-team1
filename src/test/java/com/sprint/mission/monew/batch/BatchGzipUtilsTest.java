@@ -2,6 +2,7 @@ package com.sprint.mission.monew.batch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sprint.mission.monew.batch.util.BatchGzipUtils;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

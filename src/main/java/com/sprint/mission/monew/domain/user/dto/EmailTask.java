@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.domain.user.service;
+package com.sprint.mission.monew.domain.user.dto;
 
 public record EmailTask(String email, String token, int retryCount, EmailTaskType type) {
 

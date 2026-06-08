@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -10,6 +10,9 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sprint.mission.monew.batch.exception.ArticleBackupFailedException;
+import com.sprint.mission.monew.batch.metrics.ArticleBackupMetrics;
+import com.sprint.mission.monew.batch.util.BatchGzipUtils;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
@@ -40,11 +43,13 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @ExtendWith(MockitoExtension.class)
 class ArticleBackupServiceTest {
 
-  @InjectMocks ArticleBackupService articleBackupService;
+  @InjectMocks
+  ArticleBackupService articleBackupService;
   @Mock ArticleRepository articleRepository;
   @Mock S3Client s3Client;
   @Spy ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-  @Mock ArticleBackupMetrics metrics;
+  @Mock
+  ArticleBackupMetrics metrics;
 
   @BeforeEach
   void setUp() {
