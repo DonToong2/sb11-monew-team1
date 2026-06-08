@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.NestedExceptionUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -28,21 +29,21 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException e) {
     CommonErrorCode code = CommonErrorCode.RESOURCE_NOT_FOUND;
     log.warn("[{}] {}", code.name(), e.getMessage());
-    return errorResponse(code, null, e);
+    return errorResponse(HttpStatus.NOT_FOUND, code, null, e);
   }
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
     CommonErrorCode code = CommonErrorCode.METHOD_NOT_ALLOWED;
     log.warn("[{}] {}", code.name(), e.getMessage());
-    return errorResponse(code, null, e);
+    return errorResponse(HttpStatus.METHOD_NOT_ALLOWED, code, null, e);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorResponse> handleMessageNotReadable(HttpMessageNotReadableException e) {
     CommonErrorCode code = CommonErrorCode.MESSAGE_NOT_READABLE;
     log.warn("[{}] {}", code.name(), e.getMessage());
-    return errorResponse(code, null, e);
+    return errorResponse(HttpStatus.BAD_REQUEST, code, null, e);
   }
 
   @ExceptionHandler(MissingRequestHeaderException.class)
@@ -50,7 +51,7 @@ public class GlobalExceptionHandler {
     CommonErrorCode code = CommonErrorCode.VALIDATION_ERROR;
     Map<String, Object> details = Map.of("header", e.getHeaderName());
     log.warn("[{}] {}", code.name(), details);
-    return errorResponse(code, details, e);
+    return errorResponse(HttpStatus.BAD_REQUEST, code, details, e);
   }
 
   @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -58,7 +59,7 @@ public class GlobalExceptionHandler {
     CommonErrorCode code = CommonErrorCode.VALIDATION_ERROR;
     Map<String, Object> details = Map.of(e.getParameterName(), "필수 파라미터입니다");
     log.warn("[{}] {}", code.name(), details);
-    return errorResponse(code, details, e);
+    return errorResponse(HttpStatus.BAD_REQUEST, code, details, e);
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -69,7 +70,7 @@ public class GlobalExceptionHandler {
         e.getRequiredType() != null ? e.getRequiredType().getSimpleName() + " 타입이어야 합니다" : "invalid type"
     );
     log.warn("[{}] {}", code.name(), details);
-    return errorResponse(code, details, e);
+    return errorResponse(HttpStatus.BAD_REQUEST, code, details, e);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -81,7 +82,7 @@ public class GlobalExceptionHandler {
             this::resolveFieldErrorMessage
         ));
     log.warn("[{}] {}", code.name(), details);
-    return errorResponse(code, details, e);
+    return errorResponse(HttpStatus.BAD_REQUEST, code, details, e);
   }
 
   // GenericConversionService가 컨버터 예외를 ConversionFailedException으로 래핑하므로 root cause까지 탐색한다.
@@ -100,7 +101,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleMonewException(MonewException e) {
     CommonErrorCode code = e.getErrorCode();
     log.warn("[{}] {}", code.name(), e.getMessage());
-    return errorResponse(code, e.getDetails(), e);
+    return errorResponse(e.getStatus(), code, e.getDetails(), e);
   }
 
   @ExceptionHandler(ClientAbortException.class)
@@ -113,19 +114,23 @@ public class GlobalExceptionHandler {
     CommonErrorCode code = CommonErrorCode.INTERNAL_ERROR;
     log.error("[{}] cause: {}, message: {}", code.name(), e.getClass().getSimpleName(),
         e.getCause() != null ? e.getCause().getMessage() : e.getMessage(), e);
-    return errorResponse(code, null, e);
+    return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, code, null, e);
   }
 
-  private ResponseEntity<ErrorResponse> errorResponse(CommonErrorCode code, Map<String, Object> details, Exception e) {
+  private ResponseEntity<ErrorResponse> errorResponse(HttpStatus status,
+      CommonErrorCode code,
+      Map<String,Object> details,
+      Exception e
+  ) {
     return ResponseEntity
-        .status(code.getStatus())
+        .status(status)
         .body(new ErrorResponse(
             Instant.now(),
             code.name(),
             code.getMessage(),
             details,
             e.getClass().getSimpleName(),
-            code.getStatus().value()
+            status.value()
         ));
   }
 }
