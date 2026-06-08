@@ -79,7 +79,8 @@ public class GlobalExceptionHandler {
     Map<String, Object> details = e.getBindingResult().getFieldErrors().stream()
         .collect(Collectors.toMap(
             FieldError::getField,
-            this::resolveFieldErrorMessage
+            this::resolveFieldErrorMessage,
+            (existing, replacement) -> existing
         ));
     log.warn("[{}] {}", code.name(), details);
     return errorResponse(HttpStatus.BAD_REQUEST, code, details, e);
