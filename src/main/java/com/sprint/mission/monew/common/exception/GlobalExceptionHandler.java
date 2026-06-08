@@ -99,8 +99,8 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MonewException.class)
   public ResponseEntity<ErrorResponse> handleMonewException(MonewException e) {
-    CommonErrorCode code = e.getErrorCode();
-    log.warn("[{}] {}", code.name(), e.getMessage());
+    ErrorCode code = e.getErrorCode();
+    log.warn("[{}] {}", code.getCode(), e.getMessage());
     return errorResponse(e.getStatus(), code, e.getDetails(), e);
   }
 
@@ -117,8 +117,9 @@ public class GlobalExceptionHandler {
     return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, code, null, e);
   }
 
-  private ResponseEntity<ErrorResponse> errorResponse(HttpStatus status,
-      CommonErrorCode code,
+  private ResponseEntity<ErrorResponse> errorResponse(
+      HttpStatus status,
+      ErrorCode code,
       Map<String,Object> details,
       Exception e
   ) {
@@ -126,7 +127,7 @@ public class GlobalExceptionHandler {
         .status(status)
         .body(new ErrorResponse(
             Instant.now(),
-            code.name(),
+            code.getCode(),
             code.getMessage(),
             details,
             e.getClass().getSimpleName(),

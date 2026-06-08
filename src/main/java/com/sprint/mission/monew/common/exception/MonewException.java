@@ -8,11 +8,11 @@ import org.springframework.http.HttpStatus;
 public abstract class MonewException extends RuntimeException {
 
   private final HttpStatus status;
-  private final CommonErrorCode errorCode;
+  private final ErrorCode errorCode;
   private final Map<String, Object> details;
 
   protected MonewException(HttpStatus status,
-      CommonErrorCode errorCode,
+      ErrorCode errorCode,
       Map<String, Object> details
   ) {
     super(errorCode.getMessage());
