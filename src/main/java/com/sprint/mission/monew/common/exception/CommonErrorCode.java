@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum CommonErrorCode implements ErrorCode {
 
+  UNAUTHORIZED("인증되지 않은 사용자입니다."),
   RESOURCE_NOT_FOUND("요청한 리소스를 찾을 수 없습니다."),
   METHOD_NOT_ALLOWED("지원하지 않는 HTTP 메서드입니다."),
   MESSAGE_NOT_READABLE("요청 본문을 읽을 수 없습니다."),
