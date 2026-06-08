@@ -1,10 +1,9 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
-import com.sprint.mission.monew.batch.scheduler.ArticleBackupScheduler;
 import com.sprint.mission.monew.batch.service.ArticleBackupService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

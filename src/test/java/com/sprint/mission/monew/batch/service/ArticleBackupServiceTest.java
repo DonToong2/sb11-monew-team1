@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.monew.batch.exception.ArticleBackupFailedException;
 import com.sprint.mission.monew.batch.metrics.ArticleBackupMetrics;
-import com.sprint.mission.monew.batch.service.ArticleBackupService;
 import com.sprint.mission.monew.batch.util.BatchGzipUtils;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;

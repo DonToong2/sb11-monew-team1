@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verify;
 
 import com.sprint.mission.monew.batch.dto.ArticleCandidate;
 import com.sprint.mission.monew.batch.metrics.NewsCollectMetrics;
-import com.sprint.mission.monew.batch.service.ArticleUpsertService;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleInterest;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
