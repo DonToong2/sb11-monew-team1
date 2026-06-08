@@ -31,6 +31,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
@@ -61,7 +62,7 @@ class UserIntegrationTest {
   @Autowired
   private PasswordResetTokenRepository passwordResetTokenRepository;
 
-  @MockBean
+  @MockitoBean
   private UserSessionRepository userSessionRepository;
 
   @BeforeEach
