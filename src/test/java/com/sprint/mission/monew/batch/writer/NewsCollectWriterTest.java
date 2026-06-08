@@ -10,7 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.sprint.mission.monew.batch.service.ArticleUpsertService;
-import com.sprint.mission.monew.batch.NewsCollectMetrics;
+import com.sprint.mission.monew.batch.metrics.NewsCollectMetrics;
 import com.sprint.mission.monew.batch.dto.NewsCollectItem;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.interest.service.InterestNotificationService;

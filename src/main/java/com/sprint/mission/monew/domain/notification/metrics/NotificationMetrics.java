@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.domain.notification.service;
+package com.sprint.mission.monew.domain.notification.metrics;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;

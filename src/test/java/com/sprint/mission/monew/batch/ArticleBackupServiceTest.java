@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.monew.batch.exception.ArticleBackupFailedException;
+import com.sprint.mission.monew.batch.metrics.ArticleBackupMetrics;
 import com.sprint.mission.monew.batch.service.ArticleBackupService;
 import com.sprint.mission.monew.batch.util.BatchGzipUtils;
 import com.sprint.mission.monew.domain.article.entity.Article;
@@ -48,7 +49,8 @@ class ArticleBackupServiceTest {
   @Mock ArticleRepository articleRepository;
   @Mock S3Client s3Client;
   @Spy ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-  @Mock ArticleBackupMetrics metrics;
+  @Mock
+  ArticleBackupMetrics metrics;
 
   @BeforeEach
   void setUp() {

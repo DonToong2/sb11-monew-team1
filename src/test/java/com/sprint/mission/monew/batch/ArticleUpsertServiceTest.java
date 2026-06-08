@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.sprint.mission.monew.batch.dto.ArticleCandidate;
+import com.sprint.mission.monew.batch.metrics.NewsCollectMetrics;
 import com.sprint.mission.monew.batch.service.ArticleUpsertService;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.entity.ArticleInterest;
@@ -38,7 +39,8 @@ class ArticleUpsertServiceTest {
   @Mock ArticleRepository articleRepository;
   @Mock ArticleInterestRepository articleInterestRepository;
   @Mock InterestRepository interestRepository;
-  @Mock NewsCollectMetrics newsCollectMetrics;
+  @Mock
+  NewsCollectMetrics newsCollectMetrics;
 
   @BeforeEach
   void setUp() {

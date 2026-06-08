@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.metrics;
 
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import io.micrometer.core.instrument.Counter;
