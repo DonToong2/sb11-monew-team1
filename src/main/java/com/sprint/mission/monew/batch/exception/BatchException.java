@@ -1,0 +1,14 @@
+package com.sprint.mission.monew.batch.exception;
+
+import lombok.Getter;
+
+@Getter
+public abstract class BatchException extends RuntimeException {
+
+  private final BatchErrorCode errorCode;
+
+  protected BatchException(BatchErrorCode errorCode, String detail, Throwable cause) {
+    super(errorCode.getMessage() + ": " + detail, cause);
+    this.errorCode = errorCode;
+  }
+}
