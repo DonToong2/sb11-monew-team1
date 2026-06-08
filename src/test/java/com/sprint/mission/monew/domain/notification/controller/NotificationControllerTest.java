@@ -15,6 +15,7 @@ import com.sprint.mission.monew.domain.notification.exception.NotificationNotFou
 import com.sprint.mission.monew.domain.notification.service.NotificationService;
 import com.sprint.mission.monew.domain.user.document.UserSession;
 import com.sprint.mission.monew.domain.user.repository.UserSessionRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -166,6 +167,23 @@ class NotificationControllerTest {
               get("/api/notifications")
                   .header("Monew-Request-User-ID", sessionToken)
           )
+          .andExpect(status().isBadRequest());
+
+      verifyNoInteractions(notificationService);
+    }
+
+    @Test
+    @DisplayName("cursor 형식이 Instant가 아니면 400을 반환한다")
+    void cursor_형식이_잘못되면_400을_반환한다() throws Exception {
+      // when & then
+      mockMvc
+          .perform(
+              get("/api/notifications")
+                  .header("Monew-Request-User-ID", sessionToken)
+                  .param("cursor", "not-an-instant")
+                  .param("after", Instant.now().toString())
+                  .param("idAfter", UUID.randomUUID().toString())
+                  .param("limit", "10"))
           .andExpect(status().isBadRequest());
 
       verifyNoInteractions(notificationService);
