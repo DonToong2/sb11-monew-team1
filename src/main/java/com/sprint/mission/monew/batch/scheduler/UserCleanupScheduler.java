@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.domain.user.scheduler;
+package com.sprint.mission.monew.batch.scheduler;
 
 import com.sprint.mission.monew.batch.service.UserCleanupService;
 import io.micrometer.core.annotation.Timed;

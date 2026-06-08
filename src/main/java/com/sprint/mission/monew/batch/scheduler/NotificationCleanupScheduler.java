@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.domain.notification.scheduler;
+package com.sprint.mission.monew.batch.scheduler;
 
 import com.sprint.mission.monew.batch.service.NotificationCleanupService;
 import io.micrometer.core.annotation.Timed;
