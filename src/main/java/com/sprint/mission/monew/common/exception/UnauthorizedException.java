@@ -1,9 +1,12 @@
 package com.sprint.mission.monew.common.exception;
 
-public class UnauthorizedException extends AuthException {
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+
+public class UnauthorizedException extends MonewException {
 
   private UnauthorizedException() {
-    super(ErrorCode.UNAUTHORIZED);
+    super(HttpStatus.UNAUTHORIZED, CommonErrorCode.UNAUTHORIZED, Map.of());
   }
 
   public static UnauthorizedException of() {

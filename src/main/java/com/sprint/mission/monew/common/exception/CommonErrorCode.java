@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum CommonErrorCode implements ErrorCode {
 
+  FORBIDDEN_ADMIN("관리자만 접근 가능합니다."),
   UNAUTHORIZED("인증되지 않은 사용자입니다."),
   RESOURCE_NOT_FOUND("요청한 리소스를 찾을 수 없습니다."),
   METHOD_NOT_ALLOWED("지원하지 않는 HTTP 메서드입니다."),
