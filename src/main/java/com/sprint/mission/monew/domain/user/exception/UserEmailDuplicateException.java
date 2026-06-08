@@ -15,8 +15,8 @@ public class UserEmailDuplicateException extends UserException {
 
   private static String mask(String email) {
     int at = email.indexOf("@");
-    if (at <= 1) {
-      return email.substring(at);
+    if (at <= 0) {
+      return "REDACTED";
     }
     return email.charAt(0) + "***" + email.substring(at);
   }
