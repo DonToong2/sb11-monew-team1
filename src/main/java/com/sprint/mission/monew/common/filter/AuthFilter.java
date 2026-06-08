@@ -1,5 +1,7 @@
 package com.sprint.mission.monew.common.filter;
 
+import com.sprint.mission.monew.common.exception.AuthException;
+import com.sprint.mission.monew.common.exception.ForbiddenAdminException;
 import com.sprint.mission.monew.common.exception.UnauthorizedException;
 import com.sprint.mission.monew.common.util.RequestUtils;
 import com.sprint.mission.monew.domain.user.document.UserSession;
@@ -50,8 +52,13 @@ public class AuthFilter implements Filter {
       new MethodPath(HttpMethod.POST, "/api/users/password/reset"),
       new MethodPath(HttpMethod.PATCH, "/api/users/password/reset"),
       new MethodPath(HttpMethod.POST, "/api/users/unlock"),
-      new MethodPath(HttpMethod.GET, "/api/users/unlock"),
-      new MethodPath(HttpMethod.DELETE, "/api/users/*/hard")
+      new MethodPath(HttpMethod.GET, "/api/users/unlock")
+  );
+
+  private static final List<MethodPath> ADMIN_ONLY = List.of(
+      new MethodPath(HttpMethod.DELETE, "/api/users/*/hard"),
+      new MethodPath(HttpMethod.DELETE, "/api/articles/*/hard"),
+      new MethodPath(HttpMethod.DELETE, "/api/comments/*/hard")
   );
 
   private final UserSessionRepository userSessionRepository;
@@ -59,6 +66,9 @@ public class AuthFilter implements Filter {
 
   @Value("${monew.session.timeout-minutes}")
   private int sessionTimeoutMinutes;
+
+  @Value("${monew.admin-token}")
+  private String adminToken;
 
   @Autowired
   public AuthFilter(UserSessionRepository userSessionRepository,
@@ -82,6 +92,16 @@ public class AuthFilter implements Filter {
 
     try {
       if (isExcluded(request.getMethod(), request.getRequestURI())) {
+        chain.doFilter(request, response);
+        return;
+      }
+
+      // Monew-Request-User-ID 헤더를 어드민 경로에서 정적 토큰으로 재사용 (의도된 설계)
+      if (isAdminOnly(request.getMethod(), request.getRequestURI())) {
+        String token = request.getHeader("Monew-Request-User-ID");
+        if (token == null || !token.equals(adminToken)) {
+          throw ForbiddenAdminException.of();
+        }
         chain.doFilter(request, response);
         return;
       }
@@ -115,7 +135,7 @@ public class AuthFilter implements Filter {
       session.refreshExpiry(sessionTimeoutMinutes);
       userSessionRepository.save(session);
       chain.doFilter(new UserIdHeaderWrapper(request, session.getUserId()), response);
-    } catch (UnauthorizedException e) {
+    } catch (AuthException e) {
       handlerExceptionResolver.resolveException(request, response, null, e);
     } finally {
       MDC.clear();
@@ -125,6 +145,12 @@ public class AuthFilter implements Filter {
   private boolean isExcluded(String method, String uri) {
     HttpMethod httpMethod = HttpMethod.valueOf(method);
     return EXCLUDED.stream()
+        .anyMatch(e -> e.method() == httpMethod && PATH_MATCHER.match(e.path(), uri));
+  }
+
+  private boolean isAdminOnly(String method, String uri) {
+    HttpMethod httpMethod = HttpMethod.valueOf(method);
+    return ADMIN_ONLY.stream()
         .anyMatch(e -> e.method() == httpMethod && PATH_MATCHER.match(e.path(), uri));
   }
 
