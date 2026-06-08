@@ -1,12 +1,12 @@
 package com.sprint.mission.monew.domain.interest.exception;
 
-import com.sprint.mission.monew.common.exception.ErrorCode;
+import com.sprint.mission.monew.common.exception.CommonErrorCode;
 import java.util.Map;
 
 public class InterestAlreadyExistsException extends InterestException {
 
   private InterestAlreadyExistsException(Map<String, Object> details) {
-    super(ErrorCode.INTEREST_ALREADY_EXISTS, details);
+    super(CommonErrorCode.INTEREST_ALREADY_EXISTS, details);
   }
 
   public static InterestAlreadyExistsException withName(String name) {

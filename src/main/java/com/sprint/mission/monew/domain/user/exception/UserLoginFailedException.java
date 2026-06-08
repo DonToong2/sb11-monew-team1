@@ -1,12 +1,12 @@
 package com.sprint.mission.monew.domain.user.exception;
 
-import com.sprint.mission.monew.common.exception.ErrorCode;
+import com.sprint.mission.monew.common.exception.CommonErrorCode;
 import java.util.Map;
 
 public class UserLoginFailedException extends UserException {
 
   private UserLoginFailedException(Map<String, Object> details) {
-    super(ErrorCode.USER_INVALID_PASSWORD, details);
+    super(CommonErrorCode.USER_INVALID_PASSWORD, details);
   }
 
   public static UserLoginFailedException withEmail() {

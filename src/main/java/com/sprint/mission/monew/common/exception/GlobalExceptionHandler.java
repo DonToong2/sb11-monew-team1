@@ -26,28 +26,28 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(NoResourceFoundException.class)
   public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException e) {
-    ErrorCode code = ErrorCode.RESOURCE_NOT_FOUND;
+    CommonErrorCode code = CommonErrorCode.RESOURCE_NOT_FOUND;
     log.warn("[{}] {}", code.name(), e.getMessage());
     return errorResponse(code, null, e);
   }
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
-    ErrorCode code = ErrorCode.METHOD_NOT_ALLOWED;
+    CommonErrorCode code = CommonErrorCode.METHOD_NOT_ALLOWED;
     log.warn("[{}] {}", code.name(), e.getMessage());
     return errorResponse(code, null, e);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorResponse> handleMessageNotReadable(HttpMessageNotReadableException e) {
-    ErrorCode code = ErrorCode.MESSAGE_NOT_READABLE;
+    CommonErrorCode code = CommonErrorCode.MESSAGE_NOT_READABLE;
     log.warn("[{}] {}", code.name(), e.getMessage());
     return errorResponse(code, null, e);
   }
 
   @ExceptionHandler(MissingRequestHeaderException.class)
   public ResponseEntity<ErrorResponse> handleMissingRequestHeader(MissingRequestHeaderException e) {
-    ErrorCode code = ErrorCode.VALIDATION_ERROR;
+    CommonErrorCode code = CommonErrorCode.VALIDATION_ERROR;
     Map<String, Object> details = Map.of("header", e.getHeaderName());
     log.warn("[{}] {}", code.name(), details);
     return errorResponse(code, details, e);
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MissingServletRequestParameterException.class)
   public ResponseEntity<ErrorResponse> handleMissingRequestParam(MissingServletRequestParameterException e) {
-    ErrorCode code = ErrorCode.VALIDATION_ERROR;
+    CommonErrorCode code = CommonErrorCode.VALIDATION_ERROR;
     Map<String, Object> details = Map.of(e.getParameterName(), "필수 파라미터입니다");
     log.warn("[{}] {}", code.name(), details);
     return errorResponse(code, details, e);
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
-    ErrorCode code = ErrorCode.TYPE_MISMATCH;
+    CommonErrorCode code = CommonErrorCode.TYPE_MISMATCH;
     Map<String, Object> details = Map.of(
         e.getName(),
         e.getRequiredType() != null ? e.getRequiredType().getSimpleName() + " 타입이어야 합니다" : "invalid type"
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
-    ErrorCode code = ErrorCode.VALIDATION_ERROR;
+    CommonErrorCode code = CommonErrorCode.VALIDATION_ERROR;
     Map<String, Object> details = e.getBindingResult().getFieldErrors().stream()
         .collect(Collectors.toMap(
             FieldError::getField,
@@ -98,7 +98,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(MonewException.class)
   public ResponseEntity<ErrorResponse> handleMonewException(MonewException e) {
-    ErrorCode code = e.getErrorCode();
+    CommonErrorCode code = e.getErrorCode();
     log.warn("[{}] {}", code.name(), e.getMessage());
     return errorResponse(code, e.getDetails(), e);
   }
@@ -110,13 +110,13 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleException(Exception e) {
-    ErrorCode code = ErrorCode.INTERNAL_ERROR;
+    CommonErrorCode code = CommonErrorCode.INTERNAL_ERROR;
     log.error("[{}] cause: {}, message: {}", code.name(), e.getClass().getSimpleName(),
         e.getCause() != null ? e.getCause().getMessage() : e.getMessage(), e);
     return errorResponse(code, null, e);
   }
 
-  private ResponseEntity<ErrorResponse> errorResponse(ErrorCode code, Map<String, Object> details, Exception e) {
+  private ResponseEntity<ErrorResponse> errorResponse(CommonErrorCode code, Map<String, Object> details, Exception e) {
     return ResponseEntity
         .status(code.getStatus())
         .body(new ErrorResponse(
