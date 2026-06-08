@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch;
+package com.sprint.mission.monew.batch.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
