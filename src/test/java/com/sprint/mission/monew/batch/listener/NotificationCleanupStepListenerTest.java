@@ -28,7 +28,7 @@ public class NotificationCleanupStepListenerTest {
 
   @Test
   @DisplayName("StepExecution writeCount를 metrics로 전달한다")
-  void step_listener_metrics_test() {
+  void step_listener_metrics_테스트() {
     // given
     given(stepExecution.getWriteCount()).willReturn(123L);
     given(stepExecution.getExitStatus()).willReturn(ExitStatus.COMPLETED);
