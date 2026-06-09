@@ -37,6 +37,19 @@ public interface CommentRepository extends JpaRepository<Comment, UUID>, Comment
       """)
   void decreaseLikeCount(UUID commentId);
 
+  @Query("""
+      SELECT new com.sprint.mission.monew.batch.dto.CommentCleanupItem(
+          c.id,
+          c.deletedAt
+      )
+      FROM Comment c
+      WHERE c.deletedAt < :threshold
+      AND (
+          c.deletedAt > :lastDeletedAt
+          OR (c.deletedAt = :lastDeletedAt AND c.id > :lastId)
+      )
+      ORDER BY c.deletedAt ASC, c.id ASC
+      """)
   List<CommentCleanupItem> findCommentsForCleanup(
       @Param("threshold") Instant threshold,
       @Param("lastDeletedAt") Instant lastDeletedAt,
