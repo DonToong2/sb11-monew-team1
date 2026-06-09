@@ -15,7 +15,12 @@ public class CommentCleanupStepListener implements StepExecutionListener {
 
   @Override
   public ExitStatus afterStep(StepExecution stepExecution) {
-    return null;
+
+    long deleted = stepExecution.getWriteCount();
+
+    commentCleanupMetrics.countDeleted(deleted);
+
+    return stepExecution.getExitStatus();
   }
 
 }

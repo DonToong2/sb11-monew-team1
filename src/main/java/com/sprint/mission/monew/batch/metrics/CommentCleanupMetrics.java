@@ -18,6 +18,6 @@ public class CommentCleanupMetrics {
   }
 
   public void countDeleted(long count) {
-    deletedCounter.increment(count); 
+    deletedCounter.increment(count);
   }
 }
