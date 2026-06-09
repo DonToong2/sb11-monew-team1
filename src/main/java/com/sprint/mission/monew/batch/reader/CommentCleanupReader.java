@@ -1,14 +1,18 @@
 package com.sprint.mission.monew.batch.reader;
 
 import com.sprint.mission.monew.batch.dto.CommentCleanupItem;
+import com.sprint.mission.monew.batch.dto.UserCleanupItem;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,7 +33,36 @@ public class CommentCleanupReader implements ItemReader<CommentCleanupItem> {
 
   @Override
   public CommentCleanupItem read() {
-    return null;
+
+    if (threshold == null) {
+      threshold = Instant.now().minus(Duration.ofDays(1));
+      lastDeletedAt = Instant.EPOCH;
+      lastId = new UUID(0L, 0L);
+    }
+
+    while (iterator == null || !iterator.hasNext()) {
+
+      List<CommentCleanupItem> items =
+          commentRepository.findCommentsForCleanup(
+              threshold,
+              lastDeletedAt,
+              lastId,
+              PageRequest.of(0, chunkSize)
+          );
+
+      if (items.isEmpty()) {
+        return null;
+      }
+
+      iterator = items.iterator();
+    }
+
+    CommentCleanupItem item = iterator.next();
+
+    lastDeletedAt = item.deletedAt();
+    lastId = item.id();
+
+    return item;
   }
 
 }
