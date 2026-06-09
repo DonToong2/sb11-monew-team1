@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.service;
 
+import com.sprint.mission.monew.batch.exception.CommentCleanupJobFailedException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -18,11 +19,14 @@ public class CommentCleanupService {
   @Qualifier("commentCleanupJob")
   private final Job commentCleanupJob;
 
-  public void executeCleanup() throws Exception {
+  public void executeCleanup() {
+    try {
     JobParameters params = new JobParametersBuilder()
         .addLong("time", Instant.now().toEpochMilli())
         .toJobParameters();
     jobLauncher.run(commentCleanupJob, params);
+  } catch (Exception e) {
+      throw CommentCleanupJobFailedException.wrap(e);
+    }
   }
-
 }
