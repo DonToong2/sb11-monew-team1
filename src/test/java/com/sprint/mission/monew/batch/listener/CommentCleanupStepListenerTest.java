@@ -28,7 +28,7 @@ public class CommentCleanupStepListenerTest {
 
   @Test
   @DisplayName("StepExecution writeCount를 metrics로 전달한다")
-  void step_listener_metrics_테스트() {
+  void 스텝_실행_후_메트릭스가_기록된다() {
 
     // given
     given(stepExecution.getWriteCount()).willReturn(123L);
