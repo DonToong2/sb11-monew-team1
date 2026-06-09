@@ -1,7 +1,10 @@
 package com.sprint.mission.monew.batch.service;
 
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -15,8 +18,11 @@ public class CommentCleanupService {
   @Qualifier("commentCleanupJob")
   private final Job commentCleanupJob;
 
-  public void executeCleanup() {
-
+  public void executeCleanup() throws Exception {
+    JobParameters params = new JobParametersBuilder()
+        .addLong("time", Instant.now().toEpochMilli())
+        .toJobParameters();
+    jobLauncher.run(commentCleanupJob, params);
   }
 
 }
