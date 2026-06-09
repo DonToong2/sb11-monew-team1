@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Profile("prod")
 @Slf4j
-@RequiredArgsConstructor
+@Profile("prod")
 @Component
+@RequiredArgsConstructor
 public class UserCleanupScheduler {
 
   private final UserCleanupService userCleanupService;
