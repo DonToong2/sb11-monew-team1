@@ -1,6 +1,7 @@
 package com.sprint.mission.monew.batch.config;
 
 import com.sprint.mission.monew.batch.dto.CommentCleanupItem;
+import com.sprint.mission.monew.batch.listener.CommentCleanupStepListener;
 import com.sprint.mission.monew.batch.reader.CommentCleanupReader;
 import com.sprint.mission.monew.batch.writer.CommentCleanupWriter;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class CommentCleanupJobConfig {
 
   private final CommentCleanupReader commentCleanupReader;
   private final CommentCleanupWriter commentCleanupWriter;
+  private final CommentCleanupStepListener commentCleanupStepListener;
 
   @Value("${batch.comment-cleanup.chunk-size}")
   private int chunkSize;
@@ -39,6 +41,7 @@ public class CommentCleanupJobConfig {
         .<CommentCleanupItem, CommentCleanupItem>chunk(chunkSize, transactionManager)
         .reader(commentCleanupReader)
         .writer(commentCleanupWriter)
+        .listener(commentCleanupStepListener)
         .build();
   }
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
+import com.sprint.mission.monew.batch.listener.CommentCleanupStepListener;
 import com.sprint.mission.monew.batch.reader.CommentCleanupReader;
 import com.sprint.mission.monew.batch.writer.CommentCleanupWriter;
 import com.sprint.mission.monew.batch.config.CommentCleanupJobConfig;
@@ -31,12 +32,14 @@ public class CommentCleanupJobConfigTest {
       // given
       CommentCleanupReader reader = mock(CommentCleanupReader.class);
       CommentCleanupWriter writer = mock(CommentCleanupWriter.class);
+      CommentCleanupStepListener listener = mock(CommentCleanupStepListener.class);
 
       CommentCleanupJobConfig config = new CommentCleanupJobConfig(
           jobRepository,
           transactionManager,
           reader,
-          writer
+          writer,
+          listener
       );
 
       var field = CommentCleanupJobConfig.class.getDeclaredField("chunkSize");
