@@ -1,11 +1,14 @@
 package com.sprint.mission.monew.common.config;
 
+import com.sprint.mission.monew.batch.dto.CommentCleanupItem;
 import com.sprint.mission.monew.batch.reader.CommentCleanupReader;
 import com.sprint.mission.monew.batch.writer.CommentCleanupWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,12 +29,17 @@ public class CommentCleanupJobConfig {
 
   @Bean(name = "commentCleanupJob")
   public Job commentCleanupJob() {
-    return null;
+    return new JobBuilder("commentCleanupJob", jobRepository)
+        .start(commentCleanupStep()).build();
   }
 
   @Bean
   public Step commentCleanupStep() {
-    return null;
+    return new StepBuilder("commentCleanupStep", jobRepository)
+        .<CommentCleanupItem, CommentCleanupItem>chunk(chunkSize, transactionManager)
+        .reader(commentCleanupReader)
+        .writer(commentCleanupWriter)
+        .build();
   }
 
 }
