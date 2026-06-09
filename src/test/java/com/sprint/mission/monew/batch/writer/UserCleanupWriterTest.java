@@ -31,8 +31,7 @@ public class UserCleanupWriterTest {
 
     @Test
     @DisplayName("chunk의 id만 추출해서 batch delete 한다")
-    void write_batch_delete() {
-
+    void chunk의_id만_추출하여_삭제() {
       // given
       UserCleanupItem item1 = new UserCleanupItem(UUID.randomUUID(), Instant.now());
       UserCleanupItem item2 = new UserCleanupItem(UUID.randomUUID(), Instant.now());

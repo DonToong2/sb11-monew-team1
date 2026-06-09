@@ -39,8 +39,7 @@ public class UserCleanupReaderTest {
 
     @Test
     @DisplayName("cursor 기반으로 chunk 단위로 데이터를 순차 조회한다")
-    void read_cursor_chunk_flow() {
-
+    void chunk_단위_cursor_기반으로_조회() {
       // given
       Instant now = Instant.now();
 

@@ -35,7 +35,6 @@ class UserCleanupServiceTest {
   @Test
   @DisplayName("Job 실행 실패 시 UserCleanupJobFailedException으로 감싼다")
   void UserCleanupJob_실행중_UserCleanupJobFailedException_예외_발생() throws Exception {
-
     // given
     when(jobLauncher.run(eq(userCleanupJob), any(JobParameters.class)))
         .thenThrow(new RuntimeException("batch fail"));
@@ -48,7 +47,6 @@ class UserCleanupServiceTest {
   @Test
   @DisplayName("userCleanupJob이 JobLauncher를 통해 정상 실행된다")
   void userCleanupJob이_JobLauncher를_통해_정상_실행된다() throws Exception {
-
     // given
     when(jobLauncher.run(any(Job.class), any(JobParameters.class)))
         .thenReturn(null);
