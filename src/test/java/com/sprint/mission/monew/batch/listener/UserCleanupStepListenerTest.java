@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import com.sprint.mission.monew.domain.user.metrics.UserMetrics;
+import com.sprint.mission.monew.batch.metrics.UserCleanupMetrics;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +18,7 @@ import org.springframework.batch.core.StepExecution;
 public class UserCleanupStepListenerTest {
 
   @Mock
-  UserMetrics userMetrics;
+  UserCleanupMetrics userMetrics;
 
   @InjectMocks
   UserCleanupStepListener listener;

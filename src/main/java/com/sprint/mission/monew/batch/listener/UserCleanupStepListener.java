@@ -1,6 +1,6 @@
 package com.sprint.mission.monew.batch.listener;
 
-import com.sprint.mission.monew.domain.user.metrics.UserMetrics;
+import com.sprint.mission.monew.batch.metrics.UserCleanupMetrics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserCleanupStepListener implements StepExecutionListener {
 
-  private final UserMetrics userMetrics;
+  private final UserCleanupMetrics userMetrics;
 
   @Override
   public ExitStatus afterStep(StepExecution stepExecution) {
