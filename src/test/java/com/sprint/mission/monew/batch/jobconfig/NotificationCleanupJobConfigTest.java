@@ -7,7 +7,7 @@ import static org.mockito.Mockito.mock;
 import com.sprint.mission.monew.batch.listener.NotificationCleanupStepListener;
 import com.sprint.mission.monew.batch.reader.NotificationCleanupReader;
 import com.sprint.mission.monew.batch.writer.NotificationCleanupWriter;
-import com.sprint.mission.monew.common.config.NotificationCleanupJobConfig;
+import com.sprint.mission.monew.batch.config.NotificationCleanupJobConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
