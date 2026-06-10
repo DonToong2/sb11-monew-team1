@@ -17,7 +17,7 @@ public class UserCleanupJobListener implements JobExecutionListener {
   private final UserCleanupMetrics userCleanupMetrics;
   @Override
   public void beforeJob(JobExecution jobExecution) {
-    log.info("Comment Cleanup Job 시작 | jobId={}, params={}",
+    log.info("User Cleanup Job 시작 | jobId={}, params={}",
         jobExecution.getId(),
         jobExecution.getJobParameters());
   }
