@@ -1,4 +1,7 @@
-package com.sprint.mission.monew.batch.exception;
+package com.sprint.mission.monew.batch.notification.cleanup.exception;
+
+import com.sprint.mission.monew.batch.exception.BatchErrorCode;
+import com.sprint.mission.monew.batch.exception.BatchException;
 
 public class NotificationCleanupJobFailedException extends BatchException {
 

@@ -1,6 +1,6 @@
 package com.sprint.mission.monew.batch.notification.cleanup.service;
 
-import com.sprint.mission.monew.batch.exception.NotificationCleanupJobFailedException;
+import com.sprint.mission.monew.batch.notification.cleanup.exception.NotificationCleanupJobFailedException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

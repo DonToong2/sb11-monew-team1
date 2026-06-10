@@ -1,6 +1,6 @@
 package com.sprint.mission.monew.batch.news.collect.service;
 
-import com.sprint.mission.monew.batch.exception.NewsCollectJobFailedException;
+import com.sprint.mission.monew.batch.news.collect.exception.NewsCollectJobFailedException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

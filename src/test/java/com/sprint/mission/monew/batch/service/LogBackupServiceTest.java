@@ -8,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sprint.mission.monew.batch.exception.LogBackupJobFailedException;
+import com.sprint.mission.monew.batch.log.backup.exception.LogBackupJobFailedException;
 import com.sprint.mission.monew.batch.log.backup.service.LogBackupService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

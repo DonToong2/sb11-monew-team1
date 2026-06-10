@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sprint.mission.monew.batch.comment.cleanup.service.CommentCleanupService;
-import com.sprint.mission.monew.batch.exception.CommentCleanupJobFailedException;
+import com.sprint.mission.monew.batch.comment.cleanup.exception.CommentCleanupJobFailedException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

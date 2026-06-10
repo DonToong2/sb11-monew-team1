@@ -8,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sprint.mission.monew.batch.exception.NotificationCleanupJobFailedException;
+import com.sprint.mission.monew.batch.notification.cleanup.exception.NotificationCleanupJobFailedException;
 import com.sprint.mission.monew.batch.notification.cleanup.service.NotificationCleanupService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package com.sprint.mission.monew.batch.log.backup.writer;
 
-import com.sprint.mission.monew.batch.exception.LogBackupFailedException;
+import com.sprint.mission.monew.batch.log.backup.exception.LogBackupFailedException;
 import com.sprint.mission.monew.batch.log.backup.dto.UploadPayload;
 import com.sprint.mission.monew.batch.log.backup.metrics.LogBackupMetrics;
 import java.time.Duration;

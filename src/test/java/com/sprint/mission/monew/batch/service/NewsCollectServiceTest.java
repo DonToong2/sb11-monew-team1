@@ -8,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sprint.mission.monew.batch.exception.NewsCollectJobFailedException;
+import com.sprint.mission.monew.batch.news.collect.exception.NewsCollectJobFailedException;
 import com.sprint.mission.monew.batch.news.collect.service.NewsCollectService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

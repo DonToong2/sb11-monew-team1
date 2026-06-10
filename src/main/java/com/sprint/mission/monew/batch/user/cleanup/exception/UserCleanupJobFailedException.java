@@ -1,4 +1,7 @@
-package com.sprint.mission.monew.batch.exception;
+package com.sprint.mission.monew.batch.user.cleanup.exception;
+
+import com.sprint.mission.monew.batch.exception.BatchErrorCode;
+import com.sprint.mission.monew.batch.exception.BatchException;
 
 public class UserCleanupJobFailedException extends BatchException {
 

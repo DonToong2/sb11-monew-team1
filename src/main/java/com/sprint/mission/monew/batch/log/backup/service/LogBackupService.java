@@ -1,6 +1,6 @@
 package com.sprint.mission.monew.batch.log.backup.service;
 
-import com.sprint.mission.monew.batch.exception.LogBackupJobFailedException;
+import com.sprint.mission.monew.batch.log.backup.exception.LogBackupJobFailedException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

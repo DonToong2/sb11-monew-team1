@@ -8,7 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.sprint.mission.monew.batch.exception.LogBackupFailedException;
+import com.sprint.mission.monew.batch.log.backup.exception.LogBackupFailedException;
 import com.sprint.mission.monew.batch.log.backup.metrics.LogBackupMetrics;
 import com.sprint.mission.monew.batch.log.backup.writer.LogBackupWriter;
 import com.sprint.mission.monew.batch.log.backup.dto.UploadPayload;
