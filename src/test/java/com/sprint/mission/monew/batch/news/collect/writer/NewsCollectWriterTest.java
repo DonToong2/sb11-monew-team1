@@ -70,31 +70,6 @@ public class NewsCollectWriterTest {
     }
 
     @Test
-    @DisplayName("메트릭 기록 실패 시 예외를 전파하지 않는다")
-    void 메트릭_기록_실패_시_예외를_전파하지_않는다() {
-      // given
-      NewsCollectItem item = new NewsCollectItem(
-          ArticleSource.HANKYUNG,
-          "https://hankyung.com/1",
-          "한경 기사",
-          Instant.now(),
-          "요약");
-
-      Chunk<NewsCollectItem> chunk = new Chunk<>(List.of(item));
-
-      willThrow(new RuntimeException("metric fail"))
-          .given(newsCollectMetrics)
-          .recordCollectDuration(any());
-
-      // when
-      writer.write(chunk);
-
-      // then
-      verify(articleUpsertService).upsertAll(eq(ArticleSource.HANKYUNG), anyList());
-      verify(interestNotificationService).notifyNewArticles(any());
-    }
-
-    @Test
     @DisplayName("알림 전송 실패 시 예외를 전파하지 않는다")
     void 알림_전송_실패_시_예외를_전파하지_않는다() {
       // given

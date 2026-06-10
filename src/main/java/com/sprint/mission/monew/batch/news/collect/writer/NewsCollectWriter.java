@@ -6,7 +6,6 @@ import com.sprint.mission.monew.batch.news.collect.dto.NewsCollectItem;
 import com.sprint.mission.monew.batch.news.collect.service.ArticleUpsertService;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.domain.interest.service.InterestNotificationService;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -30,7 +29,6 @@ public class NewsCollectWriter implements ItemWriter<NewsCollectItem> {
   @Override
   public void write(Chunk<? extends NewsCollectItem> chunk) {
 
-    long start = System.nanoTime();
     Instant batchStartTime = Instant.now();
 
     Map<ArticleSource, List<ArticleCandidate>> grouped =
@@ -64,15 +62,6 @@ public class NewsCollectWriter implements ItemWriter<NewsCollectItem> {
         log.error("{} 뉴스 수집 실패", source, e);
       }
     });
-
-    try {
-      newsCollectMetrics.recordCollectDuration(Duration.ofNanos(System.nanoTime() - start));
-
-      log.info("뉴스 수집 writer 완료 | sources={}", grouped.keySet());
-
-    } catch (Exception e) {
-      log.error("뉴스 수집 메트릭 기록 실패", e);
-    }
 
     try {
       interestNotificationService.notifyNewArticles(batchStartTime);

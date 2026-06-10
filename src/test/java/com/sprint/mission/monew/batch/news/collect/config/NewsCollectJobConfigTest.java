@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
+import com.sprint.mission.monew.batch.news.collect.listener.NewsCollectStepListener;
 import com.sprint.mission.monew.batch.news.collect.reader.NewsCollectReader;
 import com.sprint.mission.monew.batch.news.collect.writer.NewsCollectWriter;
 import org.junit.jupiter.api.DisplayName;
@@ -30,12 +31,14 @@ class NewsCollectJobConfigTest {
       // given
       NewsCollectReader reader = mock(NewsCollectReader.class);
       NewsCollectWriter writer = mock(NewsCollectWriter.class);
+      NewsCollectStepListener listener = mock(NewsCollectStepListener.class);
 
       NewsCollectJobConfig config = new NewsCollectJobConfig(
           jobRepository,
           transactionManager,
           reader,
-          writer
+          writer,
+          listener
       );
 
       var field = NewsCollectJobConfig.class.getDeclaredField("chunkSize");

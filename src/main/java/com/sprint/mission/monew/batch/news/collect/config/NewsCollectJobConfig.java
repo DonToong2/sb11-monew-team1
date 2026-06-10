@@ -1,6 +1,7 @@
 package com.sprint.mission.monew.batch.news.collect.config;
 
 import com.sprint.mission.monew.batch.news.collect.dto.NewsCollectItem;
+import com.sprint.mission.monew.batch.news.collect.listener.NewsCollectStepListener;
 import com.sprint.mission.monew.batch.news.collect.reader.NewsCollectReader;
 import com.sprint.mission.monew.batch.news.collect.writer.NewsCollectWriter;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class NewsCollectJobConfig {
 
   private final NewsCollectReader newsCollectReader;
   private final NewsCollectWriter newsCollectWriter;
+  private final NewsCollectStepListener newsCollectStepListener;
 
   @Value("${batch.news-collect.chunk-size}")
   private int chunkSize;
@@ -39,6 +41,7 @@ public class NewsCollectJobConfig {
         .<NewsCollectItem, NewsCollectItem>chunk(chunkSize, transactionManager)
         .reader(newsCollectReader)
         .writer(newsCollectWriter)
+        .listener(newsCollectStepListener)
         .build();
   }
 }
