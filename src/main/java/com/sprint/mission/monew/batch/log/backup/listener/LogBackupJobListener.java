@@ -18,7 +18,7 @@ public class LogBackupJobListener implements JobExecutionListener {
 
   @Override
   public void beforeJob(JobExecution jobExecution) {
-    log.info("Log Backup Job START | jobId={}, params={}",
+    log.info("Log Backup Job 시작 | jobId={}, params={}",
         jobExecution.getId(),
         jobExecution.getJobParameters());
   }
