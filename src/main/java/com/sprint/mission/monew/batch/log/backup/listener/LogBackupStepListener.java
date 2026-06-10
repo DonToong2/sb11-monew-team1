@@ -4,11 +4,13 @@ import com.sprint.mission.monew.batch.log.backup.metrics.LogBackupMetrics;
 import java.time.Duration;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class LogBackupStepListener implements StepExecutionListener {
@@ -24,6 +26,8 @@ public class LogBackupStepListener implements StepExecutionListener {
     );
 
     logBackupMetrics.recordDuration(duration);
+
+    log.info("Log Backup Step 완료 | duration={}", duration);
 
     return stepExecution.getExitStatus();
   }
