@@ -2,7 +2,8 @@ package com.sprint.mission.monew.batch.writer;
 
 import static org.mockito.Mockito.verify;
 
-import com.sprint.mission.monew.batch.dto.CommentCleanupItem;
+import com.sprint.mission.monew.batch.comment.cleanup.dto.CommentCleanupItem;
+import com.sprint.mission.monew.batch.comment.cleanup.writer.CommentCleanupWriter;
 import com.sprint.mission.monew.domain.comment.repository.CommentRepository;
 import java.time.Instant;
 import java.util.List;

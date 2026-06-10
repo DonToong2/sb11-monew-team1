@@ -1,6 +1,6 @@
 package com.sprint.mission.monew.domain.notification.repository;
 
-import com.sprint.mission.monew.batch.dto.NotificationCleanupItem;
+import com.sprint.mission.monew.batch.notification.cleanup.dto.NotificationCleanupItem;
 import com.sprint.mission.monew.domain.notification.entity.Notification;
 import com.sprint.mission.monew.domain.notification.repository.querydsl.NotificationCustomRepository;
 import java.time.Instant;

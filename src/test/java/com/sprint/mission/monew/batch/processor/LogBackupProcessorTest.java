@@ -2,8 +2,9 @@ package com.sprint.mission.monew.batch.processor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sprint.mission.monew.batch.dto.LogContent;
-import com.sprint.mission.monew.batch.dto.UploadPayload;
+import com.sprint.mission.monew.batch.log.backup.processor.LogBackupProcessor;
+import com.sprint.mission.monew.batch.log.backup.dto.LogContent;
+import com.sprint.mission.monew.batch.log.backup.dto.UploadPayload;
 import com.sprint.mission.monew.batch.util.BatchGzipUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

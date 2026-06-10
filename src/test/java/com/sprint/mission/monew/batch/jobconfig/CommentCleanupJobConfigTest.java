@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-import com.sprint.mission.monew.batch.listener.CommentCleanupStepListener;
-import com.sprint.mission.monew.batch.reader.CommentCleanupReader;
-import com.sprint.mission.monew.batch.writer.CommentCleanupWriter;
-import com.sprint.mission.monew.batch.config.CommentCleanupJobConfig;
+import com.sprint.mission.monew.batch.comment.cleanup.listener.CommentCleanupStepListener;
+import com.sprint.mission.monew.batch.comment.cleanup.reader.CommentCleanupReader;
+import com.sprint.mission.monew.batch.comment.cleanup.writer.CommentCleanupWriter;
+import com.sprint.mission.monew.batch.comment.cleanup.config.CommentCleanupJobConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

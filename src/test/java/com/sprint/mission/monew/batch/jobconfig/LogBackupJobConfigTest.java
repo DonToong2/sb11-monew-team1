@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-import com.sprint.mission.monew.batch.processor.LogBackupProcessor;
-import com.sprint.mission.monew.batch.reader.LogBackupReader;
-import com.sprint.mission.monew.batch.writer.LogBackupWriter;
-import com.sprint.mission.monew.batch.config.LogBackupJobConfig;
+import com.sprint.mission.monew.batch.log.backup.processor.LogBackupProcessor;
+import com.sprint.mission.monew.batch.log.backup.reader.LogBackupReader;
+import com.sprint.mission.monew.batch.log.backup.writer.LogBackupWriter;
+import com.sprint.mission.monew.batch.log.backup.config.LogBackupJobConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

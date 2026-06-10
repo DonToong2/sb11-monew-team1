@@ -2,7 +2,8 @@ package com.sprint.mission.monew.batch.scheduler;
 
 import static org.mockito.BDDMockito.then;
 
-import com.sprint.mission.monew.batch.service.NewsCollectService;
+import com.sprint.mission.monew.batch.news.collect.scheduler.NewsCollectScheduler;
+import com.sprint.mission.monew.batch.news.collect.service.NewsCollectService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

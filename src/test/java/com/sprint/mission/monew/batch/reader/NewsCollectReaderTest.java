@@ -7,8 +7,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sprint.mission.monew.batch.metrics.NewsCollectMetrics;
-import com.sprint.mission.monew.batch.dto.NewsCollectItem;
+import com.sprint.mission.monew.batch.news.collect.metrics.NewsCollectMetrics;
+import com.sprint.mission.monew.batch.news.collect.dto.NewsCollectItem;
+import com.sprint.mission.monew.batch.news.collect.reader.NewsCollectReader;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import com.sprint.mission.monew.external.naver.NaverNewsClient;
 import com.sprint.mission.monew.external.naver.dto.NaverNewsItem;

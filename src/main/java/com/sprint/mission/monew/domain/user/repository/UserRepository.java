@@ -1,12 +1,11 @@
 package com.sprint.mission.monew.domain.user.repository;
 
-import com.sprint.mission.monew.batch.dto.UserCleanupItem;
+import com.sprint.mission.monew.batch.user.cleanup.dto.UserCleanupItem;
 import com.sprint.mission.monew.domain.user.entity.User;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

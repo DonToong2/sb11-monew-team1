@@ -2,7 +2,8 @@ package com.sprint.mission.monew.batch.scheduler;
 
 import static org.mockito.BDDMockito.then;
 
-import com.sprint.mission.monew.batch.service.CommentCleanupService;
+import com.sprint.mission.monew.batch.comment.cleanup.scheduler.CommentCleanupScheduler;
+import com.sprint.mission.monew.batch.comment.cleanup.service.CommentCleanupService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

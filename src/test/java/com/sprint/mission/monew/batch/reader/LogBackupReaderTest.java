@@ -6,7 +6,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.sprint.mission.monew.batch.dto.LogContent;
+import com.sprint.mission.monew.batch.log.backup.reader.LogBackupReader;
+import com.sprint.mission.monew.batch.log.backup.dto.LogContent;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneOffset;

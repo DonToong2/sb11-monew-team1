@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-import com.sprint.mission.monew.batch.dto.NotificationCleanupItem;
+import com.sprint.mission.monew.batch.notification.cleanup.dto.NotificationCleanupItem;
+import com.sprint.mission.monew.batch.notification.cleanup.reader.NotificationCleanupReader;
 import com.sprint.mission.monew.domain.notification.repository.NotificationRepository;
 import java.time.Instant;
 import java.util.List;

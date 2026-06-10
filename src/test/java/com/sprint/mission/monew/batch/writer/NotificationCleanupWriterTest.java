@@ -2,7 +2,8 @@ package com.sprint.mission.monew.batch.writer;
 
 import static org.mockito.Mockito.verify;
 
-import com.sprint.mission.monew.batch.dto.NotificationCleanupItem;
+import com.sprint.mission.monew.batch.notification.cleanup.dto.NotificationCleanupItem;
+import com.sprint.mission.monew.batch.notification.cleanup.writer.NotificationCleanupWriter;
 import com.sprint.mission.monew.domain.notification.repository.NotificationRepository;
 import java.time.Instant;
 import java.util.List;

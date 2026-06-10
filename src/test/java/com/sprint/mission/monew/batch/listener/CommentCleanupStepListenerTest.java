@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import com.sprint.mission.monew.batch.metrics.CommentCleanupMetrics;
+import com.sprint.mission.monew.batch.comment.cleanup.listener.CommentCleanupStepListener;
+import com.sprint.mission.monew.batch.comment.cleanup.metrics.CommentCleanupMetrics;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 
 import org.mockito.ArgumentCaptor;
 
-import com.sprint.mission.monew.batch.metrics.LogBackupMetrics;
+import com.sprint.mission.monew.batch.log.backup.metrics.LogBackupMetrics;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;

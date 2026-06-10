@@ -2,7 +2,8 @@ package com.sprint.mission.monew.batch.writer;
 
 import static org.mockito.Mockito.verify;
 
-import com.sprint.mission.monew.batch.dto.UserCleanupItem;
+import com.sprint.mission.monew.batch.user.cleanup.dto.UserCleanupItem;
+import com.sprint.mission.monew.batch.user.cleanup.writer.UserCleanupWriter;
 import com.sprint.mission.monew.domain.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.List;

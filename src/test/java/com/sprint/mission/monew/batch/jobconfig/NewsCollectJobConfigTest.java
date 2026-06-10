@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-import com.sprint.mission.monew.batch.reader.NewsCollectReader;
-import com.sprint.mission.monew.batch.writer.NewsCollectWriter;
-import com.sprint.mission.monew.batch.config.NewsCollectJobConfig;
+import com.sprint.mission.monew.batch.news.collect.reader.NewsCollectReader;
+import com.sprint.mission.monew.batch.news.collect.writer.NewsCollectWriter;
+import com.sprint.mission.monew.batch.news.collect.config.NewsCollectJobConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

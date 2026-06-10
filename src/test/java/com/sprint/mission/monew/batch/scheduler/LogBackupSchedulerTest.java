@@ -2,7 +2,8 @@ package com.sprint.mission.monew.batch.scheduler;
 
 import static org.mockito.BDDMockito.then;
 
-import com.sprint.mission.monew.batch.service.LogBackupService;
+import com.sprint.mission.monew.batch.log.backup.scheduler.LogBackupScheduler;
+import com.sprint.mission.monew.batch.log.backup.service.LogBackupService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
