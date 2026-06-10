@@ -48,9 +48,9 @@ public class ArticleBackupJobListener implements JobExecutionListener {
 
       articleBackupMetrics.recordDuration(duration);
 
-      log.info("Log Backup Job duration={}", duration);
+      log.info("Article Backup Job duration={}", duration);
     } else {
-      log.warn("Log Backup Job 시간 정보 누락 | start={}, end={}",
+      log.warn("Article Backup Job 시간 정보 누락 | start={}, end={}",
           jobExecution.getStartTime(),
           jobExecution.getEndTime());
     }
