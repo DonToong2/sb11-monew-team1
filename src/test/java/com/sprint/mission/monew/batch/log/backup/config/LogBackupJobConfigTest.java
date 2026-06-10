@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
+import com.sprint.mission.monew.batch.log.backup.listener.LogBackupStepListener;
 import com.sprint.mission.monew.batch.log.backup.processor.LogBackupProcessor;
 import com.sprint.mission.monew.batch.log.backup.reader.LogBackupReader;
 import com.sprint.mission.monew.batch.log.backup.writer.LogBackupWriter;
@@ -32,13 +33,15 @@ class LogBackupJobConfigTest {
       LogBackupReader reader = mock(LogBackupReader.class);
       LogBackupProcessor processor = mock(LogBackupProcessor.class);
       LogBackupWriter writer = mock(LogBackupWriter.class);
+      LogBackupStepListener listener = mock(LogBackupStepListener.class);
 
       LogBackupJobConfig config = new LogBackupJobConfig(
           jobRepository,
           transactionManager,
           reader,
           processor,
-          writer
+          writer,
+          listener
       );
 
       // when

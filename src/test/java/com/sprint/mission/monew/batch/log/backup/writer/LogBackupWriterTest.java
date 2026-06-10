@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verify;
 import com.sprint.mission.monew.batch.log.backup.exception.LogBackupFailedException;
 import com.sprint.mission.monew.batch.log.backup.metrics.LogBackupMetrics;
 import com.sprint.mission.monew.batch.log.backup.dto.UploadPayload;
-import java.time.Duration;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
@@ -126,7 +125,6 @@ class LogBackupWriterTest {
       // then
       verify(metrics).countUploaded();
       verify(metrics).recordBytes(anyLong());
-      verify(metrics).recordDuration(any(Duration.class));
     }
   }
 }

@@ -3,7 +3,6 @@ package com.sprint.mission.monew.batch.log.backup.writer;
 import com.sprint.mission.monew.batch.log.backup.exception.LogBackupFailedException;
 import com.sprint.mission.monew.batch.log.backup.dto.UploadPayload;
 import com.sprint.mission.monew.batch.log.backup.metrics.LogBackupMetrics;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
@@ -29,9 +28,6 @@ public class LogBackupWriter implements ItemWriter<UploadPayload> {
   @Override
   public void write(Chunk<? extends UploadPayload> chunk) {
 
-    long start = System.nanoTime();
-
-    try {
       for (UploadPayload item : chunk) {
 
         if (exists(item.s3Key())) {
@@ -42,9 +38,6 @@ public class LogBackupWriter implements ItemWriter<UploadPayload> {
 
         doUpload(item);
       }
-    } finally {
-      metrics.recordDuration(Duration.ofNanos(System.nanoTime() - start));
-    }
   }
 
   private boolean exists(String key) {

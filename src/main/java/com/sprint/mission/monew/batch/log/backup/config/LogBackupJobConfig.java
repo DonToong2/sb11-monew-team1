@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.log.backup.config;
 
+import com.sprint.mission.monew.batch.log.backup.listener.LogBackupStepListener;
 import com.sprint.mission.monew.batch.log.backup.processor.LogBackupProcessor;
 import com.sprint.mission.monew.batch.log.backup.reader.LogBackupReader;
 import com.sprint.mission.monew.batch.log.backup.writer.LogBackupWriter;
@@ -26,6 +27,7 @@ public class LogBackupJobConfig {
   private final LogBackupReader logBackupReader;
   private final LogBackupProcessor logBackupProcessor;
   private final LogBackupWriter logBackupWriter;
+  private final LogBackupStepListener logBackupStepListener;
 
   @Value("${batch.log-backup.chunk-size}")
   private int chunkSize;
@@ -44,6 +46,7 @@ public class LogBackupJobConfig {
         .reader(logBackupReader)
         .processor(logBackupProcessor)
         .writer(logBackupWriter)
+        .listener(logBackupStepListener)
         .build();
   }
 }
