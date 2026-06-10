@@ -20,9 +20,16 @@ public class ArticleBackupStepListener implements StepExecutionListener {
   @Override
   public ExitStatus afterStep(StepExecution stepExecution) {
 
+    if (stepExecution.getStartTime() == null || stepExecution.getEndTime() == null) {
+      log.warn("Article Backup Step 시간 정보 누락 | startTime={}, endTime={}",
+          stepExecution.getStartTime(), stepExecution.getEndTime());
+
+      return stepExecution.getExitStatus();
+    }
+
     Duration duration = Duration.between(
-        Objects.requireNonNull(stepExecution.getStartTime()),
-        Objects.requireNonNull(stepExecution.getEndTime())
+        stepExecution.getStartTime(),
+        stepExecution.getEndTime()
     );
 
     try {
