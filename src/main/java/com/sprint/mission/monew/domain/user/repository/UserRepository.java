@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   int deleteAllByDeletedAtBefore(@Param("threshold") Instant threshold);
 
   @Query("""
-      SELECT new com.sprint.mission.monew.batch.dto.UserCleanupItem(
+      SELECT new com.sprint.mission.monew.batch.user.cleanup.dto.UserCleanupItem(
           u.id,
           u.deletedAt
       )

@@ -32,7 +32,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
   int deleteConfirmedBefore(@Param("cutoff") Instant cutoff);
 
   @Query("""
-    SELECT new com.sprint.mission.monew.batch.dto.NotificationCleanupItem(
+    SELECT new com.sprint.mission.monew.batch.notification.cleanup.dto.NotificationCleanupItem(
         n.id,
         n.confirmedAt
     )

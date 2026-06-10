@@ -38,7 +38,7 @@ public interface CommentRepository extends JpaRepository<Comment, UUID>, Comment
   void decreaseLikeCount(UUID commentId);
 
   @Query("""
-      SELECT new com.sprint.mission.monew.batch.dto.CommentCleanupItem(
+      SELECT new com.sprint.mission.monew.batch.comment.cleanup.dto.CommentCleanupItem(
           c.id,
           c.deletedAt
       )
