@@ -25,7 +25,11 @@ public class ArticleBackupStepListener implements StepExecutionListener {
         Objects.requireNonNull(stepExecution.getEndTime())
     );
 
-    articleBackupMetrics.recordDuration(duration);
+    try {
+      articleBackupMetrics.recordDuration(duration);
+    } catch (Exception e) {
+      log.warn("메트릭 기록 실패 (배치는 계속 진행)", e);
+    }
 
     log.info("Article Backup Step 완료 | duration={}", duration);
 

@@ -20,11 +20,14 @@ public class CommentCleanupStepListener implements StepExecutionListener {
 
     long deleted = stepExecution.getWriteCount();
 
-    commentCleanupMetrics.countDeleted(deleted);
+    try {
+      commentCleanupMetrics.countDeleted(deleted);
+    } catch (Exception e) {
+      log.warn("메트릭 기록 실패 (배치는 계속 진행)", e);
+    }
 
     log.info("Comment Cleanup Step 완료 | deleted={}", deleted);
 
     return stepExecution.getExitStatus();
   }
-
 }

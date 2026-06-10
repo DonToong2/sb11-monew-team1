@@ -25,11 +25,14 @@ public class LogBackupStepListener implements StepExecutionListener {
         Objects.requireNonNull(stepExecution.getEndTime())
     );
 
-    logBackupMetrics.recordDuration(duration);
+    try {
+      logBackupMetrics.recordDuration(duration);
+    } catch (Exception e) {
+      log.warn("메트릭 기록 실패 (배치는 계속 진행)", e);
+    }
 
     log.info("Log Backup Step 완료 | duration={}", duration);
 
     return stepExecution.getExitStatus();
   }
-
 }

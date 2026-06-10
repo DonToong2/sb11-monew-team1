@@ -20,11 +20,14 @@ public class NotificationCleanupStepListener implements StepExecutionListener {
 
     long deleted = stepExecution.getWriteCount();
 
-    notificationMetrics.countDeleted(deleted);
+    try {
+      notificationMetrics.countDeleted(deleted);
+    } catch (Exception e) {
+      log.warn("메트릭 기록 실패 (배치는 계속 진행)", e);
+    }
 
     log.info("Notification Cleanup Step 완료 | deleted={}", deleted);
 
     return stepExecution.getExitStatus();
   }
-
 }
