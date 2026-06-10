@@ -47,7 +47,7 @@ public class NewsCollectStepListenerTest {
     // then
     then(newsCollectMetrics)
         .should()
-        .recordCollectDuration(Duration.ofSeconds(5));
+        .recordStepDuration(Duration.ofSeconds(5));
 
     assertThat(result).isEqualTo(ExitStatus.FAILED);
   }
@@ -66,13 +66,13 @@ public class NewsCollectStepListenerTest {
 
     doThrow(new RuntimeException("metrics fail"))
         .when(newsCollectMetrics)
-        .recordCollectDuration(Duration.ofSeconds(5));
+        .recordStepDuration(Duration.ofSeconds(5));
 
     // when
     ExitStatus result = listener.afterStep(stepExecution);
 
     // then
-    then(newsCollectMetrics).should().recordCollectDuration(Duration.ofSeconds(5));
+    then(newsCollectMetrics).should().recordStepDuration(Duration.ofSeconds(5));
     assertThat(result).isEqualTo(ExitStatus.COMPLETED);
   }
 
@@ -92,7 +92,7 @@ public class NewsCollectStepListenerTest {
     ExitStatus result = listener.afterStep(stepExecution);
 
     // then
-    then(newsCollectMetrics).should().recordCollectDuration(Duration.ofSeconds(5));
+    then(newsCollectMetrics).should().recordStepDuration(Duration.ofSeconds(5));
     assertThat(result).isEqualTo(ExitStatus.COMPLETED);
   }
 }

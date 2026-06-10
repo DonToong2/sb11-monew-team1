@@ -46,7 +46,7 @@ public class ArticleBackupJobListener implements JobExecutionListener {
           jobExecution.getEndTime()
       );
 
-      articleBackupMetrics.recordDuration(duration);
+      articleBackupMetrics.recordJobDuration(duration);
 
       log.info("Article Backup Job duration={}", duration);
     } else {

@@ -46,7 +46,7 @@ public class LogBackupJobListener implements JobExecutionListener {
           jobExecution.getEndTime()
       );
 
-      logBackupMetrics.recordDuration(duration);
+      logBackupMetrics.recordJobDuration(duration);
 
       log.info("Log Backup Job duration={}", duration);
     } else {

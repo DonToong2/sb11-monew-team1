@@ -47,7 +47,7 @@ public class LogBackupStepListenerTest {
     // then
     then(logBackupMetrics)
         .should()
-        .recordDuration(Duration.ofSeconds(5));
+        .recordStepDuration(Duration.ofSeconds(5));
 
     assertThat(result).isEqualTo(ExitStatus.FAILED);
   }
@@ -66,13 +66,13 @@ public class LogBackupStepListenerTest {
 
     doThrow(new RuntimeException("metrics fail"))
         .when(logBackupMetrics)
-        .recordDuration(Duration.ofSeconds(5));
+        .recordStepDuration(Duration.ofSeconds(5));
 
     // when
     ExitStatus result = listener.afterStep(stepExecution);
 
     // then
-    then(logBackupMetrics).should().recordDuration(Duration.ofSeconds(5));
+    then(logBackupMetrics).should().recordStepDuration(Duration.ofSeconds(5));
     assertThat(result).isEqualTo(ExitStatus.COMPLETED);
   }
 
@@ -92,7 +92,7 @@ public class LogBackupStepListenerTest {
     ExitStatus result = listener.afterStep(stepExecution);
 
     // then
-    then(logBackupMetrics).should().recordDuration(Duration.ofSeconds(5));
+    then(logBackupMetrics).should().recordStepDuration(Duration.ofSeconds(5));
     assertThat(result).isEqualTo(ExitStatus.COMPLETED);
   }
 }

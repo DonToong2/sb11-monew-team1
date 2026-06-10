@@ -49,7 +49,7 @@ public class ArticleBackupStepListenerTest {
     // then
     then(articleBackupMetrics)
         .should()
-        .recordDuration(Duration.ofSeconds(5));
+        .recordStepDuration(Duration.ofSeconds(5));
 
     assertThat(result).isEqualTo(ExitStatus.FAILED);
   }
@@ -68,13 +68,13 @@ public class ArticleBackupStepListenerTest {
 
     doThrow(new RuntimeException("metrics fail"))
         .when(articleBackupMetrics)
-        .recordDuration(Duration.ofSeconds(5));
+        .recordStepDuration(Duration.ofSeconds(5));
 
     // when
     ExitStatus result = listener.afterStep(stepExecution);
 
     // then
-    then(articleBackupMetrics).should().recordDuration(Duration.ofSeconds(5));
+    then(articleBackupMetrics).should().recordStepDuration(Duration.ofSeconds(5));
     assertThat(result).isEqualTo(ExitStatus.COMPLETED);
   }
 
@@ -94,7 +94,7 @@ public class ArticleBackupStepListenerTest {
     ExitStatus result = listener.afterStep(stepExecution);
 
     // then
-    then(articleBackupMetrics).should().recordDuration(Duration.ofSeconds(5));
+    then(articleBackupMetrics).should().recordStepDuration(Duration.ofSeconds(5));
     assertThat(result).isEqualTo(ExitStatus.COMPLETED);
   }
 }

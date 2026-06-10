@@ -46,7 +46,7 @@ public class NewsCollectJobListener implements JobExecutionListener {
           jobExecution.getEndTime()
       );
 
-      newsCollectMetrics.recordCollectDuration(duration);
+      newsCollectMetrics.recordJobDuration(duration);
 
       log.info("News Collect Job duration={}", duration);
     } else {
