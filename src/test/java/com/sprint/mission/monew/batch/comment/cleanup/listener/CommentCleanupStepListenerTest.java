@@ -5,6 +5,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import com.sprint.mission.monew.batch.comment.cleanup.metrics.CommentCleanupMetrics;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +33,11 @@ public class CommentCleanupStepListenerTest {
   void 스텝_실행_후_메트릭스가_기록된다() {
 
     // given
+    LocalDateTime start = LocalDateTime.of(2026, 6, 10, 10, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2026, 6, 10, 10, 0, 5);
+
+    given(stepExecution.getStartTime()).willReturn(start);
+    given(stepExecution.getEndTime()).willReturn(end);
     given(stepExecution.getWriteCount()).willReturn(123L);
     given(stepExecution.getExitStatus()).willReturn(ExitStatus.COMPLETED);
 
@@ -39,6 +46,7 @@ public class CommentCleanupStepListenerTest {
 
     // then
     then(commentCleanupMetrics).should().countDeleted(123);
+    then(commentCleanupMetrics).should().recordStepDuration(Duration.ofSeconds(5));
     assertThat(result).isEqualTo(ExitStatus.COMPLETED);
   }
 }
