@@ -75,7 +75,7 @@ public class ArticleRestoreService {
       return Optional.empty();
     } catch (Exception e) {
       log.error("백업 파일 읽기 실패: {}", s3Key, e);
-      throw ArticleRestoreFailedException.withKey(s3Key);
+      throw ArticleRestoreFailedException.withKey(s3Key, e);
     }
 
     if (entries.isEmpty()) {
