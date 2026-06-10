@@ -28,8 +28,7 @@ public class LogBackupJobListenerTest {
 
   @Test
   @DisplayName("Job 실패 시 markSuccess는 호출되지 않는다")
-  void job_failed_does_not_mark_success() {
-
+  void job_실패하면_markSuccess_미호출() {
     // given
     JobExecution jobExecution = mock(JobExecution.class);
     when(jobExecution.getStatus()).thenReturn(BatchStatus.FAILED);
@@ -43,8 +42,7 @@ public class LogBackupJobListenerTest {
 
   @Test
   @DisplayName("Job 성공 시 markSuccess가 호출된다")
-  void job_success_marks_metrics() {
-
+  void job_성공하면_markSuccess_호출() {
     // given
     JobExecution jobExecution = mock(JobExecution.class);
     when(jobExecution.getStatus()).thenReturn(BatchStatus.COMPLETED);

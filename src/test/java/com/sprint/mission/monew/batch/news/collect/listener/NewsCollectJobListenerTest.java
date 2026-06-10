@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch.article.backup.listener;
+package com.sprint.mission.monew.batch.news.collect.listener;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -6,7 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sprint.mission.monew.batch.article.backup.metrics.ArticleBackupMetrics;
+import com.sprint.mission.monew.batch.news.collect.metrics.NewsCollectMetrics;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,13 +17,13 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 
 @ExtendWith(MockitoExtension.class)
-public class ArticleBackupJobListenerTest {
+public class NewsCollectJobListenerTest {
 
   @Mock
-  ArticleBackupMetrics articleBackupMetrics;
+  NewsCollectMetrics newsCollectMetrics;
 
   @InjectMocks
-  ArticleBackupJobListener listener;
+  NewsCollectJobListener listener;
 
   @Test
   @DisplayName("Job 실패 시 markSuccess는 호출되지 않는다")
@@ -36,7 +36,7 @@ public class ArticleBackupJobListenerTest {
     listener.afterJob(jobExecution);
 
     // then
-    verify(articleBackupMetrics, never()).markSuccess();
+    verify(newsCollectMetrics, never()).markSuccess();
   }
 
   @Test
@@ -50,6 +50,6 @@ public class ArticleBackupJobListenerTest {
     listener.afterJob(jobExecution);
 
     // then
-    verify(articleBackupMetrics, times(1)).markSuccess();
+    verify(newsCollectMetrics, times(1)).markSuccess();
   }
 }
