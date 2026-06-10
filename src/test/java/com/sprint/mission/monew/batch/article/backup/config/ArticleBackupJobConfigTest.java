@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
+import com.sprint.mission.monew.batch.article.backup.listener.ArticleBackupStepListener;
 import com.sprint.mission.monew.batch.article.backup.reader.ArticleBackupReader;
 import com.sprint.mission.monew.batch.article.backup.writer.ArticleBackupWriter;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 class ArticleBackupJobConfigTest {
 
   private final JobRepository jobRepository = mock(JobRepository.class);
-  private final PlatformTransactionManager transactionManager = mock(PlatformTransactionManager.class);
+  private final PlatformTransactionManager transactionManager = mock(
+      PlatformTransactionManager.class);
 
   @Nested
   @DisplayName("ArticleBackupJobConfig Job, Step 테스트")
@@ -29,12 +31,14 @@ class ArticleBackupJobConfigTest {
       // given
       ArticleBackupReader reader = mock(ArticleBackupReader.class);
       ArticleBackupWriter writer = mock(ArticleBackupWriter.class);
+      ArticleBackupStepListener listener = mock(ArticleBackupStepListener.class);
 
       ArticleBackupJobConfig config = new ArticleBackupJobConfig(
           jobRepository,
           transactionManager,
           reader,
-          writer
+          writer,
+          listener
       );
 
       // when

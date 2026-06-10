@@ -1,6 +1,7 @@
 package com.sprint.mission.monew.batch.article.backup.config;
 
 import com.sprint.mission.monew.batch.article.backup.dto.ArticleBackupItem;
+import com.sprint.mission.monew.batch.article.backup.listener.ArticleBackupStepListener;
 import com.sprint.mission.monew.batch.article.backup.reader.ArticleBackupReader;
 import com.sprint.mission.monew.batch.article.backup.writer.ArticleBackupWriter;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,10 @@ public class ArticleBackupJobConfig {
 
   private final JobRepository jobRepository;
   private final PlatformTransactionManager transactionManager;
+
   private final ArticleBackupReader articleBackupReader;
   private final ArticleBackupWriter articleBackupWriter;
+  private final ArticleBackupStepListener articleBackupStepListener;
 
   @Value("${batch.article-backup.chunk-size}")
   private int chunkSize;
@@ -39,6 +42,7 @@ public class ArticleBackupJobConfig {
         .<ArticleBackupItem, ArticleBackupItem>chunk(chunkSize, transactionManager)
         .reader(articleBackupReader)
         .writer(articleBackupWriter)
+        .listener(articleBackupStepListener)
         .build();
   }
 }

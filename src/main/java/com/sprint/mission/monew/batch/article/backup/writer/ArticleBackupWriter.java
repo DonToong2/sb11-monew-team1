@@ -5,7 +5,6 @@ import com.sprint.mission.monew.batch.article.backup.dto.ArticleBackupItem;
 import com.sprint.mission.monew.batch.article.backup.exception.ArticleBackupFailedException;
 import com.sprint.mission.monew.batch.article.backup.metrics.ArticleBackupMetrics;
 import com.sprint.mission.monew.batch.common.utils.BatchGzipUtils;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,7 +42,6 @@ public class ArticleBackupWriter implements ItemWriter<ArticleBackupItem> {
     int index = chunkCounter.incrementAndGet();
     String s3Key = BatchGzipUtils.articleS3Key(targetDate, index);
 
-    long start = System.nanoTime();
     try {
       byte[] compressed = BatchGzipUtils.gzip(objectMapper.writeValueAsBytes(chunk.getItems()));
       s3Client.putObject(
@@ -61,8 +59,6 @@ public class ArticleBackupWriter implements ItemWriter<ArticleBackupItem> {
     } catch (Exception e) {
       metrics.countFailed();
       throw ArticleBackupFailedException.withKey(s3Key, e);
-    } finally {
-      metrics.recordDuration(Duration.ofNanos(System.nanoTime() - start));
     }
   }
 }
