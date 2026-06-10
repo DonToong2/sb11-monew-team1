@@ -1,6 +1,6 @@
-package com.sprint.mission.monew.batch.service;
+package com.sprint.mission.monew.batch.article.backup.service;
 
-import com.sprint.mission.monew.batch.exception.ArticleBackupJobFailedException;
+import com.sprint.mission.monew.batch.article.backup.exception.ArticleBackupJobFailedException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

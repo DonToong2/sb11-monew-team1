@@ -1,10 +1,9 @@
-package com.sprint.mission.monew.batch.scheduler;
+package com.sprint.mission.monew.batch.article.backup.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doThrow;
 
-import com.sprint.mission.monew.batch.article.backup.scheduler.ArticleBackupScheduler;
 import com.sprint.mission.monew.batch.article.backup.service.ArticleBackupService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -1,8 +1,8 @@
-package com.sprint.mission.monew.batch.config;
+package com.sprint.mission.monew.batch.article.backup.config;
 
-import com.sprint.mission.monew.batch.dto.ArticleBackupItem;
-import com.sprint.mission.monew.batch.reader.ArticleBackupReader;
-import com.sprint.mission.monew.batch.writer.ArticleBackupWriter;
+import com.sprint.mission.monew.batch.article.backup.dto.ArticleBackupItem;
+import com.sprint.mission.monew.batch.article.backup.reader.ArticleBackupReader;
+import com.sprint.mission.monew.batch.article.backup.writer.ArticleBackupWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

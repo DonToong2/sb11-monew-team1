@@ -1,12 +1,11 @@
-package com.sprint.mission.monew.batch.jobconfig;
+package com.sprint.mission.monew.batch.article.backup.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-import com.sprint.mission.monew.batch.config.ArticleBackupJobConfig;
-import com.sprint.mission.monew.batch.reader.ArticleBackupReader;
-import com.sprint.mission.monew.batch.writer.ArticleBackupWriter;
+import com.sprint.mission.monew.batch.article.backup.reader.ArticleBackupReader;
+import com.sprint.mission.monew.batch.article.backup.writer.ArticleBackupWriter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

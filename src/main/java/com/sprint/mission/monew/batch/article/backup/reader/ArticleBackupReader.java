@@ -1,6 +1,6 @@
-package com.sprint.mission.monew.batch.reader;
+package com.sprint.mission.monew.batch.article.backup.reader;
 
-import com.sprint.mission.monew.batch.dto.ArticleBackupItem;
+import com.sprint.mission.monew.batch.article.backup.dto.ArticleBackupItem;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import java.time.Instant;
 import java.time.LocalDate;

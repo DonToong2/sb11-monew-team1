@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch.service;
+package com.sprint.mission.monew.batch.article.backup.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -8,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sprint.mission.monew.batch.exception.ArticleBackupJobFailedException;
+import com.sprint.mission.monew.batch.article.backup.exception.ArticleBackupJobFailedException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

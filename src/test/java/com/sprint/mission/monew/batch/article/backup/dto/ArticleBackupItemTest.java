@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch.dto;
+package com.sprint.mission.monew.batch.article.backup.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

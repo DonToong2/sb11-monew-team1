@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch.exception;
+package com.sprint.mission.monew.batch.common.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,7 @@ public enum BatchErrorCode {
   LOG_BACKUP_JOB_FAILED("로그 백업 배치 실행 실패"),
   LOG_BACKUP_FAILED("로그 파일 S3 업로드 실패"),
   ARTICLE_BACKUP_JOB_FAILED("기사 백업 배치 실행 실패"),
-  ARTICLE_BACKUP_FAILED("기사 S3 백업 실패"),
-  ARTICLE_RESTORE_FAILED("기사 복구 실패");
+  ARTICLE_BACKUP_FAILED("기사 S3 백업 실패");
 
   private final String message;
 }

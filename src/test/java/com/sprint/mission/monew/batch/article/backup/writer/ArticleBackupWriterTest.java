@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch.writer;
+package com.sprint.mission.monew.batch.article.backup.writer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -8,9 +8,9 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.monew.batch.dto.ArticleBackupItem;
-import com.sprint.mission.monew.batch.exception.ArticleBackupFailedException;
-import com.sprint.mission.monew.batch.metrics.ArticleBackupMetrics;
+import com.sprint.mission.monew.batch.article.backup.dto.ArticleBackupItem;
+import com.sprint.mission.monew.batch.article.backup.exception.ArticleBackupFailedException;
+import com.sprint.mission.monew.batch.article.backup.metrics.ArticleBackupMetrics;
 import com.sprint.mission.monew.domain.article.entity.ArticleSource;
 import java.time.Instant;
 import java.util.List;
