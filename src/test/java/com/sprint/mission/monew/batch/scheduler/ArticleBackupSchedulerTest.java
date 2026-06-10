@@ -4,7 +4,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
-import com.sprint.mission.monew.batch.service.ArticleBackupService;
+import com.sprint.mission.monew.batch.article.backup.scheduler.ArticleBackupScheduler;
+import com.sprint.mission.monew.batch.article.backup.service.ArticleBackupService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

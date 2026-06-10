@@ -2,7 +2,7 @@ package com.sprint.mission.monew.batch.log.backup.processor;
 
 import com.sprint.mission.monew.batch.log.backup.dto.LogContent;
 import com.sprint.mission.monew.batch.log.backup.dto.UploadPayload;
-import com.sprint.mission.monew.batch.util.BatchGzipUtils;
+import com.sprint.mission.monew.batch.common.utils.BatchGzipUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;

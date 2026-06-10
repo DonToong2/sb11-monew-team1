@@ -1,4 +1,7 @@
-package com.sprint.mission.monew.batch.exception;
+package com.sprint.mission.monew.batch.article.backup.exception;
+
+import com.sprint.mission.monew.batch.common.exception.BatchErrorCode;
+import com.sprint.mission.monew.batch.common.exception.BatchException;
 
 public class ArticleBackupFailedException extends BatchException {
 

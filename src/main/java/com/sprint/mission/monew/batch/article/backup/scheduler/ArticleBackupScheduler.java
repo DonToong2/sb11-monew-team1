@@ -1,6 +1,6 @@
-package com.sprint.mission.monew.batch.scheduler;
+package com.sprint.mission.monew.batch.article.backup.scheduler;
 
-import com.sprint.mission.monew.batch.service.ArticleBackupService;
+import com.sprint.mission.monew.batch.article.backup.service.ArticleBackupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;

@@ -1,4 +1,4 @@
-package com.sprint.mission.monew.batch.exception;
+package com.sprint.mission.monew.batch.common.exception;
 
 import lombok.Getter;
 

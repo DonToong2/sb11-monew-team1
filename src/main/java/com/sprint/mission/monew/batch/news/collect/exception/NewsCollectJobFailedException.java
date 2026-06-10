@@ -1,7 +1,7 @@
 package com.sprint.mission.monew.batch.news.collect.exception;
 
-import com.sprint.mission.monew.batch.exception.BatchErrorCode;
-import com.sprint.mission.monew.batch.exception.BatchException;
+import com.sprint.mission.monew.batch.common.exception.BatchErrorCode;
+import com.sprint.mission.monew.batch.common.exception.BatchException;
 
 public class NewsCollectJobFailedException extends BatchException {
 

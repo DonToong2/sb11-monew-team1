@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ArticleErrorCode implements ErrorCode {
 
-  ARTICLE_NOT_FOUND("뉴스 기사를 찾을 수 없습니다.");
+  ARTICLE_NOT_FOUND("뉴스 기사를 찾을 수 없습니다."),
+  ARTICLE_RESTORE_FAILED("기사 복구 실패");
 
   private final String message;
 

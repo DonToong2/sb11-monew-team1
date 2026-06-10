@@ -1,11 +1,11 @@
-package com.sprint.mission.monew.batch.service;
+package com.sprint.mission.monew.batch.article.backup.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.monew.batch.dto.ArticleBackupDto;
-import com.sprint.mission.monew.batch.exception.ArticleBackupFailedException;
-import com.sprint.mission.monew.batch.metrics.ArticleBackupMetrics;
-import com.sprint.mission.monew.batch.util.BatchGzipUtils;
+import com.sprint.mission.monew.batch.article.backup.dto.ArticleBackupDto;
+import com.sprint.mission.monew.batch.article.backup.metrics.ArticleBackupMetrics;
+import com.sprint.mission.monew.batch.article.backup.exception.ArticleBackupFailedException;
+import com.sprint.mission.monew.batch.common.utils.BatchGzipUtils;
 import com.sprint.mission.monew.domain.article.entity.Article;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import java.time.Duration;
