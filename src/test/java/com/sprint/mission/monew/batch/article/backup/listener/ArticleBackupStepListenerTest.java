@@ -1,8 +1,11 @@
 package com.sprint.mission.monew.batch.article.backup.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doThrow;
 
 import com.sprint.mission.monew.batch.article.backup.metrics.ArticleBackupMetrics;
 import java.time.Duration;
@@ -27,6 +30,53 @@ public class ArticleBackupStepListenerTest {
 
   @Mock
   StepExecution stepExecution;
+
+  @Test
+  @DisplayName("Step이 실패해도 metrics는 기록되고 ExitStatus는 그대로 반환된다")
+  void 실패해도_메트릭은_기록된다() {
+
+    // given
+    LocalDateTime start = LocalDateTime.of(2026, 6, 10, 10, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2026, 6, 10, 10, 0, 5);
+
+    given(stepExecution.getStartTime()).willReturn(start);
+    given(stepExecution.getEndTime()).willReturn(end);
+    given(stepExecution.getExitStatus()).willReturn(ExitStatus.FAILED);
+
+    // when
+    ExitStatus result = listener.afterStep(stepExecution);
+
+    // then
+    then(articleBackupMetrics)
+        .should()
+        .recordDuration(Duration.ofSeconds(5));
+
+    assertThat(result).isEqualTo(ExitStatus.FAILED);
+  }
+
+  @Test
+  @DisplayName("metrics에서 예외가 발생해도 Step은 정상 종료된다")
+  void 메트릭_예외가_발생해도_step은_정상_종료된다() {
+
+    // given
+    LocalDateTime start = LocalDateTime.of(2026, 6, 10, 10, 0, 0);
+    LocalDateTime end = LocalDateTime.of(2026, 6, 10, 10, 0, 5);
+
+    given(stepExecution.getStartTime()).willReturn(start);
+    given(stepExecution.getEndTime()).willReturn(end);
+    given(stepExecution.getExitStatus()).willReturn(ExitStatus.COMPLETED);
+
+    doThrow(new RuntimeException("metrics fail"))
+        .when(articleBackupMetrics)
+        .recordDuration(Duration.ofSeconds(5));
+
+    // when
+    ExitStatus result = listener.afterStep(stepExecution);
+
+    // then
+    then(articleBackupMetrics).should().recordDuration(Duration.ofSeconds(5));
+    assertThat(result).isEqualTo(ExitStatus.COMPLETED);
+  }
 
   @Test
   @DisplayName("StepExecution recordDuration를 metrics로 전달한다")
