@@ -20,7 +20,7 @@ public class NotificationMetrics {
   private static final String TYPE_COMMENT_LIKE = "COMMENT_LIKE";
   private static final String JOB_DURATION = "monew.notification.cleanup.job.duration";
   private static final String STEP_DURATION = "monew.notification.cleanup.step.duration";
-  private static final String LAST_SUCCESS = "monew.comment.cleanup.last_success.timestamp";
+  private static final String LAST_SUCCESS = "monew.notification.cleanup.last_success.timestamp";
 
   private final MeterRegistry registry;
   private final Counter deletedCounter;

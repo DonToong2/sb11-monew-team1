@@ -50,7 +50,7 @@ public class ArticleBackupMetrics {
         .register(registry);
     Gauge.builder(LAST_SUCCESS, lastSuccessEpochSeconds, AtomicLong::get)
         .baseUnit("seconds")
-        .description("로그 백업 배치가 마지막으로 정상 완료된 시각(epoch seconds)")
+        .description("기사 백업 배치가 마지막으로 정상 완료된 시각(epoch seconds)")
         .register(registry);
   }
 
