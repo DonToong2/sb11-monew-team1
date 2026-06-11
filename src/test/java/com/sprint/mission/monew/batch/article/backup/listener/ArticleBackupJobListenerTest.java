@@ -10,6 +10,7 @@ import com.sprint.mission.monew.batch.article.backup.metrics.ArticleBackupMetric
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,9 @@ public class ArticleBackupJobListenerTest {
   @InjectMocks
   ArticleBackupJobListener listener;
 
+  @Mock
+  JobExecution jobExecution;
+
   @Nested
   @DisplayName("beforeJob 테스트")
   class BeforeJob {
@@ -37,13 +41,14 @@ public class ArticleBackupJobListenerTest {
     @Test
     @DisplayName("beforeJob은 실행되어야 한다")
     void before_job_실행여부_확인() {
-
-      JobExecution jobExecution = mock(JobExecution.class);
+      // given
       when(jobExecution.getId()).thenReturn(1L);
       when(jobExecution.getJobParameters()).thenReturn(mock(JobParameters.class));
 
+      // when
       listener.beforeJob(jobExecution);
 
+      // then
       verify(jobExecution).getId();
       verify(jobExecution).getJobParameters();
     }
@@ -57,7 +62,6 @@ public class ArticleBackupJobListenerTest {
     @DisplayName("FailureException 존재 시 로그 처리 로직이 실행된다")
     void job이_실패하여_FailureException_있으면_warn로그_실행() {
       // given
-      JobExecution jobExecution = mock(JobExecution.class);
       when(jobExecution.getStatus()).thenReturn(BatchStatus.FAILED);
 
       when(jobExecution.getAllFailureExceptions())
@@ -71,38 +75,36 @@ public class ArticleBackupJobListenerTest {
     }
 
     @Test
-  @DisplayName("Job 실패 시 markSuccess는 호출되지 않는다")
-  void job_실패하면_markSuccess_미호출() {
-    // given
-    JobExecution jobExecution = mock(JobExecution.class);
-    when(jobExecution.getStatus()).thenReturn(BatchStatus.FAILED);
+    @DisplayName("Job 실패 시 markSuccess는 호출되지 않는다")
+    void job_실패하면_markSuccess_미호출() {
+      // given
+      when(jobExecution.getStatus()).thenReturn(BatchStatus.FAILED);
 
-    // when
-    listener.afterJob(jobExecution);
+      // when
+      listener.afterJob(jobExecution);
 
-    // then
-    verify(articleBackupMetrics, never()).markSuccess();
-  }
+      // then
+      verify(articleBackupMetrics, never()).markSuccess();
+    }
 
-  @Test
-  @DisplayName("Job 성공 시 markSuccess가 호출된다")
-  void job_성공하면_markSuccess_호출() {
-    // given
-    JobExecution jobExecution = mock(JobExecution.class);
-    when(jobExecution.getStatus()).thenReturn(BatchStatus.COMPLETED);
+    @Test
+    @DisplayName("Job 성공 시 markSuccess가 호출된다")
+    void job_성공하면_markSuccess_호출() {
+      // given
+      when(jobExecution.getStatus()).thenReturn(BatchStatus.COMPLETED);
 
-    LocalDateTime start = LocalDateTime.of(2026, 6, 10, 10, 0, 0);
-    LocalDateTime end = LocalDateTime.of(2026, 6, 10, 10, 0, 5);
+      LocalDateTime start = LocalDateTime.of(2026, 6, 10, 10, 0, 0);
+      LocalDateTime end = LocalDateTime.of(2026, 6, 10, 10, 0, 5);
 
-    when(jobExecution.getStartTime()).thenReturn(start);
-    when(jobExecution.getEndTime()).thenReturn(end);
+      when(jobExecution.getStartTime()).thenReturn(start);
+      when(jobExecution.getEndTime()).thenReturn(end);
 
-    // when
-    listener.afterJob(jobExecution);
+      // when
+      listener.afterJob(jobExecution);
 
-    // then
-    verify(articleBackupMetrics, times(1)).markSuccess();
-    verify(articleBackupMetrics).recordJobDuration(Duration.ofSeconds(5));
-  }
+      // then
+      verify(articleBackupMetrics, times(1)).markSuccess();
+      verify(articleBackupMetrics).recordJobDuration(Duration.ofSeconds(5));
+    }
   }
 }
