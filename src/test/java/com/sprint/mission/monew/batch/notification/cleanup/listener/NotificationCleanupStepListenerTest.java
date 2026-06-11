@@ -31,10 +31,30 @@ public class NotificationCleanupStepListenerTest {
   StepExecution stepExecution;
 
   @Test
-  @DisplayName("시작 시간 또는 완료 시간 정보 없으면 metrics 호출 없이 종료한다")
+  @DisplayName("시작 시간 정보 없으면 metrics 호출 없이 종료한다")
   void 시간_null이면_metrics_미호출() {
     // given
+    LocalDateTime end = LocalDateTime.of(2026, 6, 10, 10, 0, 5);
+
     given(stepExecution.getStartTime()).willReturn(null);
+    given(stepExecution.getEndTime()).willReturn(end);
+    given(stepExecution.getExitStatus()).willReturn(ExitStatus.COMPLETED);
+
+    // when
+    ExitStatus result = listener.afterStep(stepExecution);
+
+    // then
+    then(notificationMetrics).shouldHaveNoInteractions();
+    assertThat(result).isEqualTo(ExitStatus.COMPLETED);
+  }
+
+  @Test
+  @DisplayName("완료 시간 정보 없으면 metrics 호출 없이 종료한다")
+  void 완료_시간_null이면_metrics_미호출() {
+    // given
+    LocalDateTime start = LocalDateTime.of(2026, 6, 10, 10, 0, 0);
+
+    given(stepExecution.getStartTime()).willReturn(start);
     given(stepExecution.getEndTime()).willReturn(null);
     given(stepExecution.getExitStatus()).willReturn(ExitStatus.COMPLETED);
 
