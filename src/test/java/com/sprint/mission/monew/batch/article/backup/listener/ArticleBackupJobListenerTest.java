@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.article.backup.listener;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -79,7 +80,7 @@ public class ArticleBackupJobListenerTest {
       listener.afterJob(jobExecution);
 
       // then
-      then(articleBackupMetrics).should(never()).recordJobDuration(Duration.ofSeconds(anyLong()));
+      then(articleBackupMetrics).should(never()).recordJobDuration(any(Duration.class));
     }
 
     @Test
@@ -96,7 +97,7 @@ public class ArticleBackupJobListenerTest {
       listener.afterJob(jobExecution);
 
       // then
-      then(articleBackupMetrics).should(never()).recordJobDuration(Duration.ofSeconds(anyLong()));
+      then(articleBackupMetrics).should(never()).recordJobDuration(any(Duration.class));
     }
 
     @Test

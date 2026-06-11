@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.comment.cleanup.listener;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -79,7 +80,7 @@ public class CommentCleanupJobListenerTest {
       listener.afterJob(jobExecution);
 
       // then
-      then(commentCleanupMetrics).should(never()).recordJobDuration(Duration.ofSeconds(anyLong()));
+      then(commentCleanupMetrics).should(never()).recordJobDuration(any(Duration.class));
     }
 
     @Test
@@ -96,7 +97,7 @@ public class CommentCleanupJobListenerTest {
       listener.afterJob(jobExecution);
 
       // then
-      then(commentCleanupMetrics).should(never()).recordJobDuration(Duration.ofSeconds(anyLong()));
+      then(commentCleanupMetrics).should(never()).recordJobDuration(any(Duration.class));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.sprint.mission.monew.batch.log.backup.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -60,7 +61,7 @@ public class LogBackupJobListenerTest {
       listener.afterJob(jobExecution);
 
       // then
-      then(logBackupMetrics).should(never()).recordJobDuration(Duration.ofSeconds(anyLong()));
+      then(logBackupMetrics).should(never()).recordJobDuration(any(Duration.class));
     }
 
     @Test
@@ -77,7 +78,7 @@ public class LogBackupJobListenerTest {
       listener.afterJob(jobExecution);
 
       // then
-      then(logBackupMetrics).should(never()).recordJobDuration(Duration.ofSeconds(anyLong()));
+      then(logBackupMetrics).should(never()).recordJobDuration(any(Duration.class));
     }
 
     @Test
