@@ -33,7 +33,7 @@ public class NewsCollectJobListener implements JobExecutionListener {
     }
 
     // Job 상태 판단 - 실패
-    if (jobExecution.getStatus() == BatchStatus.FAILED) {
+    else if (jobExecution.getStatus() == BatchStatus.FAILED) {
       log.error("News Collect Job 실패 | jobId={}, exitStatus={}",
           jobExecution.getId(),
           jobExecution.getExitStatus());

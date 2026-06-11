@@ -33,7 +33,7 @@ public class NotificationCleanupJobListener implements JobExecutionListener {
     }
 
     // Job 상태 판단 - 실패
-    if (jobExecution.getStatus() == BatchStatus.FAILED) {
+    else if (jobExecution.getStatus() == BatchStatus.FAILED) {
       log.error("Notification Cleanup Job 실패 | jobId={}, exitStatus={}",
           jobExecution.getId(),
           jobExecution.getExitStatus());
