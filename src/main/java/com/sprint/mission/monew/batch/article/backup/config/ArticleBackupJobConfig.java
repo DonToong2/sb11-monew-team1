@@ -5,6 +5,7 @@ import com.sprint.mission.monew.batch.article.backup.listener.ArticleBackupJobLi
 import com.sprint.mission.monew.batch.article.backup.listener.ArticleBackupStepListener;
 import com.sprint.mission.monew.batch.article.backup.reader.ArticleBackupReader;
 import com.sprint.mission.monew.batch.article.backup.writer.ArticleBackupWriter;
+import com.sprint.mission.monew.batch.common.listener.ItemSkipLoggingListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -14,6 +15,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -24,6 +26,7 @@ public class ArticleBackupJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final ArticleBackupJobListener articleBackupJobListener;
+  private final ItemSkipLoggingListener itemSkipLoggingListener;
   private final ArticleBackupReader articleBackupReader;
   private final ArticleBackupWriter articleBackupWriter;
   private final ArticleBackupStepListener articleBackupStepListener;
@@ -45,6 +48,13 @@ public class ArticleBackupJobConfig {
         .<ArticleBackupItem, ArticleBackupItem>chunk(chunkSize, transactionManager)
         .reader(articleBackupReader)
         .writer(articleBackupWriter)
+        .faultTolerant()
+        .skip(Exception.class)
+        .noSkip(OutOfMemoryError.class)
+        .skipLimit(50)
+        .retryLimit(3)
+        .retry(TransientDataAccessException.class)
+        .listener(itemSkipLoggingListener)
         .listener(articleBackupStepListener)
         .build();
   }

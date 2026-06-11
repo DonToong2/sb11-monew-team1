@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.log.backup.config;
 
+import com.sprint.mission.monew.batch.common.listener.ItemSkipLoggingListener;
 import com.sprint.mission.monew.batch.log.backup.listener.LogBackupJobListener;
 import com.sprint.mission.monew.batch.log.backup.listener.LogBackupStepListener;
 import com.sprint.mission.monew.batch.log.backup.processor.LogBackupProcessor;
@@ -16,6 +17,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -26,6 +28,7 @@ public class LogBackupJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final LogBackupJobListener logBackupJobListener;
+  private final ItemSkipLoggingListener itemSkipLoggingListener;
   private final LogBackupReader logBackupReader;
   private final LogBackupProcessor logBackupProcessor;
   private final LogBackupWriter logBackupWriter;
@@ -49,6 +52,13 @@ public class LogBackupJobConfig {
         .reader(logBackupReader)
         .processor(logBackupProcessor)
         .writer(logBackupWriter)
+        .faultTolerant()
+        .skip(Exception.class)
+        .noSkip(OutOfMemoryError.class)
+        .skipLimit(10)
+        .retryLimit(3)
+        .retry(TransientDataAccessException.class)
+        .listener(itemSkipLoggingListener)
         .listener(logBackupStepListener)
         .build();
   }

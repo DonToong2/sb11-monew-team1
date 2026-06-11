@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.news.collect.config;
 
+import com.sprint.mission.monew.batch.common.listener.ItemSkipLoggingListener;
 import com.sprint.mission.monew.batch.news.collect.dto.NewsCollectItem;
 import com.sprint.mission.monew.batch.news.collect.listener.NewsCollectJobListener;
 import com.sprint.mission.monew.batch.news.collect.listener.NewsCollectStepListener;
@@ -14,6 +15,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -24,6 +26,7 @@ public class NewsCollectJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final NewsCollectJobListener newsCollectJobListener;
+  private final ItemSkipLoggingListener itemSkipLoggingListener;
   private final NewsCollectReader newsCollectReader;
   private final NewsCollectWriter newsCollectWriter;
   private final NewsCollectStepListener newsCollectStepListener;
@@ -44,6 +47,13 @@ public class NewsCollectJobConfig {
         .<NewsCollectItem, NewsCollectItem>chunk(chunkSize, transactionManager)
         .reader(newsCollectReader)
         .writer(newsCollectWriter)
+        .faultTolerant()
+        .skip(Exception.class)
+        .noSkip(OutOfMemoryError.class)
+        .skipLimit(200)
+        .retryLimit(3)
+        .retry(TransientDataAccessException.class)
+        .listener(itemSkipLoggingListener)
         .listener(newsCollectStepListener)
         .build();
   }

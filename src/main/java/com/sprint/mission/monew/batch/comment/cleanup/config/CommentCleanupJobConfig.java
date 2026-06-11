@@ -5,6 +5,8 @@ import com.sprint.mission.monew.batch.comment.cleanup.reader.CommentCleanupReade
 import com.sprint.mission.monew.batch.comment.cleanup.listener.CommentCleanupStepListener;
 import com.sprint.mission.monew.batch.comment.cleanup.writer.CommentCleanupWriter;
 import com.sprint.mission.monew.batch.comment.cleanup.dto.CommentCleanupItem;
+import com.sprint.mission.monew.batch.common.listener.ChunkSkipLoggingListener;
+import com.sprint.mission.monew.batch.common.listener.ItemSkipLoggingListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -14,6 +16,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -24,6 +27,7 @@ public class CommentCleanupJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final CommentCleanupJobListener commentCleanupJobListener;
+  private final ChunkSkipLoggingListener chunkSkipLoggingListener;
   private final CommentCleanupReader commentCleanupReader;
   private final CommentCleanupWriter commentCleanupWriter;
   private final CommentCleanupStepListener commentCleanupStepListener;
@@ -44,6 +48,13 @@ public class CommentCleanupJobConfig {
         .<CommentCleanupItem, CommentCleanupItem>chunk(chunkSize, transactionManager)
         .reader(commentCleanupReader)
         .writer(commentCleanupWriter)
+        .faultTolerant()
+        .skip(Exception.class)
+        .noSkip(OutOfMemoryError.class)
+        .skipLimit(100)
+        .retryLimit(3)
+        .retry(TransientDataAccessException.class)
+        .listener(chunkSkipLoggingListener)
         .listener(commentCleanupStepListener)
         .build();
   }

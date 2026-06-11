@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
+import com.sprint.mission.monew.batch.common.listener.ChunkSkipLoggingListener;
 import com.sprint.mission.monew.batch.notification.cleanup.listener.NotificationCleanupJobListener;
 import com.sprint.mission.monew.batch.notification.cleanup.listener.NotificationCleanupStepListener;
 import com.sprint.mission.monew.batch.notification.cleanup.reader.NotificationCleanupReader;
@@ -31,6 +32,7 @@ class NotificationCleanupJobConfigTest {
     void job_step_생성_성공() throws Exception {
       // given
       NotificationCleanupJobListener jobListener = mock(NotificationCleanupJobListener.class);
+      ChunkSkipLoggingListener chunkSkipLoggingListener = mock(ChunkSkipLoggingListener.class);
       NotificationCleanupReader reader = mock(NotificationCleanupReader.class);
       NotificationCleanupWriter writer = mock(NotificationCleanupWriter.class);
       NotificationCleanupStepListener stepListener = mock(NotificationCleanupStepListener.class);
@@ -39,6 +41,7 @@ class NotificationCleanupJobConfigTest {
           jobRepository,
           transactionManager,
           jobListener,
+          chunkSkipLoggingListener,
           reader,
           writer,
           stepListener

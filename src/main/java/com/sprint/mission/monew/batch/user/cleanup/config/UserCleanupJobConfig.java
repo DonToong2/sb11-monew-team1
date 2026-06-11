@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.user.cleanup.config;
 
+import com.sprint.mission.monew.batch.common.listener.ChunkSkipLoggingListener;
 import com.sprint.mission.monew.batch.user.cleanup.dto.UserCleanupItem;
 import com.sprint.mission.monew.batch.user.cleanup.listener.UserCleanupJobListener;
 import com.sprint.mission.monew.batch.user.cleanup.reader.UserCleanupReader;
@@ -14,6 +15,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -24,6 +26,7 @@ public class UserCleanupJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final UserCleanupJobListener userCleanupJobListener;
+  private final ChunkSkipLoggingListener chunkSkipLoggingListener;
   private final UserCleanupReader userCleanupReader;
   private final UserCleanupWriter userCleanupWriter;
   private final UserCleanupStepListener userCleanupStepListener;
@@ -44,6 +47,13 @@ public class UserCleanupJobConfig {
         .<UserCleanupItem, UserCleanupItem>chunk(chunkSize, transactionManager)
         .reader(userCleanupReader)
         .writer(userCleanupWriter)
+        .faultTolerant()
+        .skip(Exception.class)
+        .noSkip(OutOfMemoryError.class)
+        .skipLimit(100)
+        .retryLimit(3)
+        .retry(TransientDataAccessException.class)
+        .listener(chunkSkipLoggingListener)
         .listener(userCleanupStepListener)
         .build();
   }

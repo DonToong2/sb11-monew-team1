@@ -1,5 +1,6 @@
 package com.sprint.mission.monew.batch.notification.cleanup.config;
 
+import com.sprint.mission.monew.batch.common.listener.ChunkSkipLoggingListener;
 import com.sprint.mission.monew.batch.notification.cleanup.listener.NotificationCleanupJobListener;
 import com.sprint.mission.monew.batch.notification.cleanup.reader.NotificationCleanupReader;
 import com.sprint.mission.monew.batch.notification.cleanup.listener.NotificationCleanupStepListener;
@@ -14,6 +15,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
@@ -24,6 +26,7 @@ public class NotificationCleanupJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final NotificationCleanupJobListener notificationCleanupJobListener;
+  private final ChunkSkipLoggingListener chunkSkipLoggingListener;
   private final NotificationCleanupReader notificationCleanupReader;
   private final NotificationCleanupWriter notificationCleanupWriter;
   private final NotificationCleanupStepListener notificationCleanupStepListener;
@@ -44,6 +47,13 @@ public class NotificationCleanupJobConfig {
         .<NotificationCleanupItem, NotificationCleanupItem>chunk(chunkSize, transactionManager)
         .reader(notificationCleanupReader)
         .writer(notificationCleanupWriter)
+        .faultTolerant()
+        .skip(Exception.class)
+        .noSkip(OutOfMemoryError.class)
+        .skipLimit(100)
+        .retryLimit(3)
+        .retry(TransientDataAccessException.class)
+        .listener(chunkSkipLoggingListener)
         .listener(notificationCleanupStepListener)
         .build();
   }
