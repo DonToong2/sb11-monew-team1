@@ -17,14 +17,14 @@ import org.slf4j.LoggerFactory;
 public class ChunkSkipLoggingListenerTest {
 
   @InjectMocks
-  private ItemSkipLoggingListener listener;
+  private ChunkSkipLoggingListener listener;
 
   private ListAppender<ILoggingEvent> appender;
   private Logger logger;
 
   @BeforeEach
   void setUp() {
-    logger = (Logger) LoggerFactory.getLogger(ItemSkipLoggingListener.class);
+    logger = (Logger) LoggerFactory.getLogger(ChunkSkipLoggingListener.class);
 
     appender = new ListAppender<>();
     appender.start();
