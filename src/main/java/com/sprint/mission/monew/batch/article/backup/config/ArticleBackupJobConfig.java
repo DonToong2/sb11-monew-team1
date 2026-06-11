@@ -6,6 +6,7 @@ import com.sprint.mission.monew.batch.article.backup.listener.ArticleBackupStepL
 import com.sprint.mission.monew.batch.article.backup.reader.ArticleBackupReader;
 import com.sprint.mission.monew.batch.article.backup.writer.ArticleBackupWriter;
 import com.sprint.mission.monew.batch.common.listener.ItemSkipLoggingListener;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
+import software.amazon.awssdk.core.exception.SdkException;
 
 @Configuration
 @RequiredArgsConstructor
@@ -49,7 +51,8 @@ public class ArticleBackupJobConfig {
         .reader(articleBackupReader)
         .writer(articleBackupWriter)
         .faultTolerant()
-        .skip(Exception.class)
+        .skip(SdkException.class)
+        .skip(IOException.class)
         .noSkip(OutOfMemoryError.class)
         .skipLimit(50)
         .retryLimit(3)

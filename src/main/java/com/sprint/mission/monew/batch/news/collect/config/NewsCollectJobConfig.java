@@ -15,8 +15,10 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Configuration
 @RequiredArgsConstructor
@@ -48,7 +50,8 @@ public class NewsCollectJobConfig {
         .reader(newsCollectReader)
         .writer(newsCollectWriter)
         .faultTolerant()
-        .skip(Exception.class)
+        .skip(DataIntegrityViolationException.class)
+        .skip(HttpClientErrorException.class)
         .noSkip(OutOfMemoryError.class)
         .skipLimit(200)
         .retryLimit(3)

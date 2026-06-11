@@ -8,6 +8,7 @@ import com.sprint.mission.monew.batch.log.backup.reader.LogBackupReader;
 import com.sprint.mission.monew.batch.log.backup.writer.LogBackupWriter;
 import com.sprint.mission.monew.batch.log.backup.dto.LogContent;
 import com.sprint.mission.monew.batch.log.backup.dto.UploadPayload;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
+import software.amazon.awssdk.core.exception.SdkException;
 
 @Configuration
 @RequiredArgsConstructor
@@ -53,7 +55,8 @@ public class LogBackupJobConfig {
         .processor(logBackupProcessor)
         .writer(logBackupWriter)
         .faultTolerant()
-        .skip(Exception.class)
+        .skip(SdkException.class)
+        .skip(IOException.class)
         .noSkip(OutOfMemoryError.class)
         .skipLimit(10)
         .retryLimit(3)

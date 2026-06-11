@@ -16,6 +16,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.TransientDataAccessException;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -49,7 +50,7 @@ public class CommentCleanupJobConfig {
         .reader(commentCleanupReader)
         .writer(commentCleanupWriter)
         .faultTolerant()
-        .skip(Exception.class)
+        .skip(DataAccessException.class)
         .noSkip(OutOfMemoryError.class)
         .skipLimit(100)
         .retryLimit(3)
