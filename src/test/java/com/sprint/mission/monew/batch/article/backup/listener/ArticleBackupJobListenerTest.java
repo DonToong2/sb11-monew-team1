@@ -31,8 +31,12 @@ public class ArticleBackupJobListenerTest {
   @InjectMocks
   ArticleBackupJobListener listener;
 
-  @Mock
   JobExecution jobExecution;
+
+  @BeforeEach
+  void setUp() {
+    jobExecution = mock(JobExecution.class);
+  }
 
   @Nested
   @DisplayName("beforeJob 테스트")

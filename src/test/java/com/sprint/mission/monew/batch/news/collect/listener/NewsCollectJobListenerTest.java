@@ -31,8 +31,12 @@ public class NewsCollectJobListenerTest {
   @InjectMocks
   NewsCollectJobListener listener;
 
-  @Mock
   JobExecution jobExecution;
+
+  @BeforeEach
+  void setUp() {
+    jobExecution = mock(JobExecution.class);
+  }
 
   @Nested
   @DisplayName("beforeJob 테스트")
