@@ -1,5 +1,8 @@
 package com.sprint.mission.monew.batch.comment.cleanup.listener;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -63,6 +66,40 @@ public class CommentCleanupJobListenerTest {
   class AfterJob {
 
     @Test
+    @DisplayName("시작 시간 정보 없으면 metrics 호출 없이 종료한다")
+    void 시간_null이면_metrics_미호출() {
+      // given
+      LocalDateTime end = LocalDateTime.of(2026, 6, 10, 10, 0, 5);
+
+      given(jobExecution.getStartTime()).willReturn(null);
+      given(jobExecution.getEndTime()).willReturn(end);
+      given(jobExecution.getStatus()).willReturn(BatchStatus.COMPLETED);
+
+      // when
+      listener.afterJob(jobExecution);
+
+      // then
+      then(commentCleanupMetrics).should(never()).recordJobDuration(Duration.ofSeconds(anyLong()));
+    }
+
+    @Test
+    @DisplayName("완료 시간 정보 없으면 metrics 호출 없이 종료한다")
+    void 완료_시간_null이면_metrics_미호출() {
+      // given
+      LocalDateTime start = LocalDateTime.of(2026, 6, 10, 10, 0, 0);
+
+      given(jobExecution.getStartTime()).willReturn(start);
+      given(jobExecution.getEndTime()).willReturn(null);
+      given(jobExecution.getStatus()).willReturn(BatchStatus.COMPLETED);
+
+      // when
+      listener.afterJob(jobExecution);
+
+      // then
+      then(commentCleanupMetrics).should(never()).recordJobDuration(Duration.ofSeconds(anyLong()));
+    }
+
+    @Test
     @DisplayName("FailureException 존재 시 로그 처리 로직이 실행된다")
     void job이_실패하여_FailureException_있으면_warn로그_실행() {
       // given
@@ -83,11 +120,24 @@ public class CommentCleanupJobListenerTest {
     void job_실패하면_markSuccess_미호출() {
       // given
       when(jobExecution.getStatus()).thenReturn(BatchStatus.FAILED);
+      when(jobExecution.getAllFailureExceptions()).thenReturn(
+          List.of(new RuntimeException("예외 발생")));
 
       // when
       listener.afterJob(jobExecution);
 
       // then
+      verify(commentCleanupMetrics, never()).markSuccess();
+    }
+
+    @Test
+    @DisplayName("Job 상태가 COMPLETED도 FAILED도 아닌 상태에서도 markSuccess는 호출되지 않는다")
+    void job_기타_상태에도_markSuccess_미호출() {
+      when(jobExecution.getStatus()).thenReturn(BatchStatus.STARTED);
+      when(jobExecution.getAllFailureExceptions()).thenReturn(List.of());
+
+      listener.afterJob(jobExecution);
+
       verify(commentCleanupMetrics, never()).markSuccess();
     }
 
