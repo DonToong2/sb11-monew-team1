@@ -56,9 +56,7 @@ public class ArticleBackupJobListener implements JobExecutionListener {
     }
 
     // Job이 실패했을 경우 원인 로그
-    if (jobExecution.getAllFailureExceptions() != null
-        && !jobExecution.getAllFailureExceptions().isEmpty()) {
-
+    if (!jobExecution.getAllFailureExceptions().isEmpty()) {
       jobExecution.getAllFailureExceptions()
           .forEach(e -> log.error("Job 실패 원인 | ", e));
     }
