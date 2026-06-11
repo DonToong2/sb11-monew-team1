@@ -32,6 +32,22 @@ public class ArticleBackupStepListenerTest {
   StepExecution stepExecution;
 
   @Test
+  @DisplayName("시작 시간 또는 완료 시간 정보 없으면 metrics 호출 없이 종료한다")
+  void 시간_null이면_metrics_미호출() {
+    // given
+    given(stepExecution.getStartTime()).willReturn(null);
+    given(stepExecution.getEndTime()).willReturn(null);
+    given(stepExecution.getExitStatus()).willReturn(ExitStatus.COMPLETED);
+
+    // when
+    ExitStatus result = listener.afterStep(stepExecution);
+
+    // then
+    then(articleBackupMetrics).shouldHaveNoInteractions();
+    assertThat(result).isEqualTo(ExitStatus.COMPLETED);
+  }
+
+  @Test
   @DisplayName("Step이 실패해도 metrics는 기록되고 ExitStatus는 그대로 반환된다")
   void 실패해도_메트릭은_기록된다() {
 
