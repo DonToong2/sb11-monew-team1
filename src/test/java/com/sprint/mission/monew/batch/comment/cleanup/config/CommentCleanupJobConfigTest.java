@@ -8,7 +8,6 @@ import com.sprint.mission.monew.batch.comment.cleanup.listener.CommentCleanupJob
 import com.sprint.mission.monew.batch.comment.cleanup.listener.CommentCleanupStepListener;
 import com.sprint.mission.monew.batch.comment.cleanup.reader.CommentCleanupReader;
 import com.sprint.mission.monew.batch.comment.cleanup.writer.CommentCleanupWriter;
-import com.sprint.mission.monew.batch.common.listener.ChunkSkipLoggingListener;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,6 @@ public class CommentCleanupJobConfigTest {
     void job_step_생성_성공() throws Exception {
       // given
       CommentCleanupJobListener jobListener = mock(CommentCleanupJobListener.class);
-      ChunkSkipLoggingListener chunkSkipLoggingListener = mock(ChunkSkipLoggingListener.class);
       CommentCleanupReader reader = mock(CommentCleanupReader.class);
       CommentCleanupWriter writer = mock(CommentCleanupWriter.class);
       CommentCleanupStepListener stepListener = mock(CommentCleanupStepListener.class);
@@ -41,7 +39,6 @@ public class CommentCleanupJobConfigTest {
           jobRepository,
           transactionManager,
           jobListener,
-          chunkSkipLoggingListener,
           reader,
           writer,
           stepListener

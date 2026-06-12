@@ -1,6 +1,5 @@
 package com.sprint.mission.monew.batch.user.cleanup.config;
 
-import com.sprint.mission.monew.batch.common.listener.ChunkSkipLoggingListener;
 import com.sprint.mission.monew.batch.user.cleanup.dto.UserCleanupItem;
 import com.sprint.mission.monew.batch.user.cleanup.listener.UserCleanupJobListener;
 import com.sprint.mission.monew.batch.user.cleanup.reader.UserCleanupReader;
@@ -27,7 +26,6 @@ public class UserCleanupJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final UserCleanupJobListener userCleanupJobListener;
-  private final ChunkSkipLoggingListener chunkSkipLoggingListener;
   private final UserCleanupReader userCleanupReader;
   private final UserCleanupWriter userCleanupWriter;
   private final UserCleanupStepListener userCleanupStepListener;
@@ -48,13 +46,6 @@ public class UserCleanupJobConfig {
         .<UserCleanupItem, UserCleanupItem>chunk(chunkSize, transactionManager)
         .reader(userCleanupReader)
         .writer(userCleanupWriter)
-        .faultTolerant()
-        .skip(DataAccessException.class)
-        .noSkip(OutOfMemoryError.class)
-        .skipLimit(10)
-        .retryLimit(3)
-        .retry(TransientDataAccessException.class)
-        .listener(chunkSkipLoggingListener)
         .listener(userCleanupStepListener)
         .build();
   }
