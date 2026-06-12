@@ -1,10 +1,13 @@
 package com.sprint.mission.monew.batch.common.listener;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +35,12 @@ public class ItemSkipLoggingListenerTest {
     logger.addAppender(appender);
   }
 
+  @AfterEach
+  void tearDown() {
+    logger.detachAppender(appender);
+    appender.stop();
+  }
+
   @Test
   @DisplayName("Read 단계에서 Skip 발생 시 로그가 출력된다")
   void read_단계_스킵_시_로그출력() {
@@ -43,6 +52,9 @@ public class ItemSkipLoggingListenerTest {
 
     // then
     assertFalse(appender.list.isEmpty());
+    ILoggingEvent logEvent = appender.list.get(0);
+    assertThat(logEvent.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(logEvent.getFormattedMessage()).contains("배치 Reader skip");
   }
 
   @Test
@@ -56,6 +68,9 @@ public class ItemSkipLoggingListenerTest {
 
     // then
     assertFalse(appender.list.isEmpty());
+    ILoggingEvent logEvent = appender.list.get(0);
+    assertThat(logEvent.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(logEvent.getFormattedMessage()).contains("배치 Processor skip");
   }
 
   @Test
@@ -69,5 +84,8 @@ public class ItemSkipLoggingListenerTest {
 
     // then
     assertFalse(appender.list.isEmpty());
+    ILoggingEvent logEvent = appender.list.get(0);
+    assertThat(logEvent.getLevel()).isEqualTo(Level.ERROR);
+    assertThat(logEvent.getFormattedMessage()).contains("배치 Writer skip");
   }
 }
