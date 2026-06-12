@@ -18,17 +18,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 
 @ExtendWith(MockitoExtension.class)
-public class ItemSkipLoggingListenerTest {
+public class SkipLoggingListenerTest {
 
   @InjectMocks
-  private ItemSkipLoggingListener listener;
+  private SkipLoggingListener listener;
 
   private ListAppender<ILoggingEvent> appender;
   private Logger logger;
 
   @BeforeEach
   void setUp() {
-    logger = (Logger) LoggerFactory.getLogger(ItemSkipLoggingListener.class);
+    logger = (Logger) LoggerFactory.getLogger(SkipLoggingListener.class);
 
     appender = new ListAppender<>();
     appender.start();

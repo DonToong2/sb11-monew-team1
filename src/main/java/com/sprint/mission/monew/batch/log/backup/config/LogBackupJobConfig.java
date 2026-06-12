@@ -1,6 +1,6 @@
 package com.sprint.mission.monew.batch.log.backup.config;
 
-import com.sprint.mission.monew.batch.common.listener.ItemSkipLoggingListener;
+import com.sprint.mission.monew.batch.common.listener.SkipLoggingListener;
 import com.sprint.mission.monew.batch.log.backup.listener.LogBackupJobListener;
 import com.sprint.mission.monew.batch.log.backup.listener.LogBackupStepListener;
 import com.sprint.mission.monew.batch.log.backup.processor.LogBackupProcessor;
@@ -30,7 +30,7 @@ public class LogBackupJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final LogBackupJobListener logBackupJobListener;
-  private final ItemSkipLoggingListener itemSkipLoggingListener;
+  private final SkipLoggingListener skipLoggingListener;
   private final LogBackupReader logBackupReader;
   private final LogBackupProcessor logBackupProcessor;
   private final LogBackupWriter logBackupWriter;
@@ -61,7 +61,7 @@ public class LogBackupJobConfig {
         .skipLimit(10)
         .retryLimit(3)
         .retry(TransientDataAccessException.class)
-        .listener(itemSkipLoggingListener)
+        .listener(skipLoggingListener)
         .listener(logBackupStepListener)
         .build();
   }

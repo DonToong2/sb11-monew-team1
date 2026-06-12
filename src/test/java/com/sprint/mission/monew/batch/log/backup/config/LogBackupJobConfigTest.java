@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-import com.sprint.mission.monew.batch.common.listener.ItemSkipLoggingListener;
+import com.sprint.mission.monew.batch.common.listener.SkipLoggingListener;
 import com.sprint.mission.monew.batch.log.backup.listener.LogBackupJobListener;
 import com.sprint.mission.monew.batch.log.backup.listener.LogBackupStepListener;
 import com.sprint.mission.monew.batch.log.backup.processor.LogBackupProcessor;
@@ -33,7 +33,7 @@ class LogBackupJobConfigTest {
     void job_step_생성_성공() throws Exception {
       // given
       LogBackupJobListener jobListener = mock(LogBackupJobListener.class);
-      ItemSkipLoggingListener itemSkipLoggingListener = mock(ItemSkipLoggingListener.class);
+      SkipLoggingListener skipLoggingListener = mock(SkipLoggingListener.class);
       LogBackupReader reader = mock(LogBackupReader.class);
       LogBackupProcessor processor = mock(LogBackupProcessor.class);
       LogBackupWriter writer = mock(LogBackupWriter.class);
@@ -43,7 +43,7 @@ class LogBackupJobConfigTest {
           jobRepository,
           transactionManager,
           jobListener,
-          itemSkipLoggingListener,
+          skipLoggingListener,
           reader,
           processor,
           writer,

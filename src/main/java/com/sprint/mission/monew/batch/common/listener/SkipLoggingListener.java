@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ItemSkipLoggingListener implements SkipListener<Object, Object> {
+public class SkipLoggingListener implements SkipListener<Object, Object> {
 
   @Override
   public void onSkipInRead(Throwable t) {

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-import com.sprint.mission.monew.batch.common.listener.ItemSkipLoggingListener;
+import com.sprint.mission.monew.batch.common.listener.SkipLoggingListener;
 import com.sprint.mission.monew.batch.news.collect.listener.NewsCollectJobListener;
 import com.sprint.mission.monew.batch.news.collect.listener.NewsCollectStepListener;
 import com.sprint.mission.monew.batch.news.collect.reader.NewsCollectReader;
@@ -32,7 +32,7 @@ class NewsCollectJobConfigTest {
     void job_step_생성_성공() throws Exception {
       // given
       NewsCollectJobListener jobListener = mock(NewsCollectJobListener.class);
-      ItemSkipLoggingListener itemSkipLoggingListener = mock(ItemSkipLoggingListener.class);
+      SkipLoggingListener skipLoggingListener = mock(SkipLoggingListener.class);
       NewsCollectReader reader = mock(NewsCollectReader.class);
       NewsCollectWriter writer = mock(NewsCollectWriter.class);
       NewsCollectStepListener stepListener = mock(NewsCollectStepListener.class);
@@ -41,7 +41,7 @@ class NewsCollectJobConfigTest {
           jobRepository,
           transactionManager,
           jobListener,
-          itemSkipLoggingListener,
+          skipLoggingListener,
           reader,
           writer,
           stepListener

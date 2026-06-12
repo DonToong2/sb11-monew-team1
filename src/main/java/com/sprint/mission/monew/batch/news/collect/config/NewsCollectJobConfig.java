@@ -1,6 +1,6 @@
 package com.sprint.mission.monew.batch.news.collect.config;
 
-import com.sprint.mission.monew.batch.common.listener.ItemSkipLoggingListener;
+import com.sprint.mission.monew.batch.common.listener.SkipLoggingListener;
 import com.sprint.mission.monew.batch.news.collect.dto.NewsCollectItem;
 import com.sprint.mission.monew.batch.news.collect.listener.NewsCollectJobListener;
 import com.sprint.mission.monew.batch.news.collect.listener.NewsCollectStepListener;
@@ -28,7 +28,7 @@ public class NewsCollectJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final NewsCollectJobListener newsCollectJobListener;
-  private final ItemSkipLoggingListener itemSkipLoggingListener;
+  private final SkipLoggingListener skipLoggingListener;
   private final NewsCollectReader newsCollectReader;
   private final NewsCollectWriter newsCollectWriter;
   private final NewsCollectStepListener newsCollectStepListener;
@@ -56,7 +56,7 @@ public class NewsCollectJobConfig {
         .skipLimit(200)
         .retryLimit(3)
         .retry(TransientDataAccessException.class)
-        .listener(itemSkipLoggingListener)
+        .listener(skipLoggingListener)
         .listener(newsCollectStepListener)
         .build();
   }
