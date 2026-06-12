@@ -28,7 +28,6 @@ public class NewsCollectJobConfig {
   private final PlatformTransactionManager transactionManager;
 
   private final NewsCollectJobListener newsCollectJobListener;
-  private final SkipLoggingListener skipLoggingListener;
   private final NewsCollectReader newsCollectReader;
   private final NewsCollectWriter newsCollectWriter;
   private final NewsCollectStepListener newsCollectStepListener;
@@ -49,14 +48,6 @@ public class NewsCollectJobConfig {
         .<NewsCollectItem, NewsCollectItem>chunk(chunkSize, transactionManager)
         .reader(newsCollectReader)
         .writer(newsCollectWriter)
-        .faultTolerant()
-        .skip(DataIntegrityViolationException.class)
-        .skip(HttpClientErrorException.class)
-        .noSkip(OutOfMemoryError.class)
-        .skipLimit(200)
-        .retryLimit(3)
-        .retry(TransientDataAccessException.class)
-        .listener(skipLoggingListener)
         .listener(newsCollectStepListener)
         .build();
   }

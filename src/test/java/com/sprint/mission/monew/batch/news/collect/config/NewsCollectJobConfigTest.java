@@ -32,7 +32,6 @@ class NewsCollectJobConfigTest {
     void job_step_생성_성공() throws Exception {
       // given
       NewsCollectJobListener jobListener = mock(NewsCollectJobListener.class);
-      SkipLoggingListener skipLoggingListener = mock(SkipLoggingListener.class);
       NewsCollectReader reader = mock(NewsCollectReader.class);
       NewsCollectWriter writer = mock(NewsCollectWriter.class);
       NewsCollectStepListener stepListener = mock(NewsCollectStepListener.class);
@@ -41,7 +40,6 @@ class NewsCollectJobConfigTest {
           jobRepository,
           transactionManager,
           jobListener,
-          skipLoggingListener,
           reader,
           writer,
           stepListener
