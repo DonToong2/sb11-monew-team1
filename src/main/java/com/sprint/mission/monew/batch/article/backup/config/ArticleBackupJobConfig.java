@@ -1,6 +1,7 @@
 package com.sprint.mission.monew.batch.article.backup.config;
 
 import com.sprint.mission.monew.batch.article.backup.dto.ArticleBackupItem;
+import com.sprint.mission.monew.batch.article.backup.exception.ArticleBackupFailedException;
 import com.sprint.mission.monew.batch.article.backup.listener.ArticleBackupJobListener;
 import com.sprint.mission.monew.batch.article.backup.listener.ArticleBackupStepListener;
 import com.sprint.mission.monew.batch.article.backup.reader.ArticleBackupReader;
@@ -51,12 +52,12 @@ public class ArticleBackupJobConfig {
         .reader(articleBackupReader)
         .writer(articleBackupWriter)
         .faultTolerant()
-        .skip(SdkException.class)
-        .skip(IOException.class)
+        .skip(ArticleBackupFailedException.class)
         .noSkip(OutOfMemoryError.class)
         .skipLimit(50)
         .retryLimit(3)
         .retry(TransientDataAccessException.class)
+        .retry(ArticleBackupFailedException.class)
         .listener(skipLoggingListener)
         .listener(articleBackupStepListener)
         .build();

@@ -1,6 +1,7 @@
 package com.sprint.mission.monew.batch.log.backup.config;
 
 import com.sprint.mission.monew.batch.common.listener.SkipLoggingListener;
+import com.sprint.mission.monew.batch.log.backup.exception.LogBackupFailedException;
 import com.sprint.mission.monew.batch.log.backup.listener.LogBackupJobListener;
 import com.sprint.mission.monew.batch.log.backup.listener.LogBackupStepListener;
 import com.sprint.mission.monew.batch.log.backup.processor.LogBackupProcessor;
@@ -55,12 +56,12 @@ public class LogBackupJobConfig {
         .processor(logBackupProcessor)
         .writer(logBackupWriter)
         .faultTolerant()
-        .skip(SdkException.class)
-        .skip(IOException.class)
+        .skip(LogBackupFailedException.class)
         .noSkip(OutOfMemoryError.class)
         .skipLimit(10)
         .retryLimit(3)
         .retry(TransientDataAccessException.class)
+        .retry(LogBackupFailedException.class)
         .listener(skipLoggingListener)
         .listener(logBackupStepListener)
         .build();
