@@ -51,7 +51,7 @@ public class UserCleanupJobConfig {
         .faultTolerant()
         .skip(DataAccessException.class)
         .noSkip(OutOfMemoryError.class)
-        .skipLimit(100)
+        .skipLimit(10)
         .retryLimit(3)
         .retry(TransientDataAccessException.class)
         .listener(chunkSkipLoggingListener)
