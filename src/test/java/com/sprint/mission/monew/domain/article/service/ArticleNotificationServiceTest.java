@@ -1,18 +1,20 @@
-package com.sprint.mission.monew.domain.interest.service;
+package com.sprint.mission.monew.domain.article.service;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
+import com.sprint.mission.monew.domain.article.event.ArticleNotificationEvent;
 import com.sprint.mission.monew.domain.article.repository.ArticleInterestRepository;
+import com.sprint.mission.monew.domain.notification.entity.ResourceType;
 import com.sprint.mission.monew.domain.article.repository.dto.InterestArticleCount;
 import com.sprint.mission.monew.domain.interest.repository.SubscriptionRepository;
 import com.sprint.mission.monew.domain.interest.repository.dto.InterestSubscriber;
-import com.sprint.mission.monew.domain.notification.service.NotificationService;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,18 +22,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
-class InterestNotificationServiceTest {
+class ArticleNotificationServiceTest {
 
   @InjectMocks
-  InterestNotificationService interestNotificationService;
+  ArticleNotificationService articleNotificationService;
   @Mock
   ArticleInterestRepository articleInterestRepository;
   @Mock
   SubscriptionRepository subscriptionRepository;
   @Mock
-  NotificationService notificationService;
+  ApplicationEventPublisher eventPublisher;
+
+  @BeforeEach
+  void setUp() {
+    // MockitoExtension이 @BeforeEach마다 mock을 재생성하므로 상태 공유 없음
+  }
 
   @Nested
   @DisplayName("notifyNewArticles")
@@ -60,15 +68,15 @@ class InterestNotificationServiceTest {
           .willReturn(List.of(s1, s2, s3));
 
       // when
-      interestNotificationService.notifyNewArticles(since);
+      articleNotificationService.notifyNewArticles(since);
 
       // then — A는 2건/구독자 2명, B는 1건/구독자 1명
-      then(notificationService).should()
-          .createArticleNotifications(
-              interestAId, "[인공지능]와 관련된 기사가 2건 등록되었습니다.", List.of(u1, u2));
-      then(notificationService).should()
-          .createArticleNotifications(
-              interestBId, "[경제]와 관련된 기사가 1건 등록되었습니다.", List.of(u3));
+      then(eventPublisher).should()
+          .publishEvent(new ArticleNotificationEvent(
+              List.of(u1, u2), "[인공지능]와 관련된 기사가 2건 등록되었습니다.", ResourceType.ARTICLE, interestAId));
+      then(eventPublisher).should()
+          .publishEvent(new ArticleNotificationEvent(
+              List.of(u3), "[경제]와 관련된 기사가 1건 등록되었습니다.", ResourceType.ARTICLE, interestBId));
     }
 
     @Test
@@ -79,11 +87,11 @@ class InterestNotificationServiceTest {
       given(articleInterestRepository.countByInterestSince(since)).willReturn(List.of());
 
       // when
-      interestNotificationService.notifyNewArticles(since);
+      articleNotificationService.notifyNewArticles(since);
 
       // then
       then(subscriptionRepository).shouldHaveNoInteractions();
-      then(notificationService).shouldHaveNoInteractions();
+      then(eventPublisher).shouldHaveNoInteractions();
     }
 
     @Test
@@ -98,10 +106,10 @@ class InterestNotificationServiceTest {
       given(subscriptionRepository.findSubscribersByInterestIds(anyList())).willReturn(List.of());
 
       // when
-      interestNotificationService.notifyNewArticles(since);
+      articleNotificationService.notifyNewArticles(since);
 
       // then
-      then(notificationService).shouldHaveNoInteractions();
+      then(eventPublisher).shouldHaveNoInteractions();
     }
   }
 
