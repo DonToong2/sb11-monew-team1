@@ -10,17 +10,17 @@ public class ItemSkipLoggingListener implements SkipListener<Object, Object> {
 
   @Override
   public void onSkipInRead(Throwable t) {
-    log.error("배치 Reader skip | error={}", t.getMessage());
+    log.error("배치 Reader skip", t);
   }
 
   @Override
   public void onSkipInProcess(Object item, Throwable t) {
-    log.error("배치 Processor skip | item={}, error={}", item, t.getMessage());
+    log.error("배치 Processor skip | item={}", item, t);
   }
 
   @Override
   public void onSkipInWrite(Object item, Throwable t) {
-    log.error("배치 Writer skip | item={}, error={}", item, t.getMessage());
+    log.error("배치 Writer skip | item={}", item, t);
   }
 
 }
