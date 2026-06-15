@@ -23,14 +23,15 @@ public class RecentArticleView {
   private long articleViewCount;
 
   public static RecentArticleView of(
-      UUID id, UUID viewedBy, Instant createdAt, UUID articleId,
-      String source, String sourceUrl, String articleTitle,
+      UUID articleViewId, UUID viewedBy, Instant viewedAt,
+      UUID articleId, String source, String sourceUrl, String articleTitle,
       Instant articlePublishedDate, String articleSummary,
       long articleCommentCount, long articleViewCount) {
+
     RecentArticleView doc = new RecentArticleView();
-    doc.id = id;
+    doc.id = articleViewId;
     doc.viewedBy = viewedBy;
-    doc.createdAt = createdAt;
+    doc.createdAt = viewedAt;
     doc.articleId = articleId;
     doc.source = source;
     doc.sourceUrl = sourceUrl;

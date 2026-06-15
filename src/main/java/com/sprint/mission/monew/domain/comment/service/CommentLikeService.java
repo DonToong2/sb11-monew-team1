@@ -22,6 +22,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sprint.mission.monew.domain.useractivity.listener.CommentLikedEvent;
+import com.sprint.mission.monew.domain.useractivity.listener.CommentLikeRemovedEvent;
+import java.time.Instant;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -49,17 +53,23 @@ public class CommentLikeService {
             .findById(commentId)
             .orElseThrow(() -> CommentNotFoundException.withId(commentId));
 
+    UUID articleId = comment.getArticle().getId();
+    String articleTitle = comment.getArticle().getTitle();
+    Instant commentCreatedAt = comment.getCreatedAt();
+
+    UUID commentUserId = comment.getUser() != null ? comment.getUser().getId() : null;
+    String commentUserNickname = comment.getUser() != null ? comment.getUser().getNickname() : null;
+    String commentContent = comment.getContent();
+
+    long nextLikeCount = comment.getLikeCount() + 1;
+
     CommentLike commentLike = CommentLike.create(user, comment);
 
     CommentLike savedCommentLike;
     CommentLikeResponse response;
     try {
       savedCommentLike = commentLikeRepository.saveAndFlush(commentLike);
-      // IMPORTANT: 응답 매핑을 increaseLikeCount() 이전에 수행해야 함
-      // increaseLikeCount()의 clearAutomatically=true가 영속성 컨텍스트를 초기화하므로,
-      // 지연 로딩되는 연관 엔티티(comment.article, comment.user 등) 접근은 그 전에 완료되어야 함
-      // 증가 후 예상되는 좋아요 수를 미리 계산하여 응답 생성 (실제 증가는 다음 라인에서 수행)
-      response = commentLikeMapper.toResponse(savedCommentLike, comment.getLikeCount() + 1);
+      response = commentLikeMapper.toResponse(savedCommentLike, nextLikeCount);
       commentRepository.increaseLikeCount(commentId);
     } catch (DataIntegrityViolationException e) {
       throw CommentLikeAlreadyExistsException.withId(userId, commentId);
@@ -67,6 +77,21 @@ public class CommentLikeService {
 
     log.info("댓글 좋아요 등록 완료 | commentLikeId={}, commentId={}, userId={}",
         savedCommentLike.getId(), commentId, userId);
+
+    log.debug("CommentLikedEvent 발행 | commentId={}, userId={}", commentId, userId);
+    eventPublisher.publishEvent(new CommentLikedEvent(
+        userId,
+        savedCommentLike.getId(),
+        savedCommentLike.getCreatedAt(),
+        commentId,
+        articleId,
+        articleTitle,
+        commentUserId,
+        commentUserNickname,
+        commentContent,
+        nextLikeCount,
+        commentCreatedAt
+    ));
 
     UUID authorId = comment.getUser() != null ? comment.getUser().getId() : null;
     if (authorId != null && !authorId.equals(userId)) {
@@ -89,6 +114,9 @@ public class CommentLikeService {
     }
 
     commentRepository.decreaseLikeCount(commentId);
+
+    log.debug("CommentLikeRemovedEvent 발행 | commentId={}, userId={}", commentId, userId);
+    eventPublisher.publishEvent(new CommentLikeRemovedEvent(userId, commentId));
 
     log.info("댓글 좋아요 취소 완료 | commentId={}, userId={}", commentId, userId);
   }

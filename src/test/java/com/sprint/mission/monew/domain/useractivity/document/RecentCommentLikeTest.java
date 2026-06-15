@@ -18,29 +18,35 @@ class RecentCommentLikeTest {
     @DisplayName("전달한 값으로 RecentCommentLike를 생성한다")
     void 전달한_값으로_RecentCommentLike를_생성한다() {
       // given
-      UUID id = UUID.randomUUID();
+      UUID likeId = UUID.randomUUID();
       UUID commentId = UUID.randomUUID();
       UUID articleId = UUID.randomUUID();
       UUID commentUserId = UUID.randomUUID();
+      String articleTitle = "기사 제목";
+      String commentUserNickname = "댓글작성자";
+      String commentContent = "댓글내용";
+      long commentLikeCount = 3L;
       Instant now = Instant.now();
       Instant commentCreatedAt = now.minusSeconds(60);
 
       // when
       RecentCommentLike like = RecentCommentLike.of(
-          id, now, commentId, articleId, "기사 제목",
-          commentUserId, "댓글작성자", "댓글 내용", 3L, commentCreatedAt);
+          likeId, now, commentId, articleId, articleTitle,
+          commentUserId, commentUserNickname, commentContent,
+          commentLikeCount, commentCreatedAt
+      );
 
       // then
-      assertThat(like.getId()).isEqualTo(id);
-      assertThat(like.getCreatedAt()).isEqualTo(now);
+      assertThat(like.getId()).isEqualTo(likeId);
       assertThat(like.getCommentId()).isEqualTo(commentId);
       assertThat(like.getArticleId()).isEqualTo(articleId);
-      assertThat(like.getArticleTitle()).isEqualTo("기사 제목");
+      assertThat(like.getArticleTitle()).isEqualTo(articleTitle);
       assertThat(like.getCommentUserId()).isEqualTo(commentUserId);
-      assertThat(like.getCommentUserNickname()).isEqualTo("댓글작성자");
-      assertThat(like.getCommentContent()).isEqualTo("댓글 내용");
-      assertThat(like.getCommentLikeCount()).isEqualTo(3L);
+      assertThat(like.getCommentUserNickname()).isEqualTo(commentUserNickname);
+      assertThat(like.getCommentContent()).isEqualTo(commentContent);
+      assertThat(like.getCommentLikeCount()).isEqualTo(commentLikeCount);
       assertThat(like.getCommentCreatedAt()).isEqualTo(commentCreatedAt);
+      assertThat(like.getCreatedAt()).isEqualTo(now);
     }
   }
 }

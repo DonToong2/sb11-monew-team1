@@ -22,12 +22,14 @@ public class RecentCommentLike {
   private Instant commentCreatedAt;
 
   public static RecentCommentLike of(
-      UUID id, Instant createdAt, UUID commentId, UUID articleId,
-      String articleTitle, UUID commentUserId, String commentUserNickname,
-      String commentContent, long commentLikeCount, Instant commentCreatedAt) {
+      UUID likeId, Instant likedAt,
+      UUID commentId, UUID articleId, String articleTitle,
+      UUID commentUserId, String commentUserNickname, String commentContent,
+      long commentLikeCount, Instant commentCreatedAt) {
+
     RecentCommentLike doc = new RecentCommentLike();
-    doc.id = id;
-    doc.createdAt = createdAt;
+    doc.id = likeId;
+    doc.createdAt = likedAt;
     doc.commentId = commentId;
     doc.articleId = articleId;
     doc.articleTitle = articleTitle;

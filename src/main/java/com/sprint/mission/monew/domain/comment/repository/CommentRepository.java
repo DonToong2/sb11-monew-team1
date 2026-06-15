@@ -14,15 +14,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface CommentRepository extends JpaRepository<Comment, UUID>, CommentCustomRepository {
 
-  @Query("SELECT c FROM Comment c " +
-      "JOIN FETCH c.article a " +
-      "LEFT JOIN FETCH c.user u " +
-      "WHERE c.user.id = :userId " +
-      "AND c.deletedAt IS NULL " +
-      "AND a.deletedAt IS NULL " +
-      "ORDER BY c.createdAt DESC ")
-  List<Comment> findTop10RecentCommentsByUserId(@Param("userId") UUID userId, Pageable pageable);
-
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("""
       update Comment c set c.likeCount = c.likeCount + 1

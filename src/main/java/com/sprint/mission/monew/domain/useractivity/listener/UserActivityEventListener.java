@@ -1,93 +1,161 @@
 package com.sprint.mission.monew.domain.useractivity.listener;
 
+import com.sprint.mission.monew.domain.useractivity.document.RecentArticleView;
+import com.sprint.mission.monew.domain.useractivity.document.RecentComment;
+import com.sprint.mission.monew.domain.useractivity.document.RecentCommentLike;
+import com.sprint.mission.monew.domain.useractivity.document.RecentSubscription;
+import com.sprint.mission.monew.domain.useractivity.document.UserActivity;
 import com.sprint.mission.monew.domain.useractivity.repository.UserActivityMongoRepository;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class UserActivityEventListener {
 
   private final UserActivityMongoRepository userActivityMongoRepository;
 
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(UserCreatedEvent event) {
-    userActivityMongoRepository.createUserActivity(event.userActivity());
+    log.debug("UserActivity 생성 | userId={}", event.userId());
+    UserActivity userActivity = UserActivity.of(event.userId(), event.email(), event.nickname(), event.createdAt());
+    userActivityMongoRepository.createUserActivity(userActivity);
   }
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-  public void handle(UserNicknameUpdatedEvent event) {
-    userActivityMongoRepository.updateNickname(event.userId(), event.nickname());
-  }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(UserDeletedEvent event) {
-    userActivityMongoRepository.anonymize(event.userId());
-    userActivityMongoRepository.anonymizeCommentLikesByCommentUserId(event.userId());
+    log.debug("UserActivity 익명화 | userId={}", event.userId());
+    try {
+      userActivityMongoRepository.anonymize(event.userId());
+    } catch (Exception e) {
+      log.error("UserActivity 익명화 실패 | userId={}", event.userId(), e);
+    }
+    try {
+      userActivityMongoRepository.anonymizeCommentLikesByCommentUserId(event.userId());
+    } catch (Exception e) {
+      log.error("댓글 좋아요 익명화 실패 | userId={}", event.userId(), e);
+    }
   }
+
+  @Async("userActivityExecutor")
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void handle(UserNicknameUpdatedEvent event) {
+    log.debug("UserActivity 닉네임 업데이트 | userId={}", event.userId());
+    userActivityMongoRepository.updateNickname(event.userId(), event.nickname());
+  }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(SubscriptionCreatedEvent event) {
-    com.sprint.mission.monew.domain.useractivity.document.RecentSubscription subscription =
-        com.sprint.mission.monew.domain.useractivity.document.RecentSubscription.of(
-            UUID.randomUUID(), // 구독 활동 자체의 ID
-            event.interestId(), event.interestName(), event.interestKeywords(),
-            event.interestSubscriberCount(), event.createdAt()
-        );
+    log.debug("구독 push | userId={}, interestId={}", event.userId(), event.interestId());
+    RecentSubscription subscription = RecentSubscription.of(
+        event.subscriptionId(),
+        event.interestId(),
+        event.interestName(),
+        event.interestKeywords(),
+        event.interestSubscriberCount(),
+        event.createdAt()
+    );
     userActivityMongoRepository.pushSubscription(event.userId(), subscription);
   }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(SubscriptionCancelledEvent event) {
+    log.debug("구독 pull | userId={}, interestId={}", event.userId(), event.interestId());
     userActivityMongoRepository.pullSubscription(event.userId(), event.interestId());
   }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(CommentCreatedEvent event) {
-    com.sprint.mission.monew.domain.useractivity.document.RecentComment comment =
-        com.sprint.mission.monew.domain.useractivity.document.RecentComment.of(
-            event.commentId(), event.articleId(), event.articleTitle(),
-            event.userId(), event.userNickname(), event.content(),
-            event.likeCount(), event.createdAt()
-        );
-    userActivityMongoRepository.pushComment(event.userId(),comment);
-
+    log.debug("댓글 push | userId={}, commentId={}", event.userId(), event.commentId());
+    RecentComment comment = RecentComment.of(
+        event.commentId(), event.articleId(), event.articleTitle(),
+        event.userId(), event.userNickname(), event.content(), event.likeCount(), event.createdAt()
+    );
+    userActivityMongoRepository.pushComment(event.userId(), comment);
   }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(CommentUpdatedEvent event) {
-    userActivityMongoRepository.updateCommentContent(event.userId(), event.commentId(), event.content());
+    log.debug("댓글 content 업데이트 | commentId={}", event.commentId());
+    userActivityMongoRepository.updateCommentContent(event.commentId(), event.content());
   }
+
+  @Async("userActivityExecutor")
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void handle(CommentDeletedEvent event) {
+    log.debug("댓글 pull | authorId={}, commentId={}", event.authorId(), event.commentId());
+    userActivityMongoRepository.pullComment(event.authorId(), event.commentId());
+  }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(CommentLikedEvent event) {
-    com.sprint.mission.monew.domain.useractivity.document.RecentCommentLike commentLike =
-        com.sprint.mission.monew.domain.useractivity.document.RecentCommentLike.of(
-            event.likeId(), event.createdAt(), event.commentId(), event.articleId(),
-            event.articleTitle(), event.commentUserId(), event.commentUserNickname(),
-            event.commentContent(), event.commentLikeCount(), event.commentCreatedAt()
-        );
+    log.debug("댓글 좋아요 push | userId={}, commentId={}", event.userId(), event.commentId());
+    RecentCommentLike commentLike = RecentCommentLike.of(
+        event.likeId(), event.createdAt(),
+        event.commentId(), event.articleId(), event.articleTitle(),
+        event.commentUserId(), event.commentUserNickname(), event.commentContent(),
+        event.commentLikeCount(), event.commentCreatedAt()
+    );
     userActivityMongoRepository.pushCommentLike(event.userId(), commentLike);
   }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(CommentLikeRemovedEvent event) {
+    log.debug("댓글 좋아요 pull | userId={}, commentId={}", event.userId(), event.commentId());
     userActivityMongoRepository.pullCommentLike(event.userId(), event.commentId());
   }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(ArticleViewedEvent event) {
-    com.sprint.mission.monew.domain.useractivity.document.RecentArticleView articleView =
-        com.sprint.mission.monew.domain.useractivity.document.RecentArticleView.of(
-            event.viewId(), event.userId(), event.createdAt(), event.articleId(),
-            event.source(), event.sourceUrl(), event.articleTitle(),
-            event.articlePublishedDate(), event.articleSummary(),
-            event.articleCommentCount(), event.articleViewCount()
-        );
+    log.debug("기사 조회 push | userId={}, articleId={}", event.userId(), event.articleId());
+    RecentArticleView articleView = RecentArticleView.of(
+        event.articleViewId(), event.userId(), event.createdAt(),
+        event.articleId(), event.source(), event.sourceUrl(), event.articleTitle(),
+        event.articlePublishedDate(), event.articleSummary(),
+        event.articleCommentCount(), event.articleViewCount()
+    );
     userActivityMongoRepository.pushArticleView(event.userId(), articleView);
   }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(ArticleDeletedEvent event) {
-    userActivityMongoRepository.pullArticle(event.userId(), event.articleId());
-    userActivityMongoRepository.pullArticleLike(event.userId(), event.articleId());
-    userActivityMongoRepository.pullArticleView(event.userId(), event.articleId());
+    log.debug("기사 삭제 cascade | articleId={}", event.articleId());
+    try {
+      userActivityMongoRepository.pullArticleViewsByArticleId(event.articleId());
+    } catch (Exception e) {
+      log.error("기사 조회 기록 pull 실패 | articleId={}", event.articleId(), e);
+    }
+    try {
+      userActivityMongoRepository.pullCommentsByArticleId(event.articleId());
+    } catch (Exception e) {
+      log.error("기사 댓글 pull 실패 | articleId={}", event.articleId(), e);
+    }
+    try {
+      userActivityMongoRepository.pullCommentLikesByArticleId(event.articleId());
+    } catch (Exception e) {
+      log.error("기사 댓글 좋아요 pull 실패 | articleId={}", event.articleId(), e);
+    }
   }
+
+  @Async("userActivityExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(InterestDeletedEvent event) {
+    log.debug("관심사 삭제 cascade | interestId={}", event.interestId());
     userActivityMongoRepository.pullSubscriptionsByInterestId(event.interestId());
   }
 }

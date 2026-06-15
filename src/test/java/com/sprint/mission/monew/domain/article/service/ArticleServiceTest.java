@@ -23,6 +23,8 @@ import com.sprint.mission.monew.domain.article.mapper.ArticleViewMapper;
 import com.sprint.mission.monew.domain.article.exception.ArticleNotFoundException;
 import com.sprint.mission.monew.domain.article.repository.ArticleRepository;
 import com.sprint.mission.monew.domain.article.repository.ArticleViewRepository;
+import com.sprint.mission.monew.domain.useractivity.listener.ArticleDeletedEvent;
+import com.sprint.mission.monew.domain.useractivity.listener.ArticleViewedEvent;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class ArticleServiceTest {
@@ -44,6 +47,7 @@ class ArticleServiceTest {
   @Mock ArticleViewRepository articleViewRepository;
   @Mock ArticleMapper articleMapper;
   @Mock ArticleViewMapper articleViewMapper;
+  @Mock ApplicationEventPublisher eventPublisher;
 
   UUID requestUserId;
   ArticleQueryCondition defaultCondition;
@@ -288,21 +292,21 @@ class ArticleServiceTest {
     }
 
     @Test
-    @DisplayName("이미 조회한 기사이면 기존 ArticleView를 반환하고 viewCount를 증가시키지 않는다")
+    @DisplayName("이미 조회한 기사이면 기존 뷰를 반환하고 viewCount를 증가시키지 않는다")
     void 이미_조회한_기사이면_기존_뷰를_반환하고_viewCount를_증가시키지_않는다() {
       // given
       Article article = makeArticle(ArticleSource.NAVER);
-      ArticleView existingView = ArticleView.create(requestUserId, article);
+      ArticleView view = ArticleView.create(requestUserId, article);
       ArticleViewResponse dto = new ArticleViewResponse(
-          existingView.getId(), requestUserId, existingView.getCreatedAt(),
+          view.getId(), requestUserId, view.getCreatedAt(),
           article.getId(), ArticleSource.NAVER, article.getSourceUrl(),
           article.getTitle(), article.getPublishDate(), article.getSummary(),
-          0, 0);
+          0, article.getViewCount());
 
       given(articleRepository.findById(eq(article.getId()))).willReturn(Optional.of(article));
       given(articleViewRepository.findByArticleIdAndUserId(eq(article.getId()), eq(requestUserId)))
-          .willReturn(Optional.of(existingView));
-      given(articleViewMapper.toResponse(eq(existingView), anyInt())).willReturn(dto);
+          .willReturn(Optional.of(view));
+      given(articleViewMapper.toResponse(eq(view), eq(article.getViewCount()))).willReturn(dto);
 
       // when
       ArticleViewResponse result = articleService.registerView(article.getId(), requestUserId);
@@ -314,33 +318,32 @@ class ArticleServiceTest {
     }
 
     @Test
-    @DisplayName("처음 조회하는 기사이면 ArticleView를 저장하고 viewCount를 증가시킨다")
-    void 처음_조회하는_기사이면_뷰를_저장하고_viewCount를_증가시킨다() {
+    @DisplayName("신규 등록이면 저장 후 viewCount를 증가시키고 ArticleViewedEvent를 발행한다")
+    void 신규_등록이면_저장_후_viewCount를_증가시키고_ArticleViewedEvent를_발행한다() {
       // given
       Article article = makeArticle(ArticleSource.NAVER);
-      ArticleView newView = ArticleView.create(requestUserId, article);
+      ArticleView saved = ArticleView.create(requestUserId, article);
+      int expectedViewCount = article.getViewCount() + 1;
       ArticleViewResponse dto = new ArticleViewResponse(
-          newView.getId(), requestUserId, newView.getCreatedAt(),
+          saved.getId(), requestUserId, saved.getCreatedAt(),
           article.getId(), ArticleSource.NAVER, article.getSourceUrl(),
           article.getTitle(), article.getPublishDate(), article.getSummary(),
-          0, 1);
+          0, expectedViewCount);
 
       given(articleRepository.findById(eq(article.getId()))).willReturn(Optional.of(article));
       given(articleViewRepository.findByArticleIdAndUserId(eq(article.getId()), eq(requestUserId)))
           .willReturn(Optional.empty());
-      given(articleViewRepository.save(any(ArticleView.class))).willReturn(newView);
-      given(articleViewMapper.toResponse(eq(newView), anyInt())).willReturn(dto);
-
-      int viewCountBefore = article.getViewCount();
+      given(articleViewRepository.save(any())).willReturn(saved);
+      given(articleViewMapper.toResponse(eq(saved), eq(expectedViewCount))).willReturn(dto);
 
       // when
       ArticleViewResponse result = articleService.registerView(article.getId(), requestUserId);
 
       // then
       assertThat(result).isEqualTo(dto);
-      verify(articleViewRepository).save(any(ArticleView.class));
+      verify(articleViewRepository).save(any());
       verify(articleRepository).increaseViewCount(eq(article.getId()));
-      verify(articleViewMapper).toResponse(eq(newView), eq(viewCountBefore + 1));
+      verify(eventPublisher).publishEvent(any(ArticleViewedEvent.class));
     }
   }
 
@@ -374,8 +377,8 @@ class ArticleServiceTest {
     }
 
     @Test
-    @DisplayName("존재하는 기사이면 deletedAt을 설정한다")
-    void 존재하는_기사이면_deletedAt을_설정한다() {
+    @DisplayName("존재하는 기사이면 deletedAt을 설정하고 ArticleDeletedEvent를 발행한다")
+    void 존재하는_기사이면_deletedAt을_설정하고_ArticleDeletedEvent를_발행한다() {
       // given
       Article article = makeArticle(ArticleSource.NAVER);
       given(articleRepository.findById(eq(article.getId()))).willReturn(Optional.of(article));
@@ -385,6 +388,7 @@ class ArticleServiceTest {
 
       // then
       assertThat(article.isDeleted()).isTrue();
+      verify(eventPublisher).publishEvent(any(ArticleDeletedEvent.class));
     }
   }
 
