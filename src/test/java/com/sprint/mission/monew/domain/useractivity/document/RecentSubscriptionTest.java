@@ -19,21 +19,24 @@ class RecentSubscriptionTest {
     @DisplayName("전달한 값으로 RecentSubscription을 생성한다")
     void 전달한_값으로_RecentSubscription을_생성한다() {
       // given
-      UUID id = UUID.randomUUID();
+      UUID subscriptionId = UUID.randomUUID();
       UUID interestId = UUID.randomUUID();
-      List<String> keywords = List.of("AI", "클라우드");
+      String interestName = "IT 기술";
+      List<String> keywords = List.of("java", "spring");
+      long subscriberCount = 10L;
       Instant now = Instant.now();
 
       // when
-      RecentSubscription sub = RecentSubscription.of(id, interestId, "IT", keywords, 42L, now);
+      RecentSubscription subscription = RecentSubscription.of(
+          subscriptionId, interestId, interestName, keywords, subscriberCount, now);
 
       // then
-      assertThat(sub.getId()).isEqualTo(id);
-      assertThat(sub.getInterestId()).isEqualTo(interestId);
-      assertThat(sub.getInterestName()).isEqualTo("IT");
-      assertThat(sub.getInterestKeywords()).containsExactly("AI", "클라우드");
-      assertThat(sub.getInterestSubscriberCount()).isEqualTo(42L);
-      assertThat(sub.getCreatedAt()).isEqualTo(now);
+      assertThat(subscription.getId()).isEqualTo(subscriptionId);
+      assertThat(subscription.getInterestId()).isEqualTo(interestId);
+      assertThat(subscription.getInterestName()).isEqualTo(interestName);
+      assertThat(subscription.getInterestKeywords()).isEqualTo(keywords);
+      assertThat(subscription.getInterestSubscriberCount()).isEqualTo(subscriberCount);
+      assertThat(subscription.getCreatedAt()).isEqualTo(now);
     }
   }
 }

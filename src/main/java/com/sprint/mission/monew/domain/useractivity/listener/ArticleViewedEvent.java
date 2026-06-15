@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ArticleViewedEvent(
-    UUID userId, // 조회한 유저
-    UUID viewId,
+    UUID userId,
+    UUID articleViewId,
     Instant createdAt,
     UUID articleId,
     String source,

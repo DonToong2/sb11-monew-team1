@@ -10,6 +10,7 @@ import com.sprint.mission.monew.domain.interest.exception.InterestAlreadyExistsE
 import com.sprint.mission.monew.domain.interest.exception.InterestNotFoundException;
 import com.sprint.mission.monew.domain.interest.mapper.InterestMapper;
 import com.sprint.mission.monew.domain.interest.repository.InterestRepository;
+import com.sprint.mission.monew.domain.useractivity.listener.InterestDeletedEvent;
 import com.sprint.mission.monew.domain.interest.util.JamoNormalizer;
 import com.sprint.mission.monew.domain.interest.util.LevenshteinUtils;
 import com.sprint.mission.monew.domain.interest.util.SynonymUtils;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class InterestService {
   private final InterestRepository interestRepository;
   private final InterestMapper interestMapper;
   private final SynonymUtils synonymUtils;
+  private final ApplicationEventPublisher eventPublisher;
 
   public CursorPageResponse<InterestResponse> findAll(InterestQueryCondition condition,
       UUID userId) {
@@ -92,6 +95,8 @@ public class InterestService {
     Interest interest = interestRepository.findById(id)
         .orElseThrow(() -> InterestNotFoundException.withId(id));
     interestRepository.delete(interest);
+    log.debug("InterestDeletedEvent 발행 | interestId={}", id);
+    eventPublisher.publishEvent(new InterestDeletedEvent(id));
     log.info("관심사 물리 삭제 완료 | interestId={}", id);
   }
 

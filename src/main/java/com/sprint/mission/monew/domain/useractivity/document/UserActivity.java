@@ -35,8 +35,6 @@ public class UserActivity {
     doc.nickname = nickname;
     doc.createdAt = createdAt;
     return doc;
-
   }
-
 
 }

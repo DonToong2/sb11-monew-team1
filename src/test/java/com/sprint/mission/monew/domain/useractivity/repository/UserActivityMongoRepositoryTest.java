@@ -8,12 +8,10 @@ import com.sprint.mission.monew.domain.useractivity.document.RecentComment;
 import com.sprint.mission.monew.domain.useractivity.document.RecentCommentLike;
 import com.sprint.mission.monew.domain.useractivity.document.RecentSubscription;
 import com.sprint.mission.monew.domain.useractivity.document.UserActivity;
-import com.sprint.mission.monew.domain.useractivity.repository.impl.UserActivityCustomMongoRepositoryImpl;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,353 +30,334 @@ class UserActivityMongoRepositoryTest {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  @Autowired
-  private UserActivityCustomMongoRepositoryImpl impl;
+  @AfterEach
+  void tearDown() {
+    mongoTemplate.dropCollection(UserActivity.class);
+  }
 
-  private UUID userId;
-  private UserActivity activity;
-  private Instant now;
+  private UserActivity newActivity(UUID userId) {
+    return UserActivity.of(userId, "test@test.com", "테스트유저", Instant.now());
+  }
 
-  @BeforeEach
-  void setUp() {
-    repository.deleteAll();
-    userId = UUID.randomUUID();
-    now = Instant.now();
-    activity = UserActivity.of(userId, "test@example.com", "닉네임", now);
+  private RecentComment newComment(UUID commentId, UUID articleId, String title) {
+    return RecentComment.of(commentId, articleId, title, UUID.randomUUID(), "테스트유저", "내용", 0L, Instant.now());
+  }
+
+  private RecentSubscription newSubscription(UUID subscriptionId, UUID interestId, String name) {
+    return RecentSubscription.of(subscriptionId, interestId, name, List.of("키워드"), 1L, Instant.now());
+  }
+
+  private RecentCommentLike newCommentLike(UUID likeId, UUID commentId, UUID articleId, String title) {
+    return RecentCommentLike.of(likeId, Instant.now(), commentId, articleId, title,
+        UUID.randomUUID(), "댓글작성자", "댓글내용", 1L, Instant.now());
+  }
+
+  private RecentArticleView newArticleView(UUID articleViewId, UUID viewedBy, UUID articleId, String title) {
+    return RecentArticleView.of(articleViewId, viewedBy, Instant.now(), articleId,
+        "NAVER", "https://url", title, Instant.now(), "요약", 0L, 1L);
   }
 
   @Nested
-  @DisplayName("UserActivity 저장 및 단건 조회")
-  class SaveAndFind {
+  @DisplayName("유저 라이프사이클 테스트")
+  class LifecycleTest {
 
     @Test
-    @DisplayName("저장한 UserActivity를 id로 조회할 수 있다")
-    void 저장한_UserActivity를_id로_조회할_수_있다() {
+    @DisplayName("익명화하면 email·nickname이 마스킹되고 모든 활동 배열이 빈 배열로 초기화된다")
+    void 익명화하면_개인정보가_마스킹되고_모든_활동_배열이_초기화된다() {
       // given
-      repository.save(activity);
+      UUID userId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushComment(userId, newComment(UUID.randomUUID(), UUID.randomUUID(), "기사"));
+      repository.pushSubscription(userId, newSubscription(UUID.randomUUID(), UUID.randomUUID(), "IT"));
 
       // when
-      Optional<UserActivity> found = repository.findById(userId);
+      repository.anonymize(userId);
 
       // then
-      assertThat(found).isPresent();
-      assertThat(found.get().getEmail()).isEqualTo("test@example.com");
-      assertThat(found.get().getNickname()).isEqualTo("닉네임");
-    }
-  }
-
-  @Nested
-  @DisplayName("nickname 존재 여부로 활성 사용자 조회")
-  class FindByIdAndNicknameIsNotNull {
-
-    @Test
-    @DisplayName("nickname이 있으면 UserActivity를 반환한다")
-    void nickname이_있으면_UserActivity를_반환한다() {
-      // given
-      repository.save(activity);
-
-      // when
-      Optional<UserActivity> found = repository.findByIdAndNicknameIsNotNull(userId);
-
-      // then
-      assertThat(found).isPresent();
-      assertThat(found.get().getId()).isEqualTo(userId);
-    }
-
-    @Test
-    @DisplayName("nickname이 null이면 empty를 반환한다")
-    void nickname이_null이면_empty를_반환한다() {
-      // given
-      UserActivity deleted = UserActivity.of(userId, "test@example.com", null, now);
-      repository.save(deleted);
-
-      // when
-      Optional<UserActivity> found = repository.findByIdAndNicknameIsNotNull(userId);
-
-      // then
-      assertThat(found).isEmpty();
-    }
-  }
-
-  @Nested
-  @DisplayName("pushComment()")
-  class PushComment {
-
-    @Test
-    @DisplayName("댓글을 배열 첫 번째에 삽입한다")
-    void 댓글을_배열_첫_번째에_삽입한다() {
-      // given
-      mongoTemplate.insert(UserActivity.of(userId, "a@b.com", "닉네임", now));
-      RecentComment comment = RecentComment.of(
-          UUID.randomUUID(), UUID.randomUUID(), "기사 제목", userId, "닉네임", "댓글 내용", 0L, now);
-
-      // when
-      impl.pushComment(userId, comment);
-
-      // then
-      UserActivity found = mongoTemplate.findById(userId, UserActivity.class);
-      assertThat(found).isNotNull();
-      assertThat(found.getComments()).hasSize(1);
-      assertThat(found.getComments().get(0).getContent()).isEqualTo("댓글 내용");
-    }
-
-    @Test
-    @DisplayName("댓글이 10개를 초과하면 최신 10개만 유지한다")
-    void 댓글이_10개를_초과하면_최신_10개만_유지한다() {
-      // given
-      UserActivity fullActivity = UserActivity.of(userId, "a@b.com", "닉네임", now);
-      for (int i = 1; i <= 10; i++) {
-        fullActivity.getComments().add(
-            RecentComment.of(UUID.randomUUID(), UUID.randomUUID(), "기존 " + i,
-                userId, "닉네임", "기존 " + i, 0L, now));
-      }
-      mongoTemplate.insert(fullActivity);
-      RecentComment newComment = RecentComment.of(
-          UUID.randomUUID(), UUID.randomUUID(), "최신 기사", userId, "닉네임", "최신 댓글", 0L, now);
-
-      // when
-      impl.pushComment(userId, newComment);
-
-      // then
-      UserActivity found = mongoTemplate.findById(userId, UserActivity.class);
-      assertThat(found).isNotNull();
-      assertThat(found.getComments()).hasSize(10);
-    }
-
-    @Test
-    @DisplayName("도큐먼트가 없으면 upsert로 신규 생성한다")
-    void 도큐먼트가_없으면_upsert로_신규_생성한다() {
-      // given
-      RecentComment comment = RecentComment.of(
-          UUID.randomUUID(), UUID.randomUUID(), "기사", userId, "닉네임", "내용", 0L, now);
-
-      // when
-      impl.pushComment(userId, comment);
-
-      // then
-      UserActivity found = mongoTemplate.findById(userId, UserActivity.class);
-      assertThat(found).isNotNull();
-      assertThat(found.getComments()).hasSize(1);
-    }
-  }
-
-  @Nested
-  @DisplayName("pullComment()")
-  class PullComment {
-
-    @Test
-    @DisplayName("해당 commentId의 댓글을 제거한다")
-    void 해당_commentId의_댓글을_제거한다() {
-      // given
-      UUID commentId = UUID.randomUUID();
-      mongoTemplate.insert(UserActivity.of(userId, "a@b.com", "닉네임", now));
-      impl.pushComment(userId, RecentComment.of(
-          commentId, UUID.randomUUID(), "기사", userId, "닉네임", "내용", 0L, now));
-
-      // when
-      impl.pullComment(userId, commentId);
-
-      // then
-      UserActivity found = mongoTemplate.findById(userId, UserActivity.class);
-      assertThat(found).isNotNull();
-      assertThat(found.getComments()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 commentId면 배열 변화가 없다")
-    void 존재하지_않는_commentId면_배열_변화가_없다() {
-      // given
-      UUID existingId = UUID.randomUUID();
-      mongoTemplate.insert(UserActivity.of(userId, "a@b.com", "닉네임", now));
-      impl.pushComment(userId, RecentComment.of(
-          existingId, UUID.randomUUID(), "기사", userId, "닉네임", "내용", 0L, now));
-
-      // when
-      impl.pullComment(userId, UUID.randomUUID());
-
-      // then
-      UserActivity found = mongoTemplate.findById(userId, UserActivity.class);
-      assertThat(found).isNotNull();
-      assertThat(found.getComments()).hasSize(1);
-    }
-  }
-
-  @Nested
-  @DisplayName("updateNickname()")
-  class UpdateNickname {
-
-    @Test
-    @DisplayName("nickname과 모든 comments의 userNickname을 동시에 변경한다")
-    void nickname과_모든_comments의_userNickname을_동시에_변경한다() {
-      // given
-      mongoTemplate.insert(UserActivity.of(userId, "a@b.com", "구닉네임", now));
-      impl.pushComment(userId, RecentComment.of(
-          UUID.randomUUID(), UUID.randomUUID(), "기사", userId, "구닉네임", "내용", 0L, now));
-      impl.pushComment(userId, RecentComment.of(
-          UUID.randomUUID(), UUID.randomUUID(), "기사2", userId, "구닉네임", "내용2", 0L, now));
-
-      // when
-      impl.updateNickname(userId, "새닉네임");
-
-      // then
-      UserActivity found = mongoTemplate.findById(userId, UserActivity.class);
-      assertThat(found).isNotNull();
-      assertThat(found.getNickname()).isEqualTo("새닉네임");
-      assertThat(found.getComments()).extracting(RecentComment::getUserNickname)
-          .containsOnly("새닉네임");
-    }
-  }
-
-  @Nested
-  @DisplayName("anonymize()")
-  class Anonymize {
-
-    @Test
-    @DisplayName("nickname과 모든 comments의 userNickname을 알 수 없음으로 변경한다")
-    void nickname과_모든_comments의_userNickname을_알수없음으로_변경한다() {
-      // given
-      mongoTemplate.insert(UserActivity.of(userId, "a@b.com", "닉네임", now));
-      impl.pushComment(userId, RecentComment.of(
-          UUID.randomUUID(), UUID.randomUUID(), "기사", userId, "닉네임", "내용", 0L, now));
-
-      // when
-      impl.anonymize(userId);
-
-      // then
-      UserActivity found = mongoTemplate.findById(userId, UserActivity.class);
-      assertThat(found).isNotNull();
+      UserActivity found = repository.findById(userId).orElseThrow();
+      assertThat(found.getEmail()).isEqualTo("");
       assertThat(found.getNickname()).isEqualTo("알 수 없음");
-      assertThat(found.getComments().get(0).getUserNickname()).isEqualTo("알 수 없음");
+      assertThat(found.getComments()).isEmpty();
+      assertThat(found.getCommentLikes()).isEmpty();
+      assertThat(found.getSubscriptions()).isEmpty();
+      assertThat(found.getArticleViews()).isEmpty();
     }
   }
 
   @Nested
-  @DisplayName("pullArticleViewsByArticleId()")
-  class PullArticleViewsByArticleId {
+  @DisplayName("댓글 활동 테스트")
+  class CommentTest {
 
     @Test
-    @DisplayName("모든 유저 도큐먼트에서 해당 articleId의 조회 기록을 제거한다")
-    void 모든_유저_도큐먼트에서_해당_articleId의_조회_기록을_제거한다() {
+    @DisplayName("댓글을 push 하면 배열 맨 앞에 추가되며 최대 10개만 유지된다")
+    void push_및_최대_10개_유지_검증() {
       // given
-      UUID articleId = UUID.randomUUID();
-      UUID user1 = UUID.randomUUID();
-      UUID user2 = UUID.randomUUID();
-      mongoTemplate.insert(UserActivity.of(user1, "a@b.com", "유저1", now));
-      mongoTemplate.insert(UserActivity.of(user2, "c@d.com", "유저2", now));
-      RecentArticleView view1 = RecentArticleView.of(
-          UUID.randomUUID(), user1, now, articleId, "출처", "url", "제목", now, "요약", 0L, 0L);
-      RecentArticleView view2 = RecentArticleView.of(
-          UUID.randomUUID(), user2, now, articleId, "출처", "url", "제목", now, "요약", 0L, 0L);
-      impl.pushArticleView(user1, view1);
-      impl.pushArticleView(user2, view2);
+      UUID userId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
 
       // when
-      impl.pullArticleViewsByArticleId(articleId);
+      for (int i = 1; i <= 11; i++) {
+        repository.pushComment(userId, newComment(UUID.randomUUID(), UUID.randomUUID(), "기사" + i));
+      }
 
       // then
-      UserActivity found1 = mongoTemplate.findById(user1, UserActivity.class);
-      UserActivity found2 = mongoTemplate.findById(user2, UserActivity.class);
-      assertThat(found1).isNotNull();
-      assertThat(found2).isNotNull();
-      assertThat(found1.getArticleViews()).isEmpty();
-      assertThat(found2.getArticleViews()).isEmpty();
+      UserActivity found = repository.findById(userId).orElseThrow();
+      assertThat(found.getComments()).hasSize(10);
+      assertThat(found.getComments().get(0).getArticleTitle()).isEqualTo("기사11");
     }
-  }
-
-  @Nested
-  @DisplayName("pullCommentsByArticleId()")
-  class PullCommentsByArticleId {
 
     @Test
-    @DisplayName("모든 유저 도큐먼트에서 해당 articleId의 댓글들을 제거한다")
-    void 모든_유저_도큐먼트에서_해당_articleId의_댓글들을_제거한다() {
+    @DisplayName("조회 시 댓글의 ID 목록과 불변 필드를 정확히 확보한다")
+    void findById_ID_및_불변필드_확보_검증() {
       // given
-      UUID articleId = UUID.randomUUID();
-      UUID user1 = UUID.randomUUID();
-      UUID user2 = UUID.randomUUID();
-      mongoTemplate.insert(UserActivity.of(user1, "a@b.com", "유저1", now));
-      mongoTemplate.insert(UserActivity.of(user2, "c@d.com", "유저2", now));
-      impl.pushComment(user1, RecentComment.of(
-          UUID.randomUUID(), articleId, "제목1", user1, "유저1", "내용1", 0L, now));
-      impl.pushComment(user2, RecentComment.of(
-          UUID.randomUUID(), articleId, "제목2", user2, "유저2", "내용2", 0L, now));
+      UUID userId = UUID.randomUUID();
+      UUID commentId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushComment(userId, newComment(commentId, UUID.randomUUID(), "불변 기사 제목"));
 
       // when
-      impl.pullCommentsByArticleId(articleId);
+      UserActivity found = repository.findById(userId).orElseThrow();
 
       // then
-      UserActivity found1 = mongoTemplate.findById(user1, UserActivity.class);
-      UserActivity found2 = mongoTemplate.findById(user2, UserActivity.class);
-      assertThat(found1).isNotNull();
-      assertThat(found2).isNotNull();
-      assertThat(found1.getComments()).isEmpty();
-      assertThat(found2.getComments()).isEmpty();
+      assertThat(found.getComments()).hasSize(1);
+      assertThat(found.getComments().get(0).getId()).isEqualTo(commentId);
+      assertThat(found.getComments().get(0).getArticleTitle()).isEqualTo("불변 기사 제목");
     }
-  }
-
-  @Nested
-  @DisplayName("pullCommentLikesByArticleId()")
-  class PullCommentLikesByArticleId {
 
     @Test
-    @DisplayName("모든 유저 도큐먼트에서 해당 articleId의 댓글 좋아요 기록을 제거한다")
-    void 모든_유저_도큐먼트에서_해당_articleId의_댓글_좋아요_기록을_제거한다() {
+    @DisplayName("commentId로 댓글을 단건 pull 할 수 있다")
+    void 단건_pull_검증() {
       // given
-      UUID articleId = UUID.randomUUID();
-      UUID user1 = UUID.randomUUID();
-      UUID user2 = UUID.randomUUID();
-      mongoTemplate.insert(UserActivity.of(user1, "a@b.com", "유저1", now));
-      mongoTemplate.insert(UserActivity.of(user2, "c@d.com", "유저2", now));
-      RecentCommentLike like1 = RecentCommentLike.of(
-          UUID.randomUUID(), now, UUID.randomUUID(), articleId, "제목", user1, "유저1", "내용", 0L, now);
-      RecentCommentLike like2 = RecentCommentLike.of(
-          UUID.randomUUID(), now, UUID.randomUUID(), articleId, "제목", user2, "유저2", "내용", 0L, now);
-      impl.pushCommentLike(user1, like1);
-      impl.pushCommentLike(user2, like2);
+      UUID userId = UUID.randomUUID();
+      UUID commentId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushComment(userId, newComment(commentId, UUID.randomUUID(), "기사"));
 
       // when
-      impl.pullCommentLikesByArticleId(articleId);
+      repository.pullComment(userId, commentId);
 
       // then
-      UserActivity found1 = mongoTemplate.findById(user1, UserActivity.class);
-      UserActivity found2 = mongoTemplate.findById(user2, UserActivity.class);
-      assertThat(found1).isNotNull();
-      assertThat(found2).isNotNull();
-      assertThat(found1.getCommentLikes()).isEmpty();
-      assertThat(found2.getCommentLikes()).isEmpty();
+      assertThat(repository.findById(userId).orElseThrow().getComments()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("commentId로 댓글 내용을 수정할 수 있다")
+    void 댓글_내용_수정_검증() {
+      // given
+      UUID userId = UUID.randomUUID();
+      UUID commentId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushComment(userId, newComment(commentId, UUID.randomUUID(), "기사"));
+
+      // when
+      repository.updateCommentContent(commentId, "수정된 내용");
+
+      // then
+      assertThat(repository.findById(userId).orElseThrow().getComments().get(0).getContent())
+          .isEqualTo("수정된 내용");
+    }
+
+    @Test
+    @DisplayName("articleId로 전체 유저의 댓글을 연쇄 삭제(Cascade)한다")
+    void 연쇄_삭제_Cascade_검증() {
+      // given
+      UUID articleId = UUID.randomUUID();
+      UUID userId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushComment(userId, newComment(UUID.randomUUID(), articleId, "제목"));
+
+      // when
+      repository.pullCommentsByArticleId(articleId);
+
+      // then
+      assertThat(repository.findById(userId).orElseThrow().getComments()).isEmpty();
     }
   }
 
+
   @Nested
-  @DisplayName("pullSubscriptionsByInterestId()")
-  class PullSubscriptionsByInterestId {
+  @DisplayName("댓글 좋아요 활동 테스트")
+  class CommentLikeTest {
 
     @Test
-    @DisplayName("모든 유저 도큐먼트에서 해당 interestId의 구독 기록을 제거한다")
-    void 모든_유저_도큐먼트에서_해당_interestId의_구독_기록을_제거한다() {
+    @DisplayName("좋아요를 push 하면 배열 맨 앞에 추가되며 최대 10개만 유지된다")
+    void push_및_최대_10개_유지_검증() {
+      // given
+      UUID userId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+
+      // when
+      for (int i = 1; i <= 11; i++) {
+        repository.pushCommentLike(userId, newCommentLike(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), "제목" + i));
+      }
+
+      // then
+      UserActivity found = repository.findById(userId).orElseThrow();
+      assertThat(found.getCommentLikes()).hasSize(10);
+      assertThat(found.getCommentLikes().get(0).getArticleTitle()).isEqualTo("제목11");
+    }
+
+    @Test
+    @DisplayName("조회 시 좋아요의 ID 목록과 불변 필드를 정확히 확보한다")
+    void findById_ID_및_불변필드_확보_검증() {
+      // given
+      UUID userId = UUID.randomUUID();
+      UUID commentId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushCommentLike(userId, newCommentLike(UUID.randomUUID(), commentId, UUID.randomUUID(), "좋아요한 기사"));
+
+      // when
+      UserActivity found = repository.findById(userId).orElseThrow();
+
+      // then
+      assertThat(found.getCommentLikes()).hasSize(1);
+      assertThat(found.getCommentLikes().get(0).getCommentId()).isEqualTo(commentId);
+      assertThat(found.getCommentLikes().get(0).getArticleTitle()).isEqualTo("좋아요한 기사");
+    }
+
+    @Test
+    @DisplayName("commentId로 댓글 좋아요를 단건 pull 할 수 있다")
+    void 단건_pull_검증() {
+      // given
+      UUID userId = UUID.randomUUID();
+      UUID commentId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushCommentLike(userId, newCommentLike(UUID.randomUUID(), commentId, UUID.randomUUID(), "기사"));
+
+      // when
+      repository.pullCommentLike(userId, commentId);
+
+      // then
+      assertThat(repository.findById(userId).orElseThrow().getCommentLikes()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("articleId로 전체 유저의 댓글 좋아요를 연쇄 삭제(Cascade)한다")
+    void 연쇄_삭제_Cascade_검증() {
+      // given
+      UUID articleId = UUID.randomUUID();
+      UUID userId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushCommentLike(userId, newCommentLike(UUID.randomUUID(), UUID.randomUUID(), articleId, "제목"));
+
+      // when
+      repository.pullCommentLikesByArticleId(articleId);
+
+      // then
+      assertThat(repository.findById(userId).orElseThrow().getCommentLikes()).isEmpty();
+    }
+  }
+
+
+  @Nested
+  @DisplayName("구독/관심사 활동 테스트")
+  class SubscriptionTest {
+
+    @Test
+    @DisplayName("조회 시 관심사의 ID 목록과 불변 필드를 정확히 확보한다")
+    void findById_ID_및_불변필드_확보_검증() {
+      // given
+      UUID userId = UUID.randomUUID();
+      UUID interestId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushSubscription(userId, newSubscription(UUID.randomUUID(), interestId, "AI"));
+
+      // when
+      UserActivity found = repository.findById(userId).orElseThrow();
+
+      // then
+      assertThat(found.getSubscriptions()).hasSize(1);
+      assertThat(found.getSubscriptions().get(0).getInterestId()).isEqualTo(interestId);
+      assertThat(found.getSubscriptions().get(0).getInterestName()).isEqualTo("AI");
+    }
+
+    @Test
+    @DisplayName("interestId로 관심사를 단건 pull 할 수 있다")
+    void 단건_pull_검증() {
+      // given
+      UUID userId = UUID.randomUUID();
+      UUID interestId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushSubscription(userId, newSubscription(UUID.randomUUID(), interestId, "IT"));
+
+      // when
+      repository.pullSubscription(userId, interestId);
+
+      // then
+      assertThat(repository.findById(userId).orElseThrow().getSubscriptions()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("interestId로 전체 유저의 관심사 구독 내역을 연쇄 삭제(Cascade)한다")
+    void 연쇄_삭제_Cascade_검증() {
       // given
       UUID interestId = UUID.randomUUID();
-      UUID user1 = UUID.randomUUID();
-      UUID user2 = UUID.randomUUID();
-      mongoTemplate.insert(UserActivity.of(user1, "a@b.com", "유저1", now));
-      mongoTemplate.insert(UserActivity.of(user2, "c@d.com", "유저2", now));
-      RecentSubscription sub1 = RecentSubscription.of(
-          UUID.randomUUID(), interestId, "인공지능", List.of("AI"), 1L, now);
-      RecentSubscription sub2 = RecentSubscription.of(
-          UUID.randomUUID(), interestId, "인공지능", List.of("AI"), 1L, now);
-      impl.pushSubscription(user1, sub1);
-      impl.pushSubscription(user2, sub2);
+      UUID userId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushSubscription(userId, newSubscription(UUID.randomUUID(), interestId, "IT"));
 
       // when
-      impl.pullSubscriptionsByInterestId(interestId);
+      repository.pullSubscriptionsByInterestId(interestId);
 
       // then
-      UserActivity found1 = mongoTemplate.findById(user1, UserActivity.class);
-      UserActivity found2 = mongoTemplate.findById(user2, UserActivity.class);
-      assertThat(found1).isNotNull();
-      assertThat(found2).isNotNull();
-      assertThat(found1.getSubscriptions()).isEmpty();
-      assertThat(found2.getSubscriptions()).isEmpty();
+      assertThat(repository.findById(userId).orElseThrow().getSubscriptions()).isEmpty();
+    }
+  }
+
+  @Nested
+  @DisplayName("기사 조회 활동 테스트")
+  class ArticleViewTest {
+
+    @Test
+    @DisplayName("기사 조회를 push 하면 배열 맨 앞에 추가되며 최대 10개만 유지된다")
+    void push_및_최대_10개_유지_검증() {
+      // given
+      UUID userId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+
+      // when
+      for (int i = 1; i <= 11; i++) {
+        repository.pushArticleView(userId, newArticleView(UUID.randomUUID(), userId, UUID.randomUUID(), "제목" + i));
+      }
+
+      // then
+      UserActivity found = repository.findById(userId).orElseThrow();
+      assertThat(found.getArticleViews()).hasSize(10);
+      assertThat(found.getArticleViews().get(0).getArticleTitle()).isEqualTo("제목11");
+    }
+
+    @Test
+    @DisplayName("조회 시 기사 조회의 ID 목록과 불변 필드를 정확히 확보한다")
+    void findById_ID_및_불변필드_확보_검증() {
+      // given
+      UUID userId = UUID.randomUUID();
+      UUID articleId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushArticleView(userId, newArticleView(UUID.randomUUID(), userId, articleId, "불변 기사 제목"));
+
+      // when
+      UserActivity found = repository.findById(userId).orElseThrow();
+
+      // then
+      assertThat(found.getArticleViews()).hasSize(1);
+      assertThat(found.getArticleViews().get(0).getArticleId()).isEqualTo(articleId);
+      assertThat(found.getArticleViews().get(0).getArticleTitle()).isEqualTo("불변 기사 제목");
+    }
+
+    @Test
+    @DisplayName("articleId로 전체 유저의 기사 조회 내역을 연쇄 삭제(Cascade)한다")
+    void 연쇄_삭제_Cascade_검증() {
+      // given
+      UUID articleId = UUID.randomUUID();
+      UUID userId = UUID.randomUUID();
+      repository.createUserActivity(newActivity(userId));
+      repository.pushArticleView(userId, newArticleView(UUID.randomUUID(), userId, articleId, "제목"));
+
+      // when
+      repository.pullArticleViewsByArticleId(articleId);
+
+      // then
+      assertThat(repository.findById(userId).orElseThrow().getArticleViews()).isEmpty();
     }
   }
 }

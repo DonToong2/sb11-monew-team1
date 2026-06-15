@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// RecentComment.java
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecentComment {
@@ -21,11 +20,11 @@ public class RecentComment {
   private Instant createdAt;
 
   public static RecentComment of(
-      UUID id, UUID articleId, String articleTitle,
-      UUID userId, String userNickname, String content,
-      long likeCount, Instant createdAt) {
+      UUID commentId, UUID articleId, String articleTitle,
+      UUID userId, String userNickname, String content, long likeCount, Instant createdAt) {
+
     RecentComment doc = new RecentComment();
-    doc.id = id;
+    doc.id = commentId;
     doc.articleId = articleId;
     doc.articleTitle = articleTitle;
     doc.userId = userId;

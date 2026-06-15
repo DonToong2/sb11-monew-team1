@@ -45,6 +45,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import org.springframework.context.ApplicationEventPublisher;
+import com.sprint.mission.monew.domain.useractivity.listener.UserCreatedEvent;
+import com.sprint.mission.monew.domain.useractivity.listener.UserDeletedEvent;
+import com.sprint.mission.monew.domain.useractivity.listener.UserNicknameUpdatedEvent;
+
 @Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -61,6 +66,7 @@ public class UserService {
   private final EmailQueue emailQueue;
   private final LoginFailureHandler loginFailureHandler;
   private final LoginSuccessHandler loginSuccessHandler;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Value("${monew.session.timeout-minutes}")
   private int sessionTimeoutMinutes;
@@ -74,6 +80,10 @@ public class UserService {
     User user = User.create(request.email(), request.nickname(),
         passwordEncoder.encode(request.password()));
     User saved = userRepository.save(user);
+
+    log.debug("UserCreatedEvent 발행 | userId={}, nickname={}", saved.getId(), saved.getNickname());
+    eventPublisher.publishEvent(
+        new UserCreatedEvent(saved.getId(), saved.getEmail(), saved.getNickname(), Instant.now()));
 
     EmailVerification verification = EmailVerification.create(saved.getId());
     EmailVerification savedVerification = emailVerificationRepository.save(verification);
@@ -151,6 +161,8 @@ public class UserService {
     User user = userRepository.findByIdAndDeletedAtIsNull(userId)
         .orElseThrow(() -> UserNotFoundException.withId(userId));
     user.updateNickname(request.nickname());
+    log.debug("UserNicknameUpdatedEvent 발행 | userId={}, nickname={}", userId, request.nickname());
+    eventPublisher.publishEvent(new UserNicknameUpdatedEvent(userId, request.nickname()));
     log.info("닉네임 수정 완료 | userId={}", userId);
     return userMapper.toResponse(user);
   }
@@ -200,6 +212,10 @@ public class UserService {
     User user = userRepository.findByIdAndDeletedAtIsNull(userId)
         .orElseThrow(() -> UserNotFoundException.withId(userId));
     user.softDelete();
+
+    log.debug("UserDeletedEvent 발행 | userId={}", userId);
+    eventPublisher.publishEvent(new UserDeletedEvent(userId));
+
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
         @Override
